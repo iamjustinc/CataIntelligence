@@ -22,6 +22,8 @@ export interface HandlerResult {
   data: unknown;
   /** Extra response headers, e.g. Set-Cookie. */
   headers?: Record<string, string>;
+  /** A non-JSON response (file download). Returned as is, with the request ID header added. */
+  raw?: Response;
 }
 
 interface RouteOptions<S extends z.ZodType | undefined> {
@@ -117,6 +119,11 @@ export function route<S extends z.ZodType | undefined = undefined>(
 
       if (!options.idempotent) {
         const result = await handler(ctx);
+        if (result.raw) {
+          result.raw.headers.set("x-request-id", requestId);
+          result.raw.headers.set("cache-control", "no-store");
+          return result.raw;
+        }
         return json(result.status ?? 200, { data: result.data, requestId }, requestId, result.headers);
       }
       return await runIdempotent(ctx, handler);

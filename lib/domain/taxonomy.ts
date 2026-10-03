@@ -50,7 +50,7 @@ function validateCsvText(text: string): TaxonomyValidation {
 }
 
 /** Concept revisions of one version as validator inputs (parent expressed by stable key). */
-async function loadConceptInputs(tx: Tx, versionId: string): Promise<ConceptInput[]> {
+export async function loadConceptInputs(tx: Tx, versionId: string): Promise<ConceptInput[]> {
   const parent = alias(concepts, "parent");
   const rows = await tx
     .select({
@@ -94,7 +94,7 @@ function diffAgainst(base: ConceptInput[], next: ConceptInput[], baseVersion: { 
   return { baseVersionId: baseVersion?.id ?? null, baseSequence: baseVersion?.sequence ?? null, added, changed, removed: removedKeys.length, unchanged, removedKeys: removedKeys.slice(0, 50) };
 }
 
-async function activeVersion(tx: Tx, workspaceId: string) {
+export async function activeVersion(tx: Tx, workspaceId: string) {
   const [row] = await tx
     .select({ id: taxonomyVersions.id, sequence: taxonomyVersions.sequence })
     .from(workspaces)
@@ -256,7 +256,7 @@ export async function commitTaxonomyImport(actor: Actor, importId: string, optio
 // Publish and discard
 // ---------------------------------------------------------------------------------------------
 
-async function lockDraft(tx: Tx, actor: Actor, versionId: string, expectedVersion: number) {
+export async function lockDraft(tx: Tx, actor: Actor, versionId: string, expectedVersion: number) {
   await tx.select({ id: workspaces.id }).from(workspaces).where(eq(workspaces.id, actor.workspaceId)).for("update");
   const [version] = await tx.select().from(taxonomyVersions).where(eq(taxonomyVersions.id, versionId)).for("update");
   if (!version) throw notFound("Taxonomy version");
@@ -289,14 +289,21 @@ export async function publishTaxonomyVersion(actor: Actor, versionId: string, ex
       .set({ state: "published", publishedBy: actor.userId, publishedAt, lockVersion: version.lockVersion + 1 })
       .where(eq(taxonomyVersions.id, versionId));
     await tx.update(workspaces).set({ activeTaxonomyVersionId: versionId }).where(eq(workspaces.id, actor.workspaceId));
+    // Suggestions and approvals bound to an earlier version are stale until revalidated (PRD TAX11).
+    const stale = await tx.execute(sql`
+      update review_states rs set state = 'stale', lock_version = rs.lock_version + 1, updated_at = now()
+      where rs.state in ('suggested', 'approved') and rs.taxonomy_version_id is not null and rs.taxonomy_version_id <> ${versionId}
+        and rs.listing_revision_id in (
+          select lr.id from listing_revisions lr join merchants m on m.active_catalog_revision_id = lr.catalog_revision_id where lr.active)`);
+    const staleMarked = stale.rowCount ?? 0;
     await recordAudit(tx, actor, requestId, {
       action: "taxonomy.publish",
       entityType: "taxonomy_version",
       entityId: versionId,
       before: { activeVersionId: previous?.id ?? null, activeSequence: previous?.sequence ?? null },
-      after: { activeVersionId: versionId, sequence: version.sequence, concepts: validation.counts.concepts, mappable: validation.counts.mappable },
+      after: { activeVersionId: versionId, sequence: version.sequence, concepts: validation.counts.concepts, mappable: validation.counts.mappable, staleMarked },
     });
-    return { versionId, sequence: version.sequence, state: "published" as const, publishedAt };
+    return { versionId, sequence: version.sequence, state: "published" as const, publishedAt, staleMarked };
   });
 }
 

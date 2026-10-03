@@ -46,7 +46,7 @@ describe("fresh database from migrations", () => {
   });
   it("seeding twice is idempotent", async () => {
     await seed(PASSWORD);
-    const users = await admin.query('select count(*)::int as n from "user"');
+    const users = await admin.query('select count(*)::int as n from "user" where email = any($1)', [SEED_USERS.map((u) => u.email)]);
     const merchantCount = await admin.query("select count(*)::int as n from merchants where external_key in ('HARBOR', 'DAILY', 'CORNER')");
     expect(users.rows[0].n).toBe(SEED_USERS.length);
     expect(merchantCount.rows[0].n).toBe(3);

@@ -140,7 +140,7 @@ describe("authorization, validation and idempotency", () => {
     const b = await second.json();
     expect(b.data.id).toBe(a.data.id);
     expect(b.replayed).toBe(true);
-    const rows = await admin.query("select count(*)::int as n from merchants where name = 'Pier Pantry'");
+    const rows = await admin.query("select count(*)::int as n from merchants where name = 'Pier Pantry' and workspace_id = $1", [demoId]);
     const audits = await admin.query("select count(*)::int as n from audit_events where entity_id = $1", [a.data.id]);
     expect(rows.rows[0].n).toBe(1);
     expect(audits.rows[0].n).toBe(1);
