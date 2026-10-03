@@ -4,7 +4,9 @@ import { Badge, buttonClass, PageHeader, StatePanel } from "@/components/ui";
 import { ApiError } from "@/lib/api/errors";
 import { can } from "@/lib/auth/permissions";
 import { requirePageSession } from "@/lib/auth/session";
+import { countStale, listProposals } from "@/lib/domain/proposals";
 import { getTaxonomyVersion, listTaxonomyVersions } from "@/lib/domain/taxonomy";
+import { RevalidateButton } from "./revalidate-button";
 import { DraftActions } from "./version-actions";
 
 export const metadata = { title: "Taxonomy" };
@@ -16,10 +18,21 @@ export default async function TaxonomyPage({ searchParams }: { searchParams: Pro
   const { version: requested } = await searchParams;
   const { activeVersionId, versions } = await listTaxonomyVersions(actor);
   const canManage = can(actor.role, "taxonomy.manage");
+  const canPropose = can(actor.role, "taxonomy.propose");
+  const [stale, pending] = await Promise.all([countStale(actor), canPropose ? listProposals(actor).then((all) => all.filter((p) => p.state === "submitted").length) : 0]);
   const importLink = (
-    <Link href="/taxonomy/import" className={buttonClass.secondary}>
-      Import taxonomy CSV
-    </Link>
+    <>
+      {canPropose ? (
+        <Link href="/taxonomy/proposals" className={buttonClass.secondary}>
+          Proposals{pending > 0 ? ` (${pending} awaiting decision)` : ""}
+        </Link>
+      ) : null}
+      {canManage ? (
+        <Link href="/taxonomy/import" className={buttonClass.secondary}>
+          Import taxonomy CSV
+        </Link>
+      ) : null}
+    </>
   );
 
   if (versions.length === 0) {
@@ -64,7 +77,7 @@ export default async function TaxonomyPage({ searchParams }: { searchParams: Pro
         eyebrow="Taxonomy"
         title="Canonical taxonomy"
         description="Each version is an immutable snapshot once published. Products map to exactly one active leaf concept."
-        actions={canManage ? importLink : undefined}
+        actions={importLink}
       />
 
       <div className="rise rise-1 flex flex-wrap items-center gap-x-6 gap-y-3 rounded-md border border-rule bg-surface px-4 py-3">
@@ -107,6 +120,13 @@ export default async function TaxonomyPage({ searchParams }: { searchParams: Pro
         </dl>
       </div>
 
+      {stale > 0 ? (
+        <StatePanel kind="stale" title={`${stale} listing${stale === 1 ? " has" : "s have"} a stale mapping or suggestion`} action={canManage ? <RevalidateButton /> : undefined}>
+          The taxonomy changed after these were made. Unchanged human decisions are kept by an explicit revalidation; affected ones return to review. Mapping releases are blocked until this is done.
+          {canManage ? "" : " An administrator can run the revalidation."}
+        </StatePanel>
+      ) : null}
+
       {meta.state === "draft" ? (
         <StatePanel kind="stale" title={`Draft version ${meta.sequence} is not live`} action={canManage ? <div className="flex flex-wrap gap-2"><DraftActions versionId={meta.id} sequence={meta.sequence} lockVersion={meta.lockVersion} conceptCount={data.concepts.length} /></div> : undefined}>
           {activeVersionId ? "Mappings and analytics keep using the active published version until an administrator publishes this draft." : "No version is published yet, so catalogs cannot be mapped."}
@@ -126,7 +146,7 @@ export default async function TaxonomyPage({ searchParams }: { searchParams: Pro
       ) : null}
 
       <div className="rise rise-2">
-        <TaxonomyBrowser key={selectedId} versionId={selectedId} concepts={data.concepts} />
+        <TaxonomyBrowser key={selectedId} versionId={selectedId} concepts={data.concepts} canPropose={canPropose && isActive} />
       </div>
     </div>
   );

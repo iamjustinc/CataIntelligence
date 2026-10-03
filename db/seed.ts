@@ -1,8 +1,8 @@
 /**
- * Seeds demo identities, workspaces and merchants. Idempotent: rerunning changes nothing.
- * Runs as the application role through the same row-level security and domain services as the
- * web app. Catalog and taxonomy data are loaded through the import services (Phase 1), never
- * inserted directly, so every seeded count derives from real records.
+ * Seeds demo identities, workspaces, merchants and the demo scenario. Idempotent: rerunning
+ * changes nothing. Runs as the application role through the same row-level security and domain
+ * services as the web app. Catalog and taxonomy data are loaded through the import services,
+ * never inserted directly, so every seeded count derives from real records.
  */
 import "dotenv/config";
 import { randomUUID } from "node:crypto";
@@ -16,6 +16,7 @@ import { resolveActor } from "@/lib/auth/actor";
 import type { Role } from "@/lib/auth/permissions";
 import { createMerchant, listMerchants } from "@/lib/domain/merchants";
 import { MERCHANTS } from "@/fixtures/generate";
+import { seedScenario } from "./seed-scenario";
 
 export const DEMO_WORKSPACE = { slug: "tidewater-demo", name: "Tidewater Catalog Ops (Demo)" };
 export const SANDBOX_WORKSPACE = { slug: "fennel-sandbox", name: "Fennel & Fig Sandbox" };
@@ -54,7 +55,11 @@ async function ensureMembership(workspaceId: string, userId: string, role: Role)
   await withContext({ workspaceId }, (tx) => tx.insert(memberships).values({ workspaceId, userId, role }).onConflictDoNothing());
 }
 
-export async function seed(password: string): Promise<{ demoWorkspaceId: string; sandboxWorkspaceId: string }> {
+/**
+ * Seeds identities, workspaces and merchants. With `scenario`, also loads the full demo scenario
+ * into the demo workspace through the domain services (see db/seed-scenario.ts).
+ */
+export async function seed(password: string, options: { scenario?: boolean } = {}): Promise<{ demoWorkspaceId: string; sandboxWorkspaceId: string; scenarioLoaded: boolean }> {
   const ids = new Map<string, string>();
   for (const u of SEED_USERS) ids.set(u.email, await ensureUser(u.email, u.name, password));
 
@@ -74,7 +79,14 @@ export async function seed(password: string): Promise<{ demoWorkspaceId: string;
   for (const m of MERCHANTS) {
     if (!existing.has(m.name)) await createMerchant(actor, { name: m.name, externalKey: m.externalKey, region: m.region }, `seed-${randomUUID()}`);
   }
-  return { demoWorkspaceId, sandboxWorkspaceId };
+  let scenarioLoaded = false;
+  if (options.scenario) {
+    const rin = SEED_USERS[1];
+    const reviewer = await resolveActor({ id: ids.get(rin.email)!, email: rin.email, name: rin.name }, demoWorkspaceId);
+    if (!reviewer) throw new Error("Seed taxonomist has no membership.");
+    scenarioLoaded = (await seedScenario(actor, reviewer)) !== null;
+  }
+  return { demoWorkspaceId, sandboxWorkspaceId, scenarioLoaded };
 }
 
 if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
@@ -83,9 +95,9 @@ if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.ur
     console.error("SEED_USER_PASSWORD (10+ characters) is required. Run `pnpm setup:env`.");
     process.exit(1);
   }
-  seed(password)
-    .then(() => {
-      console.log("Seeded demo identities, workspaces and merchants.");
+  seed(password, { scenario: !process.argv.includes("--base-only") })
+    .then(({ scenarioLoaded }) => {
+      console.log(scenarioLoaded ? "Seeded demo identities, workspaces, merchants and the demo scenario (taxonomy, catalogs, reviews, releases)." : "Seed is up to date: identities, workspaces and merchants exist; the demo scenario was already loaded or skipped.");
       console.log(SEED_USERS.map((u) => `  ${u.email}`).join("\n"));
       console.log("Sign in with any address above and the SEED_USER_PASSWORD value from .env.");
     })

@@ -37,7 +37,7 @@ export default async function OverviewPage() {
       count: progress.catalogRevisions,
       unit: "catalog revision",
       href: "/catalogs",
-      action: "Go to catalogs",
+      action: "Open catalogs",
       allowed: can(actor.role, "catalog.import"),
       who: "a taxonomist or administrator",
     },
@@ -53,6 +53,7 @@ export default async function OverviewPage() {
     },
   ];
   const done = steps.filter((s) => s.count > 0).length;
+  const remaining = progress.activeListings - progress.approvedListings;
   // Only the next actionable step is emphasised.
   const next = steps.find((s) => s.count === 0 && s.allowed);
 
@@ -60,9 +61,46 @@ export default async function OverviewPage() {
     <div className="space-y-8">
       <PageHeader
         eyebrow={`Overview · ${actor.workspace.name}`}
-        title="Workspace setup"
-        description="Coverage, backlog and review metrics appear here once this workspace holds catalog data. Until then this page shows only what the database contains."
+        title={progress.activeListings > 0 ? "Review progress" : "Workspace setup"}
+        description="Counts are live queries over this workspace's records. The governed dashboard with coverage, backlog and trends arrives with the analytics phase."
+        actions={
+          remaining > 0 ? (
+            <Link href="/review?state=unresolved" className={buttonClass.primary}>
+              Continue review
+            </Link>
+          ) : undefined
+        }
       />
+
+      {progress.activeListings > 0 ? (
+        <dl className="rise grid gap-px overflow-hidden rounded-md border border-rule bg-rule sm:grid-cols-3">
+          {(
+            [
+              ["Active listings", progress.activeListings, "In merchants' current catalog revisions", "/catalogs"],
+              ["Approved (draft)", progress.approvedListings, "Reviewer-approved mappings, published or not", "/review?state=approved"],
+              ["Pending review", remaining, "Active listings whose state is not Approved", "/review?state=unresolved"],
+            ] as const
+          ).map(([label, value, scope, href]) => (
+            <div key={label} className="bg-surface px-5 py-4">
+              <dt className="eyebrow">{label}</dt>
+              <dd className="mt-1 font-display text-4xl">
+                <Link href={href} className="underline decoration-rule-strong decoration-1 underline-offset-8 hover:decoration-ink">
+                  {value}
+                </Link>
+              </dd>
+              <dd className="mt-2 text-xs text-muted">{scope}</dd>
+            </div>
+          ))}
+        </dl>
+      ) : null}
+      {progress.staleListings > 0 ? (
+        <p className="rounded-sm border border-warn/40 bg-warn-bg px-4 py-3 text-sm text-warn">
+          {progress.staleListings} listing{progress.staleListings === 1 ? " is" : "s are"} stale after a taxonomy change.{" "}
+          <Link href="/taxonomy" className="font-semibold underline underline-offset-4">
+            Open taxonomy to revalidate
+          </Link>
+        </p>
+      ) : null}
 
       <Card className="rise rise-1">
         <div className="flex items-baseline justify-between border-b border-rule px-5 py-3">
@@ -100,10 +138,6 @@ export default async function OverviewPage() {
         </ol>
       </Card>
 
-      <p className="rise rise-2 max-w-3xl text-sm leading-relaxed text-muted">
-        Counts above are live queries scoped to this workspace: published taxonomy versions, active merchants, catalog revisions and mapping releases.
-        {progress.draftTaxonomyVersions > 0 ? ` One taxonomy draft is in progress.` : ""}
-      </p>
     </div>
   );
 }

@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Badge, inputClass } from "@/components/ui";
 
@@ -75,7 +76,7 @@ function usePersistedTreeState(versionId: string, rootIds: string[]) {
   return { expanded, setExpanded, selected, setSelected, scrollTopRef, dirtyRef, saveScroll };
 }
 
-export function TaxonomyBrowser({ versionId, concepts }: { versionId: string; concepts: ConceptView[] }) {
+export function TaxonomyBrowser({ versionId, concepts, canPropose = false }: { versionId: string; concepts: ConceptView[]; canPropose?: boolean }) {
   const byId = useMemo(() => new Map(concepts.map((c) => [c.conceptId, c])), [concepts]);
   const children = useMemo(() => {
     const map = new Map<string | null, ConceptView[]>();
@@ -320,6 +321,18 @@ export function TaxonomyBrowser({ versionId, concepts }: { versionId: string; co
                 </div>
               </div>
             </dl>
+            {canPropose ? (
+              <p className="mt-4 flex flex-wrap gap-x-4 gap-y-1 border-t border-rule pt-3 text-sm">
+                <Link href={`/taxonomy/proposals/new?type=synonym&concept=${current.conceptId}`} className="font-semibold text-stamp underline underline-offset-4">
+                  Propose a synonym
+                </Link>
+                {!current.mappingAllowed && current.status === "active" ? (
+                  <Link href={`/taxonomy/proposals/new?type=new_leaf&parent=${current.conceptId}`} className="font-semibold text-stamp underline underline-offset-4">
+                    Propose a new leaf here
+                  </Link>
+                ) : null}
+              </p>
+            ) : null}
           </div>
         ) : (
           <div className="p-6 text-sm text-muted">

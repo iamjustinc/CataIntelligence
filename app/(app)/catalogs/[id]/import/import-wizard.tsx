@@ -50,6 +50,8 @@ export function CatalogImportWizard({ merchantId, hasCatalog }: { merchantId: st
   const [job, setJob] = useState<ImportView | null>(null);
   const [map, setMap] = useState<ColumnMap>({});
   const [acceptExcluded, setAcceptExcluded] = useState(false);
+  // Shown immediately while the server re-validates with the selection.
+  const [choice, setChoice] = useState<Record<string, number>>({});
   const fileRef = useRef<{ name: string; content: string } | null>(null);
   const commitKey = useRef(crypto.randomUUID());
 
@@ -265,7 +267,12 @@ export function CatalogImportWizard({ merchantId, hasCatalog }: { merchantId: st
                       <legend className="px-1 font-mono text-xs">{c.sku}</legend>
                       {c.rows.map((r) => (
                         <label key={r.row} className="flex cursor-pointer items-start gap-2 py-1 text-sm">
-                          <input type="radio" name={`conflict-${c.sku}`} checked={c.selectedRow === r.row} disabled={busy !== null} onChange={() => validate(job.columnMap, { ...job.resolutions, [c.sku]: r.row })} className="mt-1 accent-[var(--color-stamp)]" />
+                          <input type="radio" name={`conflict-${c.sku}`} checked={(choice[c.sku] ?? c.selectedRow) === r.row}
+                            disabled={busy !== null}
+                            onChange={() => {
+                              setChoice((prev) => ({ ...prev, [c.sku]: r.row }));
+                              validate(job.columnMap, { ...job.resolutions, [c.sku]: r.row });
+                            }} className="mt-1 accent-[var(--color-stamp)]" />
                           <span>
                             <span className="font-mono text-xs text-muted">Row {r.row}</span> {r.title}
                             {r.description ? <span className="text-muted"> · {r.description}</span> : null}
