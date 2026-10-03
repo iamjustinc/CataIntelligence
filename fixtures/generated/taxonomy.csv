@@ -1,0 +1,154 @@
+concept_id,parent_id,name,definition,synonyms,status,mapping_allowed
+ROOT,,All Products,Root of the canonical retail taxonomy.,,active,false
+GRO,ROOT,Grocery,Food products for preparation and consumption at home.,,active,false
+GRO-DAI,GRO,Dairy & Eggs,"Refrigerated dairy products, dairy alternatives and eggs.",,active,false
+GRO-DAI-MILK,GRO-DAI,Dairy Milk,"Fluid milk from cows, including whole, reduced fat, skim and lactose-free.",whole milk|2% milk|skim milk,active,true
+GRO-DAI-PLANT,GRO-DAI,Plant-Based Milk,"Refrigerated or shelf-stable non-dairy milk beverages made from nuts, oats, soy or other plants.",almond milk|oat milk|soy milk|non-dairy milk,active,true
+GRO-DAI-CHEESE,GRO-DAI,Cheese,"Natural and processed cheese in blocks, slices, shreds or spreads.",cheddar|mozzarella,active,true
+GRO-DAI-YOG,GRO-DAI,Yogurt,"Cultured dairy and non-dairy yogurt, including Greek and drinkable styles.",greek yogurt,active,true
+GRO-DAI-BUTTER,GRO-DAI,Butter & Margarine,"Butter, margarine and plant-based buttery spreads.",butter,active,true
+GRO-DAI-EGGS,GRO-DAI,Eggs,Shell eggs and liquid egg products.,eggs,active,true
+GRO-PRO,GRO,Produce,"Fresh fruits, vegetables and herbs.",,active,false
+GRO-PRO-FRUIT,GRO-PRO,Fresh Fruit,"Whole or cut fresh fruit sold by weight, each or package.",apples|bananas|berries,active,true
+GRO-PRO-VEG,GRO-PRO,Fresh Vegetables,"Whole or cut fresh vegetables, including salad greens.",lettuce|carrots,active,true
+GRO-PRO-HERB,GRO-PRO,Fresh Herbs,Fresh culinary herbs sold cut or potted.,basil|cilantro,active,true
+GRO-MEAT,GRO,Meat & Seafood,"Fresh, frozen and packaged meat, poultry and seafood.",,active,false
+GRO-MEAT-POULTRY,GRO-MEAT,Poultry,"Fresh or frozen raw chicken, turkey and other poultry.",chicken breast,active,true
+GRO-MEAT-BEEF,GRO-MEAT,Beef & Pork,"Fresh or frozen raw beef, pork and lamb cuts and grinds.",ground beef,active,true
+GRO-MEAT-SEA,GRO-MEAT,Seafood,"Fresh, frozen or smoked fish and shellfish.",salmon|shrimp,active,true
+GRO-MEAT-DELI,GRO-MEAT,Deli Meats,Sliced or packaged cooked and cured meats.,lunch meat,active,true
+GRO-BAK,GRO,Bakery,Bread and baked goods.,,active,false
+GRO-BAK-BREAD,GRO-BAK,Bread & Rolls,"Sliced bread, rolls, bagels and tortillas.",sandwich bread,active,true
+GRO-BAK-SWEET,GRO-BAK,Sweet Baked Goods,"Cakes, muffins, cookies and pastries from the bakery.",muffins|donuts,active,true
+GRO-PAN,GRO,Pantry,Shelf-stable cooking and meal ingredients.,,active,false
+GRO-PAN-PASTA,GRO-PAN,Pasta & Noodles,Dry or fresh pasta and noodles.,spaghetti|penne,active,true
+GRO-PAN-RICE,GRO-PAN,Rice & Grains,"Rice, quinoa, oats and other dry grains.",jasmine rice|quinoa,active,true
+GRO-PAN-CANVEG,GRO-PAN,Canned Vegetables & Beans,"Canned or jarred vegetables, beans and tomatoes.",canned beans|canned tomatoes,active,true
+GRO-PAN-COOKMILK,GRO-PAN,Canned Cooking Milks,"Shelf-stable canned coconut milk, evaporated milk and condensed milk used as cooking ingredients.",canned coconut milk|evaporated milk|condensed milk,active,true
+GRO-PAN-SOUP,GRO-PAN,Soup & Broth,"Canned, boxed or dry soups, broths and stocks.",chicken broth,active,true
+GRO-PAN-OIL,GRO-PAN,Cooking Oils & Vinegars,"Edible oils, cooking sprays and vinegars.",olive oil|vegetable oil,active,true
+GRO-PAN-SAUCE,GRO-PAN,Sauces & Condiments,"Pasta sauce, ketchup, mustard, mayonnaise, salsa and dressings.",ketchup|pasta sauce,active,true
+GRO-PAN-BAKING,GRO-PAN,Baking Ingredients,"Flour, sugar, baking mixes, leaveners and baking chips.",flour|sugar,active,true
+GRO-PAN-SPICE,GRO-PAN,Spices & Seasonings,"Dried herbs, spices, salt and seasoning blends.",black pepper,active,true
+GRO-PAN-SPREAD,GRO-PAN,Nut Butters & Spreads,"Peanut butter, other nut butters, jams and honey.",peanut butter|jam,active,true
+GRO-PAN-NUTS,GRO-PAN,Nuts & Dried Fruit,"Shelled or unshelled culinary and snacking nuts, seeds and dried fruit.",almonds|raisins,active,true
+GRO-BRK,GRO,Breakfast,Breakfast cereals and breakfast foods.,,active,false
+GRO-BRK-CEREAL,GRO-BRK,Cereal & Granola,"Ready-to-eat cereals, granola and muesli.",cereal,active,true
+GRO-BRK-SYRUP,GRO-BRK,Pancake Mixes & Syrups,Pancake and waffle mixes and breakfast syrups.,maple syrup,active,true
+GRO-SNK,GRO,Snacks & Candy,Packaged snack foods and confectionery.,,active,false
+GRO-SNK-CHIPS,GRO-SNK,Chips & Crackers,"Potato chips, tortilla chips, pretzels, popcorn and crackers.",potato chips,active,true
+GRO-SNK-BARS,GRO-SNK,Snack & Granola Bars,"Granola, cereal, protein and fruit bars.",protein bar,active,true
+GRO-SNK-CANDY,GRO-SNK,Candy & Chocolate,"Chocolate, gummies, hard candy and gum.",chocolate bar,active,true
+GRO-SNK-COOKIE,GRO-SNK,Packaged Cookies,Shelf-stable packaged cookies and snack cakes.,cookies,active,true
+GRO-FRZ,GRO,Frozen Foods,Foods stored and sold frozen.,,active,false
+GRO-FRZ-MEAL,GRO-FRZ,Frozen Meals & Pizza,"Frozen entrees, pizza and prepared meals.",frozen pizza,active,true
+GRO-FRZ-VEG,GRO-FRZ,Frozen Fruits & Vegetables,Plain frozen vegetables and fruit.,frozen peas,active,true
+GRO-FRZ-ICE,GRO-FRZ,Ice Cream & Frozen Desserts,"Ice cream, frozen yogurt, sorbet and novelties.",ice cream,active,true
+BEV,ROOT,Beverages,Drinks other than fluid dairy and plant-based milks.,,active,false
+BEV-WATER,BEV,Water,"Still, sparkling and flavored waters.",,active,false
+BEV-WATER-STILL,BEV-WATER,Still Water,"Plain bottled still water, including spring and purified.",bottled water,active,true
+BEV-WATER-SPARK,BEV-WATER,Sparkling Water,"Carbonated water and seltzer, unsweetened, plain or naturally flavored.",seltzer,active,true
+BEV-WATER-ENH,BEV-WATER,Enhanced & Flavored Water,"Still water with added vitamins, electrolytes or flavors, sweetened or unsweetened.",electrolyte water,active,true
+BEV-SOFT,BEV,Soft Drinks,Carbonated sweetened beverages and mixers.,,active,false
+BEV-SOFT-SODA,BEV-SOFT,Soda,"Carbonated soft drinks, regular and diet.",cola|pop,active,true
+BEV-JUICE,BEV,Juice,Fruit and vegetable juices and juice drinks.,,active,false
+BEV-JUICE-FRUIT,BEV-JUICE,Fruit Juice,"100% fruit juices and nectars, refrigerated or shelf-stable.",orange juice|apple juice,active,true
+BEV-JUICE-DRINK,BEV-JUICE,Juice Drinks & Lemonade,"Sweetened juice drinks, lemonade and fruit punch with less than 100% juice.",lemonade,active,true
+BEV-JUICE-COCO,BEV-JUICE,Coconut Water & Coconut Beverages,Ready-to-drink coconut water and refrigerated coconut milk beverages meant for drinking.,coconut water,active,true
+BEV-HOT,BEV,Coffee & Tea,"Coffee, tea and hot drink mixes.",,active,false
+BEV-HOT-COFFEE,BEV-HOT,Coffee,"Whole bean, ground, instant and single-serve coffee.",ground coffee|k-cups,active,true
+BEV-HOT-TEA,BEV-HOT,Tea,"Bagged, loose leaf and ready-to-drink tea.",green tea|iced tea,active,true
+BEV-HOT-COCOA,BEV-HOT,Hot Cocoa & Drink Mixes,Hot chocolate mixes and powdered drink mixes.,hot chocolate,active,true
+BEV-SPORT,BEV,Sports & Energy Drinks,"Sports, energy and protein drinks.",,active,false
+BEV-SPORT-ENERGY,BEV-SPORT,Energy Drinks,Caffeinated energy drinks and shots.,energy drink,active,true
+BEV-SPORT-SPORTS,BEV-SPORT,Sports Drinks,Electrolyte sports drinks for hydration during activity.,sports drink,active,true
+HOU,ROOT,Household,Supplies for cleaning and maintaining a home.,,active,false
+HOU-CLEAN,HOU,Cleaning Supplies,Products for cleaning surfaces and dishes.,,active,false
+HOU-CLEAN-DISH,HOU-CLEAN,Dish Soap & Dishwasher Detergent,Hand dishwashing liquid and automatic dishwasher detergents.,dish soap|dishwasher pods,active,true
+HOU-CLEAN-SURF,HOU-CLEAN,Surface Cleaners,"All-purpose, glass, bathroom and kitchen surface cleaners and wipes.",all purpose cleaner|disinfecting wipes,active,true
+HOU-CLEAN-TOOLS,HOU-CLEAN,Cleaning Tools,"Sponges, brushes, mops, brooms and gloves.",sponges,active,true
+HOU-LAUN,HOU,Laundry,Products for washing and caring for clothes.,,active,false
+HOU-LAUN-DET,HOU-LAUN,Laundry Detergent,"Liquid, powder and pod laundry detergents.",laundry soap,active,true
+HOU-LAUN-SOFT,HOU-LAUN,Fabric Softeners & Stain Removers,"Fabric softener, dryer sheets, bleach and stain treatments.",dryer sheets|bleach,active,true
+HOU-PAPER,HOU,Paper & Plastic,Disposable paper and plastic household goods.,,active,false
+HOU-PAPER-TOWEL,HOU-PAPER,Paper Towels & Napkins,Paper towels and paper napkins.,paper towels,active,true
+HOU-PAPER-TP,HOU-PAPER,Toilet Paper,Bath tissue.,bath tissue,active,true
+HOU-PAPER-TISSUE,HOU-PAPER,Facial Tissue,Boxed and pocket facial tissues.,tissues,active,true
+HOU-PAPER-BAGS,HOU-PAPER,Trash & Storage Bags,"Trash bags, food storage bags, foil and wraps.",garbage bags|zip bags,active,true
+HOU-AIR,HOU,Air Care & Pest,"Air fresheners, candles and pest control.",,active,false
+HOU-AIR-FRESH,HOU-AIR,Air Fresheners & Candles,"Room sprays, plug-ins and scented candles.",air freshener,active,true
+HOU-AIR-PEST,HOU-AIR,Pest Control,"Insect sprays, traps and repellents for home use.",bug spray,active,true
+PC,ROOT,Personal Care,Products for hygiene and grooming.,,active,false
+PC-HAIR,PC,Hair Care,Products for cleaning and styling hair.,,active,false
+PC-HAIR-SHAMPOO,PC-HAIR,Shampoo & Conditioner,"Shampoo, conditioner and 2-in-1 hair cleansers.",shampoo|conditioner,active,true
+PC-HAIR-STYLE,PC-HAIR,Hair Styling,"Gels, sprays, mousse and styling creams.",hair gel|hairspray,active,true
+PC-ORAL,PC,Oral Care,Products for cleaning teeth and mouth.,,active,false
+PC-ORAL-PASTE,PC-ORAL,Toothpaste,Toothpaste and tooth gels.,toothpaste,active,true
+PC-ORAL-BRUSH,PC-ORAL,Toothbrushes & Floss,"Manual and electric toothbrushes, floss and picks.",toothbrush|dental floss,active,true
+PC-ORAL-RINSE,PC-ORAL,Mouthwash,Mouth rinses and breath sprays.,mouth rinse,active,true
+PC-BATH,PC,Bath & Body,Products for washing and caring for skin.,,active,false
+PC-BATH-SOAP,PC-BATH,Body Wash & Bar Soap,"Body wash, shower gel and bar soap.",body wash|bar soap,active,true
+PC-BATH-HAND,PC-BATH,Hand Soap & Sanitizer,"Liquid hand soap, refills and hand sanitizer.",hand soap|hand sanitizer,active,true
+PC-BATH-LOTION,PC-BATH,Lotion & Moisturizers,"Body lotion, hand cream and facial moisturizers.",body lotion,active,true
+PC-BATH-DEO,PC-BATH,Deodorant,Deodorants and antiperspirants.,antiperspirant,active,true
+PC-BATH-SUN,PC-BATH,Sun Care,Sunscreens and after-sun products.,sunscreen,active,true
+PC-SHAVE,PC,Shaving & Grooming,"Razors, shaving cream and grooming tools.",,active,false
+PC-SHAVE-RAZOR,PC-SHAVE,Razors & Blades,"Disposable razors, cartridges and handles.",razor,active,true
+PC-FEM,PC,Feminine Care,Menstrual and feminine hygiene products.,,active,false
+PC-FEM-PADS,PC-FEM,Pads & Tampons,"Menstrual pads, liners and tampons.",tampons|pads,active,true
+OTC,ROOT,OTC Health,"Over-the-counter medicines, supplements and first aid. Classification only: no medical advice.",,active,false
+OTC-PAIN,OTC,Pain & Fever,Over-the-counter pain relievers and fever reducers.,,active,false
+OTC-PAIN-ORAL,OTC-PAIN,Oral Pain Relievers,"Tablets, capsules and liquids for pain or fever relief taken by mouth.",ibuprofen|acetaminophen,active,true
+OTC-PAIN-TOPICAL,OTC-PAIN,Topical Pain Relief,"Creams, gels and patches applied to skin for muscle or joint pain.",pain patch,active,true
+OTC-COLD,OTC,"Cough, Cold & Allergy","Remedies for cold, cough, flu and allergy symptoms.",,active,false
+OTC-COLD-ALLERGY,OTC-COLD,Allergy Relief,"Antihistamine tablets, liquids and nasal sprays labeled for allergy relief.",antihistamine,active,true
+OTC-COLD-COUGH,OTC-COLD,Cough & Cold Remedies,"Cough syrups, cold and flu multi-symptom medicines and lozenges.",cough syrup|cough drops,active,true
+OTC-DIG,OTC,Digestive Health,"Antacids, laxatives and digestive remedies.",,active,false
+OTC-DIG-ANTACID,OTC-DIG,Antacids & Heartburn Relief,Antacids and acid reducers labeled for heartburn relief.,antacid,active,true
+OTC-VIT,OTC,Vitamins & Supplements,"Dietary supplements in pill, gummy, powder or liquid form.",,active,false
+OTC-VIT-MULTI,OTC-VIT,Multivitamins,Multivitamin and multimineral supplements.,multivitamin,active,true
+OTC-VIT-SINGLE,OTC-VIT,Single Vitamins & Minerals,"Individual vitamin and mineral supplements such as vitamin C, D or magnesium.",vitamin c|vitamin d,active,true
+OTC-VIT-PROTEIN,OTC-VIT,Protein & Nutrition Powders,Protein powders and meal replacement powders.,protein powder,active,true
+OTC-AID,OTC,First Aid,"Bandages, antiseptics and first aid supplies.",,active,false
+OTC-AID-BANDAGE,OTC-AID,Bandages & Dressings,"Adhesive bandages, gauze and medical tape.",band-aids,active,true
+OTC-AID-ANTISEPTIC,OTC-AID,Antiseptics & Ointments,"Hydrogen peroxide, rubbing alcohol and antibiotic ointments.",rubbing alcohol,active,true
+PET,ROOT,Pet,Food and supplies for household pets.,,active,false
+PET-DOG,PET,Dog,Products for dogs.,,active,false
+PET-DOG-FOOD,PET-DOG,Dog Food,Dry and wet complete food for dogs.,kibble,active,true
+PET-DOG-TREAT,PET-DOG,Dog Treats,"Treats, chews and biscuits for dogs.",dog biscuits,active,true
+PET-CAT,PET,Cat,Products for cats.,,active,false
+PET-CAT-FOOD,PET-CAT,Cat Food,Dry and wet complete food for cats.,cat kibble,active,true
+PET-CAT-LITTER,PET-CAT,Cat Litter,Clumping and non-clumping litter for cats.,kitty litter,active,true
+PET-CAT-TREAT,PET-CAT,Cat Treats,Treats and catnip for cats.,catnip,active,true
+PET-SUP,PET,Pet Supplies,Non-food supplies for pets.,,active,false
+PET-SUP-TOYS,PET-SUP,Pet Toys,"Toys for dogs, cats and small animals.",dog toy,active,true
+PET-SUP-WASTE,PET-SUP,Pet Waste & Cleanup,"Waste bags, pads and pet stain cleaners.",poop bags,active,true
+BABY,ROOT,Baby,Products for infants and toddlers.,,active,false
+BABY-DIAPER,BABY,Diapering,"Diapers, wipes and diaper care.",,active,false
+BABY-DIAPER-DIAPERS,BABY-DIAPER,Diapers & Training Pants,Disposable diapers and training pants.,nappies,active,true
+BABY-DIAPER-WIPES,BABY-DIAPER,Baby Wipes,Wipes for diaper changes and baby cleanup.,wet wipes,active,true
+BABY-DIAPER-CREAM,BABY-DIAPER,Diaper Rash Care,Diaper rash creams and ointments.,diaper cream,active,true
+BABY-FEED,BABY,Baby Feeding,"Formula, baby food and feeding supplies.",,active,false
+BABY-FEED-FORMULA,BABY-FEED,Infant Formula,"Powder, concentrate and ready-to-feed infant formula.",baby formula,active,true
+BABY-FEED-FOOD,BABY-FEED,Baby Food & Snacks,"Purees, pouches, cereals and snacks formulated for babies and toddlers.",baby puree,active,true
+BABY-FEED-BOTTLE,BABY-FEED,Bottles & Feeding Supplies,"Baby bottles, nipples, sippy cups and bibs.",baby bottle,active,true
+BABY-CARE,BABY,Baby Bath & Skin Care,"Baby wash, shampoo, lotion and oil.",,active,false
+BABY-CARE-WASH,BABY-CARE,Baby Wash & Shampoo,Gentle washes and shampoos formulated for babies.,baby shampoo,active,true
+BABY-CARE-LOTION,BABY-CARE,Baby Lotion & Oil,"Lotions, oils and creams formulated for baby skin.",baby oil,active,true
+GM,ROOT,General Merchandise,"Non-consumable goods for home, office and leisure.",,active,false
+GM-KIT,GM,Kitchen & Dining,"Cookware, tools and tableware.",,active,false
+GM-KIT-COOK,GM-KIT,Cookware & Bakeware,"Pots, pans and baking dishes.",frying pan,active,true
+GM-KIT-TOOLS,GM-KIT,Kitchen Tools & Storage,"Utensils, gadgets and reusable food storage containers.",food containers,active,true
+GM-KIT-DISPOSABLE,GM-KIT,Disposable Tableware,"Paper plates, plastic cups and disposable cutlery.",paper plates,active,true
+GM-ELEC,GM,Electronics & Batteries,"Batteries, cables and small electronics.",,active,false
+GM-ELEC-BATT,GM-ELEC,Batteries,Household disposable and rechargeable batteries.,aa batteries,active,true
+GM-ELEC-ACC,GM-ELEC,Phone & Device Accessories,"Charging cables, chargers, earbuds and cases.",charging cable|phone charger,active,true
+GM-OFF,GM,Office & School,Stationery and school supplies.,,active,false
+GM-OFF-WRITE,GM-OFF,"Pens, Pencils & Markers",Writing instruments.,pens,active,true
+GM-OFF-PAPER,GM-OFF,Notebooks & Paper,"Notebooks, printer paper and sticky notes.",notebook,active,true
+GM-HOME,GM,Home & Hardware,"Light bulbs, basic tools and home goods.",,active,false
+GM-HOME-LIGHT,GM-HOME,Light Bulbs,LED and other household light bulbs.,led bulb,active,true
+GM-HOME-TOOLS,GM-HOME,Hardware & Tools,"Hand tools, tape, adhesives and fasteners.",duct tape,active,true
+GM-SEAS,GM,Seasonal & Party,"Party supplies, gift wrap and seasonal goods.",,active,false
+GM-SEAS-PARTY,GM-SEAS,Party Supplies & Gift Wrap,"Balloons, candles, gift bags and wrapping paper.",balloons,active,true
+GM-SEAS-CARDS,GM-SEAS,Greeting Cards,Greeting cards for occasions.,birthday card,active,true

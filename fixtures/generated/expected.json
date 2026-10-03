@@ -1,0 +1,2429 @@
+{
+  "harbor-market": {
+    "HM-10001": {
+      "expected": "GRO-DAI-MILK",
+      "acceptable": [],
+      "kind": "straightforward",
+      "note": ""
+    },
+    "HM-10002": {
+      "expected": "GRO-DAI-PLANT",
+      "acceptable": [],
+      "kind": "straightforward",
+      "note": ""
+    },
+    "HM-10003": {
+      "expected": "GRO-DAI-CHEESE",
+      "acceptable": [],
+      "kind": "straightforward",
+      "note": ""
+    },
+    "HM-10004": {
+      "expected": "GRO-DAI-YOG",
+      "acceptable": [],
+      "kind": "straightforward",
+      "note": ""
+    },
+    "HM-10005": {
+      "expected": "GRO-DAI-BUTTER",
+      "acceptable": [],
+      "kind": "straightforward",
+      "note": ""
+    },
+    "HM-10006": {
+      "expected": "GRO-DAI-EGGS",
+      "acceptable": [],
+      "kind": "straightforward",
+      "note": ""
+    },
+    "HM-10007": {
+      "expected": "GRO-PRO-FRUIT",
+      "acceptable": [],
+      "kind": "straightforward",
+      "note": ""
+    },
+    "HM-10008": {
+      "expected": "GRO-PRO-VEG",
+      "acceptable": [],
+      "kind": "straightforward",
+      "note": ""
+    },
+    "HM-10009": {
+      "expected": "GRO-MEAT-POULTRY",
+      "acceptable": [],
+      "kind": "straightforward",
+      "note": ""
+    },
+    "HM-10010": {
+      "expected": "GRO-MEAT-BEEF",
+      "acceptable": [],
+      "kind": "straightforward",
+      "note": ""
+    },
+    "HM-10011": {
+      "expected": "GRO-MEAT-DELI",
+      "acceptable": [],
+      "kind": "straightforward",
+      "note": ""
+    },
+    "HM-10012": {
+      "expected": "GRO-BAK-BREAD",
+      "acceptable": [],
+      "kind": "straightforward",
+      "note": ""
+    },
+    "HM-10013": {
+      "expected": "GRO-BAK-SWEET",
+      "acceptable": [],
+      "kind": "straightforward",
+      "note": ""
+    },
+    "HM-10014": {
+      "expected": "GRO-PAN-PASTA",
+      "acceptable": [],
+      "kind": "straightforward",
+      "note": ""
+    },
+    "HM-10015": {
+      "expected": "GRO-PAN-RICE",
+      "acceptable": [],
+      "kind": "straightforward",
+      "note": ""
+    },
+    "HM-10016": {
+      "expected": "GRO-PAN-CANVEG",
+      "acceptable": [],
+      "kind": "straightforward",
+      "note": ""
+    },
+    "HM-10017": {
+      "expected": "GRO-PAN-COOKMILK",
+      "acceptable": [],
+      "kind": "straightforward",
+      "note": ""
+    },
+    "HM-10018": {
+      "expected": "GRO-PAN-OIL",
+      "acceptable": [],
+      "kind": "straightforward",
+      "note": ""
+    },
+    "HM-10019": {
+      "expected": "GRO-PAN-SAUCE",
+      "acceptable": [],
+      "kind": "straightforward",
+      "note": ""
+    },
+    "HM-10020": {
+      "expected": "GRO-PAN-BAKING",
+      "acceptable": [],
+      "kind": "straightforward",
+      "note": ""
+    },
+    "HM-10021": {
+      "expected": "GRO-PAN-SPICE",
+      "acceptable": [],
+      "kind": "straightforward",
+      "note": ""
+    },
+    "HM-10022": {
+      "expected": "GRO-PAN-SPREAD",
+      "acceptable": [],
+      "kind": "straightforward",
+      "note": ""
+    },
+    "HM-10023": {
+      "expected": "GRO-PAN-NUTS",
+      "acceptable": [],
+      "kind": "straightforward",
+      "note": ""
+    },
+    "HM-10024": {
+      "expected": "GRO-BRK-CEREAL",
+      "acceptable": [],
+      "kind": "straightforward",
+      "note": ""
+    },
+    "HM-10025": {
+      "expected": "GRO-SNK-CHIPS",
+      "acceptable": [],
+      "kind": "straightforward",
+      "note": ""
+    },
+    "HM-10026": {
+      "expected": "GRO-SNK-BARS",
+      "acceptable": [],
+      "kind": "straightforward",
+      "note": ""
+    },
+    "HM-10027": {
+      "expected": "GRO-SNK-CANDY",
+      "acceptable": [],
+      "kind": "straightforward",
+      "note": ""
+    },
+    "HM-10028": {
+      "expected": "GRO-FRZ-MEAL",
+      "acceptable": [],
+      "kind": "straightforward",
+      "note": ""
+    },
+    "HM-10029": {
+      "expected": "GRO-FRZ-VEG",
+      "acceptable": [],
+      "kind": "straightforward",
+      "note": ""
+    },
+    "HM-10030": {
+      "expected": "BEV-WATER-STILL",
+      "acceptable": [],
+      "kind": "straightforward",
+      "note": ""
+    },
+    "HM-10031": {
+      "expected": "BEV-WATER-SPARK",
+      "acceptable": [],
+      "kind": "straightforward",
+      "note": ""
+    },
+    "HM-10032": {
+      "expected": "BEV-SOFT-SODA",
+      "acceptable": [],
+      "kind": "straightforward",
+      "note": ""
+    },
+    "HM-10033": {
+      "expected": "BEV-JUICE-FRUIT",
+      "acceptable": [],
+      "kind": "straightforward",
+      "note": ""
+    },
+    "HM-10034": {
+      "expected": "BEV-JUICE-DRINK",
+      "acceptable": [],
+      "kind": "straightforward",
+      "note": ""
+    },
+    "HM-10035": {
+      "expected": "BEV-HOT-COFFEE",
+      "acceptable": [],
+      "kind": "straightforward",
+      "note": ""
+    },
+    "HM-10036": {
+      "expected": "BEV-HOT-TEA",
+      "acceptable": [],
+      "kind": "straightforward",
+      "note": ""
+    },
+    "HM-10037": {
+      "expected": "BEV-SPORT-ENERGY",
+      "acceptable": [],
+      "kind": "straightforward",
+      "note": ""
+    },
+    "HM-10038": {
+      "expected": "BEV-SPORT-SPORTS",
+      "acceptable": [],
+      "kind": "straightforward",
+      "note": ""
+    },
+    "HM-10039": {
+      "expected": "HOU-CLEAN-DISH",
+      "acceptable": [],
+      "kind": "straightforward",
+      "note": ""
+    },
+    "HM-10040": {
+      "expected": "HOU-CLEAN-SURF",
+      "acceptable": [],
+      "kind": "straightforward",
+      "note": ""
+    },
+    "HM-10041": {
+      "expected": "HOU-LAUN-DET",
+      "acceptable": [],
+      "kind": "straightforward",
+      "note": ""
+    },
+    "HM-10042": {
+      "expected": "HOU-LAUN-SOFT",
+      "acceptable": [],
+      "kind": "straightforward",
+      "note": ""
+    },
+    "HM-10043": {
+      "expected": "HOU-PAPER-TP",
+      "acceptable": [],
+      "kind": "straightforward",
+      "note": ""
+    },
+    "HM-10044": {
+      "expected": "HOU-PAPER-BAGS",
+      "acceptable": [],
+      "kind": "straightforward",
+      "note": ""
+    },
+    "HM-10045": {
+      "expected": "HOU-AIR-FRESH",
+      "acceptable": [],
+      "kind": "straightforward",
+      "note": ""
+    },
+    "HM-10046": {
+      "expected": "PC-HAIR-SHAMPOO",
+      "acceptable": [],
+      "kind": "straightforward",
+      "note": ""
+    },
+    "HM-10047": {
+      "expected": "PC-HAIR-STYLE",
+      "acceptable": [],
+      "kind": "straightforward",
+      "note": ""
+    },
+    "HM-10048": {
+      "expected": "PC-ORAL-PASTE",
+      "acceptable": [],
+      "kind": "straightforward",
+      "note": ""
+    },
+    "HM-10049": {
+      "expected": "PC-ORAL-RINSE",
+      "acceptable": [],
+      "kind": "straightforward",
+      "note": ""
+    },
+    "HM-10050": {
+      "expected": "PC-BATH-HAND",
+      "acceptable": [],
+      "kind": "straightforward",
+      "note": ""
+    },
+    "HM-10051": {
+      "expected": "PC-BATH-LOTION",
+      "acceptable": [],
+      "kind": "straightforward",
+      "note": ""
+    },
+    "HM-10052": {
+      "expected": "PC-BATH-SUN",
+      "acceptable": [],
+      "kind": "straightforward",
+      "note": ""
+    },
+    "HM-10053": {
+      "expected": "PC-FEM-PADS",
+      "acceptable": [],
+      "kind": "straightforward",
+      "note": ""
+    },
+    "HM-10054": {
+      "expected": "OTC-PAIN-ORAL",
+      "acceptable": [],
+      "kind": "straightforward",
+      "note": ""
+    },
+    "HM-10055": {
+      "expected": "OTC-COLD-ALLERGY",
+      "acceptable": [],
+      "kind": "straightforward",
+      "note": ""
+    },
+    "HM-10056": {
+      "expected": "OTC-COLD-COUGH",
+      "acceptable": [],
+      "kind": "straightforward",
+      "note": ""
+    },
+    "HM-10057": {
+      "expected": "OTC-VIT-MULTI",
+      "acceptable": [],
+      "kind": "straightforward",
+      "note": ""
+    },
+    "HM-10058": {
+      "expected": "OTC-VIT-SINGLE",
+      "acceptable": [],
+      "kind": "straightforward",
+      "note": ""
+    },
+    "HM-10059": {
+      "expected": "OTC-AID-BANDAGE",
+      "acceptable": [],
+      "kind": "straightforward",
+      "note": ""
+    },
+    "HM-10060": {
+      "expected": "PET-DOG-FOOD",
+      "acceptable": [],
+      "kind": "straightforward",
+      "note": ""
+    },
+    "HM-10061": {
+      "expected": "PET-DOG-TREAT",
+      "acceptable": [],
+      "kind": "straightforward",
+      "note": ""
+    },
+    "HM-10062": {
+      "expected": "PET-CAT-LITTER",
+      "acceptable": [],
+      "kind": "straightforward",
+      "note": ""
+    },
+    "HM-10063": {
+      "expected": "PET-SUP-TOYS",
+      "acceptable": [],
+      "kind": "straightforward",
+      "note": ""
+    },
+    "HM-10064": {
+      "expected": "BABY-DIAPER-DIAPERS",
+      "acceptable": [],
+      "kind": "straightforward",
+      "note": ""
+    },
+    "HM-10065": {
+      "expected": "BABY-DIAPER-WIPES",
+      "acceptable": [],
+      "kind": "straightforward",
+      "note": ""
+    },
+    "HM-10066": {
+      "expected": "BABY-FEED-FORMULA",
+      "acceptable": [],
+      "kind": "straightforward",
+      "note": ""
+    },
+    "HM-10067": {
+      "expected": "BABY-FEED-FOOD",
+      "acceptable": [],
+      "kind": "straightforward",
+      "note": ""
+    },
+    "HM-10068": {
+      "expected": "BABY-CARE-WASH",
+      "acceptable": [],
+      "kind": "straightforward",
+      "note": ""
+    },
+    "HM-10069": {
+      "expected": "GM-KIT-COOK",
+      "acceptable": [],
+      "kind": "straightforward",
+      "note": ""
+    },
+    "HM-10070": {
+      "expected": "GM-KIT-TOOLS",
+      "acceptable": [],
+      "kind": "straightforward",
+      "note": ""
+    },
+    "HM-10071": {
+      "expected": "GM-KIT-DISPOSABLE",
+      "acceptable": [],
+      "kind": "straightforward",
+      "note": ""
+    },
+    "HM-10072": {
+      "expected": "GM-ELEC-ACC",
+      "acceptable": [],
+      "kind": "straightforward",
+      "note": ""
+    },
+    "HM-10073": {
+      "expected": "GM-OFF-WRITE",
+      "acceptable": [],
+      "kind": "straightforward",
+      "note": ""
+    },
+    "HM-10074": {
+      "expected": "GM-OFF-PAPER",
+      "acceptable": [],
+      "kind": "straightforward",
+      "note": ""
+    },
+    "HM-10075": {
+      "expected": "GM-HOME-TOOLS",
+      "acceptable": [],
+      "kind": "straightforward",
+      "note": ""
+    },
+    "HM-10076": {
+      "expected": "GM-SEAS-CARDS",
+      "acceptable": [],
+      "kind": "straightforward",
+      "note": ""
+    },
+    "HM-10077": {
+      "expected": "GRO-DAI-MILK",
+      "acceptable": [],
+      "kind": "straightforward",
+      "note": ""
+    },
+    "HM-10078": {
+      "expected": "GRO-DAI-CHEESE",
+      "acceptable": [],
+      "kind": "straightforward",
+      "note": ""
+    },
+    "HM-10079": {
+      "expected": "GRO-DAI-EGGS",
+      "acceptable": [],
+      "kind": "straightforward",
+      "note": ""
+    },
+    "HM-10080": {
+      "expected": "GRO-PRO-VEG",
+      "acceptable": [],
+      "kind": "straightforward",
+      "note": ""
+    },
+    "HM-10081": {
+      "expected": "GRO-MEAT-BEEF",
+      "acceptable": [],
+      "kind": "straightforward",
+      "note": ""
+    },
+    "HM-10082": {
+      "expected": "GRO-BAK-BREAD",
+      "acceptable": [],
+      "kind": "straightforward",
+      "note": ""
+    },
+    "HM-10083": {
+      "expected": "GRO-PAN-PASTA",
+      "acceptable": [],
+      "kind": "straightforward",
+      "note": ""
+    },
+    "HM-10084": {
+      "expected": "GRO-PAN-CANVEG",
+      "acceptable": [],
+      "kind": "straightforward",
+      "note": ""
+    },
+    "HM-10085": {
+      "expected": "GRO-PAN-SOUP",
+      "acceptable": [],
+      "kind": "straightforward",
+      "note": ""
+    },
+    "HM-10086": {
+      "expected": "GRO-PAN-SAUCE",
+      "acceptable": [],
+      "kind": "straightforward",
+      "note": ""
+    },
+    "HM-10087": {
+      "expected": "GRO-PAN-SPREAD",
+      "acceptable": [],
+      "kind": "straightforward",
+      "note": ""
+    },
+    "HM-10088": {
+      "expected": "GRO-BRK-CEREAL",
+      "acceptable": [],
+      "kind": "straightforward",
+      "note": ""
+    },
+    "HM-10089": {
+      "expected": "GRO-SNK-CHIPS",
+      "acceptable": [],
+      "kind": "straightforward",
+      "note": ""
+    },
+    "HM-10090": {
+      "expected": "GRO-SNK-COOKIE",
+      "acceptable": [],
+      "kind": "straightforward",
+      "note": ""
+    },
+    "HM-10091": {
+      "expected": "GRO-FRZ-ICE",
+      "acceptable": [],
+      "kind": "straightforward",
+      "note": ""
+    },
+    "HM-10092": {
+      "expected": "BEV-WATER-ENH",
+      "acceptable": [],
+      "kind": "straightforward",
+      "note": ""
+    },
+    "HM-10093": {
+      "expected": "BEV-JUICE-DRINK",
+      "acceptable": [],
+      "kind": "straightforward",
+      "note": ""
+    },
+    "HM-10094": {
+      "expected": "BEV-HOT-COFFEE",
+      "acceptable": [],
+      "kind": "straightforward",
+      "note": ""
+    },
+    "HM-10095": {
+      "expected": "BEV-SPORT-SPORTS",
+      "acceptable": [],
+      "kind": "straightforward",
+      "note": ""
+    },
+    "HM-90004": {
+      "expected": "HOU-CLEAN-DISH",
+      "acceptable": [],
+      "kind": "injection",
+      "note": "Embedded instructions are catalog text, not commands."
+    },
+    "HM-90006": {
+      "expected": "PET-DOG-TREAT",
+      "acceptable": [],
+      "kind": "misleading_category",
+      "note": "Flavor term matches a pantry concept; the product is a pet treat."
+    },
+    "HM-90007": {
+      "expected": null,
+      "acceptable": [
+        "GRO-PAN-COOKMILK",
+        "BEV-JUICE-COCO"
+      ],
+      "kind": "alternative",
+      "note": "Canned cooking milk or a drinking beverage: the size hints at a can but the form is not stated."
+    },
+    "HM-90009": {
+      "expected": null,
+      "acceptable": [],
+      "kind": "missing_concept",
+      "note": "No drinkware leaf exists; not a beverage."
+    },
+    "HM-90012": {
+      "expected": null,
+      "acceptable": [],
+      "kind": "missing_concept",
+      "note": "No dips or prepared deli salads leaf exists."
+    },
+    "HM-90016": {
+      "expected": "HOU-AIR-FRESH",
+      "acceptable": [],
+      "kind": "alternative",
+      "note": "Scent terms are attributes, not the product type."
+    }
+  },
+  "daily-basket": {
+    "DB-10001": {
+      "expected": "GRO-DAI-MILK",
+      "acceptable": [],
+      "kind": "straightforward",
+      "note": ""
+    },
+    "DB-10002": {
+      "expected": "GRO-DAI-PLANT",
+      "acceptable": [],
+      "kind": "straightforward",
+      "note": ""
+    },
+    "DB-10003": {
+      "expected": "GRO-DAI-CHEESE",
+      "acceptable": [],
+      "kind": "straightforward",
+      "note": ""
+    },
+    "DB-10004": {
+      "expected": "GRO-DAI-YOG",
+      "acceptable": [],
+      "kind": "straightforward",
+      "note": ""
+    },
+    "DB-10005": {
+      "expected": "GRO-DAI-BUTTER",
+      "acceptable": [],
+      "kind": "straightforward",
+      "note": ""
+    },
+    "DB-10006": {
+      "expected": "GRO-PRO-FRUIT",
+      "acceptable": [],
+      "kind": "straightforward",
+      "note": ""
+    },
+    "DB-10007": {
+      "expected": "GRO-PRO-VEG",
+      "acceptable": [],
+      "kind": "straightforward",
+      "note": ""
+    },
+    "DB-10008": {
+      "expected": "GRO-PRO-HERB",
+      "acceptable": [],
+      "kind": "straightforward",
+      "note": ""
+    },
+    "DB-10009": {
+      "expected": "GRO-MEAT-POULTRY",
+      "acceptable": [],
+      "kind": "straightforward",
+      "note": ""
+    },
+    "DB-10010": {
+      "expected": "GRO-MEAT-SEA",
+      "acceptable": [],
+      "kind": "straightforward",
+      "note": ""
+    },
+    "DB-10011": {
+      "expected": "GRO-MEAT-DELI",
+      "acceptable": [],
+      "kind": "straightforward",
+      "note": ""
+    },
+    "DB-10012": {
+      "expected": "GRO-BAK-BREAD",
+      "acceptable": [],
+      "kind": "straightforward",
+      "note": ""
+    },
+    "DB-10013": {
+      "expected": "GRO-PAN-PASTA",
+      "acceptable": [],
+      "kind": "straightforward",
+      "note": ""
+    },
+    "DB-10014": {
+      "expected": "GRO-PAN-RICE",
+      "acceptable": [],
+      "kind": "straightforward",
+      "note": ""
+    },
+    "DB-10015": {
+      "expected": "GRO-PAN-CANVEG",
+      "acceptable": [],
+      "kind": "straightforward",
+      "note": ""
+    },
+    "DB-10016": {
+      "expected": "GRO-PAN-COOKMILK",
+      "acceptable": [],
+      "kind": "straightforward",
+      "note": ""
+    },
+    "DB-10017": {
+      "expected": "GRO-PAN-SOUP",
+      "acceptable": [],
+      "kind": "straightforward",
+      "note": ""
+    },
+    "DB-10018": {
+      "expected": "GRO-PAN-OIL",
+      "acceptable": [],
+      "kind": "straightforward",
+      "note": ""
+    },
+    "DB-10019": {
+      "expected": "GRO-PAN-SAUCE",
+      "acceptable": [],
+      "kind": "straightforward",
+      "note": ""
+    },
+    "DB-10020": {
+      "expected": "GRO-PAN-BAKING",
+      "acceptable": [],
+      "kind": "straightforward",
+      "note": ""
+    },
+    "DB-10021": {
+      "expected": "GRO-PAN-SPICE",
+      "acceptable": [],
+      "kind": "straightforward",
+      "note": ""
+    },
+    "DB-10022": {
+      "expected": "GRO-PAN-SPREAD",
+      "acceptable": [],
+      "kind": "straightforward",
+      "note": ""
+    },
+    "DB-10023": {
+      "expected": "GRO-PAN-NUTS",
+      "acceptable": [],
+      "kind": "straightforward",
+      "note": ""
+    },
+    "DB-10024": {
+      "expected": "GRO-BRK-SYRUP",
+      "acceptable": [],
+      "kind": "straightforward",
+      "note": ""
+    },
+    "DB-10025": {
+      "expected": "GRO-SNK-CHIPS",
+      "acceptable": [],
+      "kind": "straightforward",
+      "note": ""
+    },
+    "DB-10026": {
+      "expected": "GRO-SNK-BARS",
+      "acceptable": [],
+      "kind": "straightforward",
+      "note": ""
+    },
+    "DB-10027": {
+      "expected": "GRO-SNK-COOKIE",
+      "acceptable": [],
+      "kind": "straightforward",
+      "note": ""
+    },
+    "DB-10028": {
+      "expected": "GRO-FRZ-MEAL",
+      "acceptable": [],
+      "kind": "straightforward",
+      "note": ""
+    },
+    "DB-10029": {
+      "expected": "GRO-FRZ-ICE",
+      "acceptable": [],
+      "kind": "straightforward",
+      "note": ""
+    },
+    "DB-10030": {
+      "expected": "BEV-WATER-STILL",
+      "acceptable": [],
+      "kind": "straightforward",
+      "note": ""
+    },
+    "DB-10031": {
+      "expected": "BEV-WATER-ENH",
+      "acceptable": [],
+      "kind": "straightforward",
+      "note": ""
+    },
+    "DB-10032": {
+      "expected": "BEV-SOFT-SODA",
+      "acceptable": [],
+      "kind": "straightforward",
+      "note": ""
+    },
+    "DB-10033": {
+      "expected": "BEV-JUICE-FRUIT",
+      "acceptable": [],
+      "kind": "straightforward",
+      "note": ""
+    },
+    "DB-10034": {
+      "expected": "BEV-JUICE-COCO",
+      "acceptable": [],
+      "kind": "straightforward",
+      "note": ""
+    },
+    "DB-10035": {
+      "expected": "BEV-HOT-COFFEE",
+      "acceptable": [],
+      "kind": "straightforward",
+      "note": ""
+    },
+    "DB-10036": {
+      "expected": "BEV-HOT-TEA",
+      "acceptable": [],
+      "kind": "straightforward",
+      "note": ""
+    },
+    "DB-10037": {
+      "expected": "BEV-SPORT-ENERGY",
+      "acceptable": [],
+      "kind": "straightforward",
+      "note": ""
+    },
+    "DB-10038": {
+      "expected": "HOU-CLEAN-DISH",
+      "acceptable": [],
+      "kind": "straightforward",
+      "note": ""
+    },
+    "DB-10039": {
+      "expected": "HOU-CLEAN-SURF",
+      "acceptable": [],
+      "kind": "straightforward",
+      "note": ""
+    },
+    "DB-10040": {
+      "expected": "HOU-CLEAN-TOOLS",
+      "acceptable": [],
+      "kind": "straightforward",
+      "note": ""
+    },
+    "DB-10041": {
+      "expected": "HOU-LAUN-DET",
+      "acceptable": [],
+      "kind": "straightforward",
+      "note": ""
+    },
+    "DB-10042": {
+      "expected": "HOU-PAPER-TOWEL",
+      "acceptable": [],
+      "kind": "straightforward",
+      "note": ""
+    },
+    "DB-10043": {
+      "expected": "HOU-PAPER-TP",
+      "acceptable": [],
+      "kind": "straightforward",
+      "note": ""
+    },
+    "DB-10044": {
+      "expected": "HOU-PAPER-BAGS",
+      "acceptable": [],
+      "kind": "straightforward",
+      "note": ""
+    },
+    "DB-10045": {
+      "expected": "HOU-AIR-FRESH",
+      "acceptable": [],
+      "kind": "straightforward",
+      "note": ""
+    },
+    "DB-10046": {
+      "expected": "PC-HAIR-SHAMPOO",
+      "acceptable": [],
+      "kind": "straightforward",
+      "note": ""
+    },
+    "DB-10047": {
+      "expected": "PC-HAIR-STYLE",
+      "acceptable": [],
+      "kind": "straightforward",
+      "note": ""
+    },
+    "DB-10048": {
+      "expected": "PC-ORAL-BRUSH",
+      "acceptable": [],
+      "kind": "straightforward",
+      "note": ""
+    },
+    "DB-10049": {
+      "expected": "PC-BATH-SOAP",
+      "acceptable": [],
+      "kind": "straightforward",
+      "note": ""
+    },
+    "DB-10050": {
+      "expected": "PC-BATH-HAND",
+      "acceptable": [],
+      "kind": "straightforward",
+      "note": ""
+    },
+    "DB-10051": {
+      "expected": "PC-BATH-DEO",
+      "acceptable": [],
+      "kind": "straightforward",
+      "note": ""
+    },
+    "DB-10052": {
+      "expected": "PC-SHAVE-RAZOR",
+      "acceptable": [],
+      "kind": "straightforward",
+      "note": ""
+    },
+    "DB-10053": {
+      "expected": "PC-FEM-PADS",
+      "acceptable": [],
+      "kind": "straightforward",
+      "note": ""
+    },
+    "DB-10054": {
+      "expected": "OTC-PAIN-TOPICAL",
+      "acceptable": [],
+      "kind": "straightforward",
+      "note": ""
+    },
+    "DB-10055": {
+      "expected": "OTC-COLD-ALLERGY",
+      "acceptable": [],
+      "kind": "straightforward",
+      "note": ""
+    },
+    "DB-10056": {
+      "expected": "OTC-DIG-ANTACID",
+      "acceptable": [],
+      "kind": "straightforward",
+      "note": ""
+    },
+    "DB-10057": {
+      "expected": "OTC-VIT-MULTI",
+      "acceptable": [],
+      "kind": "straightforward",
+      "note": ""
+    },
+    "DB-10058": {
+      "expected": "OTC-VIT-PROTEIN",
+      "acceptable": [],
+      "kind": "straightforward",
+      "note": ""
+    },
+    "DB-10059": {
+      "expected": "OTC-AID-ANTISEPTIC",
+      "acceptable": [],
+      "kind": "straightforward",
+      "note": ""
+    },
+    "DB-10060": {
+      "expected": "PET-DOG-FOOD",
+      "acceptable": [],
+      "kind": "straightforward",
+      "note": ""
+    },
+    "DB-10061": {
+      "expected": "PET-CAT-FOOD",
+      "acceptable": [],
+      "kind": "straightforward",
+      "note": ""
+    },
+    "DB-10062": {
+      "expected": "PET-CAT-TREAT",
+      "acceptable": [],
+      "kind": "straightforward",
+      "note": ""
+    },
+    "DB-10063": {
+      "expected": "PET-SUP-WASTE",
+      "acceptable": [],
+      "kind": "straightforward",
+      "note": ""
+    },
+    "DB-10064": {
+      "expected": "BABY-DIAPER-DIAPERS",
+      "acceptable": [],
+      "kind": "straightforward",
+      "note": ""
+    },
+    "DB-10065": {
+      "expected": "BABY-DIAPER-CREAM",
+      "acceptable": [],
+      "kind": "straightforward",
+      "note": ""
+    },
+    "DB-10066": {
+      "expected": "BABY-FEED-FOOD",
+      "acceptable": [],
+      "kind": "straightforward",
+      "note": ""
+    },
+    "DB-10067": {
+      "expected": "BABY-FEED-BOTTLE",
+      "acceptable": [],
+      "kind": "straightforward",
+      "note": ""
+    },
+    "DB-10068": {
+      "expected": "BABY-CARE-WASH",
+      "acceptable": [],
+      "kind": "straightforward",
+      "note": ""
+    },
+    "DB-10069": {
+      "expected": "GM-KIT-COOK",
+      "acceptable": [],
+      "kind": "straightforward",
+      "note": ""
+    },
+    "DB-10070": {
+      "expected": "GM-KIT-TOOLS",
+      "acceptable": [],
+      "kind": "straightforward",
+      "note": ""
+    },
+    "DB-10071": {
+      "expected": "GM-ELEC-BATT",
+      "acceptable": [],
+      "kind": "straightforward",
+      "note": ""
+    },
+    "DB-10072": {
+      "expected": "GM-ELEC-ACC",
+      "acceptable": [],
+      "kind": "straightforward",
+      "note": ""
+    },
+    "DB-10073": {
+      "expected": "GM-OFF-WRITE",
+      "acceptable": [],
+      "kind": "straightforward",
+      "note": ""
+    },
+    "DB-10074": {
+      "expected": "GM-HOME-LIGHT",
+      "acceptable": [],
+      "kind": "straightforward",
+      "note": ""
+    },
+    "DB-10075": {
+      "expected": "GM-SEAS-PARTY",
+      "acceptable": [],
+      "kind": "straightforward",
+      "note": ""
+    },
+    "DB-10076": {
+      "expected": "GRO-DAI-MILK",
+      "acceptable": [],
+      "kind": "straightforward",
+      "note": ""
+    },
+    "DB-10077": {
+      "expected": "GRO-DAI-CHEESE",
+      "acceptable": [],
+      "kind": "straightforward",
+      "note": ""
+    },
+    "DB-10078": {
+      "expected": "GRO-DAI-BUTTER",
+      "acceptable": [],
+      "kind": "straightforward",
+      "note": ""
+    },
+    "DB-10079": {
+      "expected": "GRO-PRO-FRUIT",
+      "acceptable": [],
+      "kind": "straightforward",
+      "note": ""
+    },
+    "DB-10080": {
+      "expected": "GRO-MEAT-POULTRY",
+      "acceptable": [],
+      "kind": "straightforward",
+      "note": ""
+    },
+    "DB-10081": {
+      "expected": "GRO-MEAT-DELI",
+      "acceptable": [],
+      "kind": "straightforward",
+      "note": ""
+    },
+    "DB-10082": {
+      "expected": "GRO-BAK-SWEET",
+      "acceptable": [],
+      "kind": "straightforward",
+      "note": ""
+    },
+    "DB-10083": {
+      "expected": "GRO-PAN-RICE",
+      "acceptable": [],
+      "kind": "straightforward",
+      "note": ""
+    },
+    "DB-10084": {
+      "expected": "GRO-PAN-COOKMILK",
+      "acceptable": [],
+      "kind": "straightforward",
+      "note": ""
+    },
+    "DB-10085": {
+      "expected": "GRO-PAN-SAUCE",
+      "acceptable": [],
+      "kind": "straightforward",
+      "note": ""
+    },
+    "DB-10086": {
+      "expected": "GRO-PAN-SPICE",
+      "acceptable": [],
+      "kind": "straightforward",
+      "note": ""
+    },
+    "DB-10087": {
+      "expected": "GRO-PAN-NUTS",
+      "acceptable": [],
+      "kind": "straightforward",
+      "note": ""
+    },
+    "DB-10088": {
+      "expected": "GRO-SNK-CHIPS",
+      "acceptable": [],
+      "kind": "straightforward",
+      "note": ""
+    },
+    "DB-10089": {
+      "expected": "GRO-SNK-CANDY",
+      "acceptable": [],
+      "kind": "straightforward",
+      "note": ""
+    },
+    "DB-10090": {
+      "expected": "GRO-FRZ-VEG",
+      "acceptable": [],
+      "kind": "straightforward",
+      "note": ""
+    },
+    "DB-10091": {
+      "expected": "BEV-WATER-SPARK",
+      "acceptable": [],
+      "kind": "straightforward",
+      "note": ""
+    },
+    "DB-10092": {
+      "expected": "BEV-JUICE-FRUIT",
+      "acceptable": [],
+      "kind": "straightforward",
+      "note": ""
+    },
+    "DB-10093": {
+      "expected": "BEV-HOT-COFFEE",
+      "acceptable": [],
+      "kind": "straightforward",
+      "note": ""
+    },
+    "DB-10094": {
+      "expected": "BEV-SPORT-ENERGY",
+      "acceptable": [],
+      "kind": "straightforward",
+      "note": ""
+    },
+    "DB-10095": {
+      "expected": "HOU-CLEAN-DISH",
+      "acceptable": [],
+      "kind": "straightforward",
+      "note": ""
+    },
+    "DB-90002": {
+      "expected": null,
+      "acceptable": [
+        "BEV-WATER-ENH"
+      ],
+      "kind": "ambiguous",
+      "note": "Enhanced water versus a vitamin supplement; the label alone does not decide."
+    },
+    "DB-90005": {
+      "expected": "PC-HAIR-SHAMPOO",
+      "acceptable": [],
+      "kind": "misleading_category",
+      "note": "Merchant path says dairy alternatives; the product is hair care."
+    },
+    "DB-90008": {
+      "expected": null,
+      "acceptable": [],
+      "kind": "missing_concept",
+      "note": "No kombucha or fermented beverage leaf exists."
+    },
+    "DB-90011": {
+      "expected": null,
+      "acceptable": [],
+      "kind": "missing_concept",
+      "note": "No garden concept exists."
+    },
+    "DB-90014": {
+      "expected": null,
+      "acceptable": [
+        "BEV-JUICE-FRUIT",
+        "OTC-VIT-SINGLE"
+      ],
+      "kind": "unsupported_claim",
+      "note": "Juice shot or supplement; no ingredient list supports either."
+    }
+  },
+  "corner-goods": {
+    "CG-10001": {
+      "expected": "GRO-DAI-MILK",
+      "acceptable": [],
+      "kind": "straightforward",
+      "note": ""
+    },
+    "CG-10002": {
+      "expected": "GRO-DAI-PLANT",
+      "acceptable": [],
+      "kind": "straightforward",
+      "note": ""
+    },
+    "CG-10003": {
+      "expected": "GRO-DAI-CHEESE",
+      "acceptable": [],
+      "kind": "straightforward",
+      "note": ""
+    },
+    "CG-10004": {
+      "expected": "GRO-DAI-YOG",
+      "acceptable": [],
+      "kind": "straightforward",
+      "note": ""
+    },
+    "CG-10005": {
+      "expected": "GRO-DAI-EGGS",
+      "acceptable": [],
+      "kind": "straightforward",
+      "note": ""
+    },
+    "CG-10006": {
+      "expected": "GRO-PRO-FRUIT",
+      "acceptable": [],
+      "kind": "straightforward",
+      "note": ""
+    },
+    "CG-10007": {
+      "expected": "GRO-PRO-VEG",
+      "acceptable": [],
+      "kind": "straightforward",
+      "note": ""
+    },
+    "CG-10008": {
+      "expected": "GRO-PRO-HERB",
+      "acceptable": [],
+      "kind": "straightforward",
+      "note": ""
+    },
+    "CG-10009": {
+      "expected": "GRO-MEAT-BEEF",
+      "acceptable": [],
+      "kind": "straightforward",
+      "note": ""
+    },
+    "CG-10010": {
+      "expected": "GRO-MEAT-SEA",
+      "acceptable": [],
+      "kind": "straightforward",
+      "note": ""
+    },
+    "CG-10011": {
+      "expected": "GRO-BAK-BREAD",
+      "acceptable": [],
+      "kind": "straightforward",
+      "note": ""
+    },
+    "CG-10012": {
+      "expected": "GRO-BAK-SWEET",
+      "acceptable": [],
+      "kind": "straightforward",
+      "note": ""
+    },
+    "CG-10013": {
+      "expected": "GRO-PAN-PASTA",
+      "acceptable": [],
+      "kind": "straightforward",
+      "note": ""
+    },
+    "CG-10014": {
+      "expected": "GRO-PAN-RICE",
+      "acceptable": [],
+      "kind": "straightforward",
+      "note": ""
+    },
+    "CG-10015": {
+      "expected": "GRO-PAN-CANVEG",
+      "acceptable": [],
+      "kind": "straightforward",
+      "note": ""
+    },
+    "CG-10016": {
+      "expected": "GRO-PAN-COOKMILK",
+      "acceptable": [],
+      "kind": "straightforward",
+      "note": ""
+    },
+    "CG-10017": {
+      "expected": "GRO-PAN-SOUP",
+      "acceptable": [],
+      "kind": "straightforward",
+      "note": ""
+    },
+    "CG-10018": {
+      "expected": "GRO-PAN-OIL",
+      "acceptable": [],
+      "kind": "straightforward",
+      "note": ""
+    },
+    "CG-10019": {
+      "expected": "GRO-PAN-SAUCE",
+      "acceptable": [],
+      "kind": "straightforward",
+      "note": ""
+    },
+    "CG-10020": {
+      "expected": "GRO-PAN-BAKING",
+      "acceptable": [],
+      "kind": "straightforward",
+      "note": ""
+    },
+    "CG-10021": {
+      "expected": "GRO-PAN-SPREAD",
+      "acceptable": [],
+      "kind": "straightforward",
+      "note": ""
+    },
+    "CG-10022": {
+      "expected": "GRO-PAN-NUTS",
+      "acceptable": [],
+      "kind": "straightforward",
+      "note": ""
+    },
+    "CG-10023": {
+      "expected": "GRO-BRK-CEREAL",
+      "acceptable": [],
+      "kind": "straightforward",
+      "note": ""
+    },
+    "CG-10024": {
+      "expected": "GRO-BRK-SYRUP",
+      "acceptable": [],
+      "kind": "straightforward",
+      "note": ""
+    },
+    "CG-10025": {
+      "expected": "GRO-SNK-CHIPS",
+      "acceptable": [],
+      "kind": "straightforward",
+      "note": ""
+    },
+    "CG-10026": {
+      "expected": "GRO-SNK-CANDY",
+      "acceptable": [],
+      "kind": "straightforward",
+      "note": ""
+    },
+    "CG-10027": {
+      "expected": "GRO-SNK-COOKIE",
+      "acceptable": [],
+      "kind": "straightforward",
+      "note": ""
+    },
+    "CG-10028": {
+      "expected": "GRO-FRZ-VEG",
+      "acceptable": [],
+      "kind": "straightforward",
+      "note": ""
+    },
+    "CG-10029": {
+      "expected": "GRO-FRZ-ICE",
+      "acceptable": [],
+      "kind": "straightforward",
+      "note": ""
+    },
+    "CG-10030": {
+      "expected": "BEV-WATER-SPARK",
+      "acceptable": [],
+      "kind": "straightforward",
+      "note": ""
+    },
+    "CG-10031": {
+      "expected": "BEV-WATER-ENH",
+      "acceptable": [],
+      "kind": "straightforward",
+      "note": ""
+    },
+    "CG-10032": {
+      "expected": "BEV-SOFT-SODA",
+      "acceptable": [],
+      "kind": "straightforward",
+      "note": ""
+    },
+    "CG-10033": {
+      "expected": "BEV-JUICE-DRINK",
+      "acceptable": [],
+      "kind": "straightforward",
+      "note": ""
+    },
+    "CG-10034": {
+      "expected": "BEV-JUICE-COCO",
+      "acceptable": [],
+      "kind": "straightforward",
+      "note": ""
+    },
+    "CG-10035": {
+      "expected": "BEV-HOT-COFFEE",
+      "acceptable": [],
+      "kind": "straightforward",
+      "note": ""
+    },
+    "CG-10036": {
+      "expected": "BEV-HOT-COCOA",
+      "acceptable": [],
+      "kind": "straightforward",
+      "note": ""
+    },
+    "CG-10037": {
+      "expected": "BEV-SPORT-SPORTS",
+      "acceptable": [],
+      "kind": "straightforward",
+      "note": ""
+    },
+    "CG-10038": {
+      "expected": "HOU-CLEAN-DISH",
+      "acceptable": [],
+      "kind": "straightforward",
+      "note": ""
+    },
+    "CG-10039": {
+      "expected": "HOU-CLEAN-SURF",
+      "acceptable": [],
+      "kind": "straightforward",
+      "note": ""
+    },
+    "CG-10040": {
+      "expected": "HOU-CLEAN-TOOLS",
+      "acceptable": [],
+      "kind": "straightforward",
+      "note": ""
+    },
+    "CG-10041": {
+      "expected": "HOU-LAUN-SOFT",
+      "acceptable": [],
+      "kind": "straightforward",
+      "note": ""
+    },
+    "CG-10042": {
+      "expected": "HOU-PAPER-TOWEL",
+      "acceptable": [],
+      "kind": "straightforward",
+      "note": ""
+    },
+    "CG-10043": {
+      "expected": "HOU-PAPER-TISSUE",
+      "acceptable": [],
+      "kind": "straightforward",
+      "note": ""
+    },
+    "CG-10044": {
+      "expected": "HOU-PAPER-BAGS",
+      "acceptable": [],
+      "kind": "straightforward",
+      "note": ""
+    },
+    "CG-10045": {
+      "expected": "HOU-AIR-PEST",
+      "acceptable": [],
+      "kind": "straightforward",
+      "note": ""
+    },
+    "CG-10046": {
+      "expected": "PC-HAIR-SHAMPOO",
+      "acceptable": [],
+      "kind": "straightforward",
+      "note": ""
+    },
+    "CG-10047": {
+      "expected": "PC-ORAL-PASTE",
+      "acceptable": [],
+      "kind": "straightforward",
+      "note": ""
+    },
+    "CG-10048": {
+      "expected": "PC-ORAL-BRUSH",
+      "acceptable": [],
+      "kind": "straightforward",
+      "note": ""
+    },
+    "CG-10049": {
+      "expected": "PC-BATH-SOAP",
+      "acceptable": [],
+      "kind": "straightforward",
+      "note": ""
+    },
+    "CG-10050": {
+      "expected": "PC-BATH-LOTION",
+      "acceptable": [],
+      "kind": "straightforward",
+      "note": ""
+    },
+    "CG-10051": {
+      "expected": "PC-BATH-DEO",
+      "acceptable": [],
+      "kind": "straightforward",
+      "note": ""
+    },
+    "CG-10052": {
+      "expected": "PC-SHAVE-RAZOR",
+      "acceptable": [],
+      "kind": "straightforward",
+      "note": ""
+    },
+    "CG-10053": {
+      "expected": "OTC-PAIN-ORAL",
+      "acceptable": [],
+      "kind": "straightforward",
+      "note": ""
+    },
+    "CG-10054": {
+      "expected": "OTC-PAIN-TOPICAL",
+      "acceptable": [],
+      "kind": "straightforward",
+      "note": ""
+    },
+    "CG-10055": {
+      "expected": "OTC-COLD-COUGH",
+      "acceptable": [],
+      "kind": "straightforward",
+      "note": ""
+    },
+    "CG-10056": {
+      "expected": "OTC-DIG-ANTACID",
+      "acceptable": [],
+      "kind": "straightforward",
+      "note": ""
+    },
+    "CG-10057": {
+      "expected": "OTC-VIT-SINGLE",
+      "acceptable": [],
+      "kind": "straightforward",
+      "note": ""
+    },
+    "CG-10058": {
+      "expected": "OTC-AID-BANDAGE",
+      "acceptable": [],
+      "kind": "straightforward",
+      "note": ""
+    },
+    "CG-10059": {
+      "expected": "OTC-AID-ANTISEPTIC",
+      "acceptable": [],
+      "kind": "straightforward",
+      "note": ""
+    },
+    "CG-10060": {
+      "expected": "PET-DOG-TREAT",
+      "acceptable": [],
+      "kind": "straightforward",
+      "note": ""
+    },
+    "CG-10061": {
+      "expected": "PET-CAT-FOOD",
+      "acceptable": [],
+      "kind": "straightforward",
+      "note": ""
+    },
+    "CG-10062": {
+      "expected": "PET-SUP-TOYS",
+      "acceptable": [],
+      "kind": "straightforward",
+      "note": ""
+    },
+    "CG-10063": {
+      "expected": "PET-SUP-WASTE",
+      "acceptable": [],
+      "kind": "straightforward",
+      "note": ""
+    },
+    "CG-10064": {
+      "expected": "BABY-DIAPER-WIPES",
+      "acceptable": [],
+      "kind": "straightforward",
+      "note": ""
+    },
+    "CG-10065": {
+      "expected": "BABY-FEED-FORMULA",
+      "acceptable": [],
+      "kind": "straightforward",
+      "note": ""
+    },
+    "CG-10066": {
+      "expected": "BABY-FEED-FOOD",
+      "acceptable": [],
+      "kind": "straightforward",
+      "note": ""
+    },
+    "CG-10067": {
+      "expected": "BABY-FEED-BOTTLE",
+      "acceptable": [],
+      "kind": "straightforward",
+      "note": ""
+    },
+    "CG-10068": {
+      "expected": "BABY-CARE-LOTION",
+      "acceptable": [],
+      "kind": "straightforward",
+      "note": ""
+    },
+    "CG-10069": {
+      "expected": "GM-KIT-TOOLS",
+      "acceptable": [],
+      "kind": "straightforward",
+      "note": ""
+    },
+    "CG-10070": {
+      "expected": "GM-KIT-DISPOSABLE",
+      "acceptable": [],
+      "kind": "straightforward",
+      "note": ""
+    },
+    "CG-10071": {
+      "expected": "GM-ELEC-BATT",
+      "acceptable": [],
+      "kind": "straightforward",
+      "note": ""
+    },
+    "CG-10072": {
+      "expected": "GM-ELEC-ACC",
+      "acceptable": [],
+      "kind": "straightforward",
+      "note": ""
+    },
+    "CG-10073": {
+      "expected": "GM-OFF-PAPER",
+      "acceptable": [],
+      "kind": "straightforward",
+      "note": ""
+    },
+    "CG-10074": {
+      "expected": "GM-HOME-TOOLS",
+      "acceptable": [],
+      "kind": "straightforward",
+      "note": ""
+    },
+    "CG-10075": {
+      "expected": "GM-SEAS-PARTY",
+      "acceptable": [],
+      "kind": "straightforward",
+      "note": ""
+    },
+    "CG-10076": {
+      "expected": "GRO-DAI-PLANT",
+      "acceptable": [],
+      "kind": "straightforward",
+      "note": ""
+    },
+    "CG-10077": {
+      "expected": "GRO-DAI-YOG",
+      "acceptable": [],
+      "kind": "straightforward",
+      "note": ""
+    },
+    "CG-10078": {
+      "expected": "GRO-PRO-FRUIT",
+      "acceptable": [],
+      "kind": "straightforward",
+      "note": ""
+    },
+    "CG-10079": {
+      "expected": "GRO-PRO-HERB",
+      "acceptable": [],
+      "kind": "straightforward",
+      "note": ""
+    },
+    "CG-10080": {
+      "expected": "GRO-MEAT-SEA",
+      "acceptable": [],
+      "kind": "straightforward",
+      "note": ""
+    },
+    "CG-10081": {
+      "expected": "GRO-BAK-BREAD",
+      "acceptable": [],
+      "kind": "straightforward",
+      "note": ""
+    },
+    "CG-10082": {
+      "expected": "GRO-PAN-RICE",
+      "acceptable": [],
+      "kind": "straightforward",
+      "note": ""
+    },
+    "CG-10083": {
+      "expected": "GRO-PAN-COOKMILK",
+      "acceptable": [],
+      "kind": "straightforward",
+      "note": ""
+    },
+    "CG-10084": {
+      "expected": "GRO-PAN-OIL",
+      "acceptable": [],
+      "kind": "straightforward",
+      "note": ""
+    },
+    "CG-10085": {
+      "expected": "GRO-PAN-BAKING",
+      "acceptable": [],
+      "kind": "straightforward",
+      "note": ""
+    },
+    "CG-10086": {
+      "expected": "GRO-PAN-SPREAD",
+      "acceptable": [],
+      "kind": "straightforward",
+      "note": ""
+    },
+    "CG-10087": {
+      "expected": "GRO-BRK-SYRUP",
+      "acceptable": [],
+      "kind": "straightforward",
+      "note": ""
+    },
+    "CG-10088": {
+      "expected": "GRO-SNK-BARS",
+      "acceptable": [],
+      "kind": "straightforward",
+      "note": ""
+    },
+    "CG-10089": {
+      "expected": "GRO-FRZ-MEAL",
+      "acceptable": [],
+      "kind": "straightforward",
+      "note": ""
+    },
+    "CG-10090": {
+      "expected": "BEV-WATER-STILL",
+      "acceptable": [],
+      "kind": "straightforward",
+      "note": ""
+    },
+    "CG-10091": {
+      "expected": "BEV-SOFT-SODA",
+      "acceptable": [],
+      "kind": "straightforward",
+      "note": ""
+    },
+    "CG-10092": {
+      "expected": "BEV-JUICE-COCO",
+      "acceptable": [],
+      "kind": "straightforward",
+      "note": ""
+    },
+    "CG-10093": {
+      "expected": "BEV-HOT-TEA",
+      "acceptable": [],
+      "kind": "straightforward",
+      "note": ""
+    },
+    "CG-10094": {
+      "expected": "HOU-CLEAN-DISH",
+      "acceptable": [],
+      "kind": "straightforward",
+      "note": ""
+    },
+    "CG-90001": {
+      "expected": null,
+      "acceptable": [
+        "GRO-PRO-FRUIT"
+      ],
+      "kind": "ambiguous",
+      "note": "No description: could be fruit, juice or an accessory. Route to investigation."
+    },
+    "CG-90003": {
+      "expected": null,
+      "acceptable": [],
+      "kind": "sparse",
+      "note": "Allergy, heartburn or pain relief cannot be told apart from the title."
+    },
+    "CG-90010": {
+      "expected": null,
+      "acceptable": [],
+      "kind": "missing_concept",
+      "note": "No grilling or fuel concept exists."
+    },
+    "CG-90013": {
+      "expected": null,
+      "acceptable": [],
+      "kind": "unsupported_claim",
+      "note": "Ingredients and function are not stated; do not invent them."
+    },
+    "CG-90015": {
+      "expected": "GRO-DAI-PLANT",
+      "acceptable": [],
+      "kind": "alternative",
+      "note": "Almond is an ingredient term; the product type is plant-based milk, not nuts."
+    }
+  },
+  "harbor-market-r2": {
+    "HM-10001": {
+      "expected": "GRO-DAI-MILK",
+      "acceptable": [],
+      "kind": "straightforward",
+      "note": ""
+    },
+    "HM-10002": {
+      "expected": "GRO-DAI-PLANT",
+      "acceptable": [],
+      "kind": "straightforward",
+      "note": ""
+    },
+    "HM-10003": {
+      "expected": "GRO-DAI-CHEESE",
+      "acceptable": [],
+      "kind": "straightforward",
+      "note": ""
+    },
+    "HM-10005": {
+      "expected": "GRO-DAI-BUTTER",
+      "acceptable": [],
+      "kind": "straightforward",
+      "note": ""
+    },
+    "HM-10006": {
+      "expected": "GRO-DAI-EGGS",
+      "acceptable": [],
+      "kind": "straightforward",
+      "note": ""
+    },
+    "HM-10007": {
+      "expected": "GRO-PRO-FRUIT",
+      "acceptable": [],
+      "kind": "straightforward",
+      "note": ""
+    },
+    "HM-10008": {
+      "expected": "GRO-PRO-VEG",
+      "acceptable": [],
+      "kind": "straightforward",
+      "note": ""
+    },
+    "HM-10009": {
+      "expected": "GRO-MEAT-POULTRY",
+      "acceptable": [],
+      "kind": "straightforward",
+      "note": ""
+    },
+    "HM-10010": {
+      "expected": "GRO-MEAT-BEEF",
+      "acceptable": [],
+      "kind": "straightforward",
+      "note": ""
+    },
+    "HM-10011": {
+      "expected": "GRO-MEAT-DELI",
+      "acceptable": [],
+      "kind": "straightforward",
+      "note": ""
+    },
+    "HM-10012": {
+      "expected": "GRO-BAK-BREAD",
+      "acceptable": [],
+      "kind": "straightforward",
+      "note": ""
+    },
+    "HM-10013": {
+      "expected": "GRO-BAK-SWEET",
+      "acceptable": [],
+      "kind": "straightforward",
+      "note": ""
+    },
+    "HM-10014": {
+      "expected": "GRO-PAN-PASTA",
+      "acceptable": [],
+      "kind": "straightforward",
+      "note": ""
+    },
+    "HM-10015": {
+      "expected": "GRO-PAN-RICE",
+      "acceptable": [],
+      "kind": "straightforward",
+      "note": ""
+    },
+    "HM-10016": {
+      "expected": "GRO-PAN-CANVEG",
+      "acceptable": [],
+      "kind": "straightforward",
+      "note": ""
+    },
+    "HM-10017": {
+      "expected": "GRO-PAN-COOKMILK",
+      "acceptable": [],
+      "kind": "straightforward",
+      "note": ""
+    },
+    "HM-10019": {
+      "expected": "GRO-PAN-SAUCE",
+      "acceptable": [],
+      "kind": "straightforward",
+      "note": ""
+    },
+    "HM-10020": {
+      "expected": "GRO-PAN-BAKING",
+      "acceptable": [],
+      "kind": "straightforward",
+      "note": ""
+    },
+    "HM-10021": {
+      "expected": "GRO-PAN-SPICE",
+      "acceptable": [],
+      "kind": "straightforward",
+      "note": ""
+    },
+    "HM-10022": {
+      "expected": "GRO-PAN-SPREAD",
+      "acceptable": [],
+      "kind": "straightforward",
+      "note": ""
+    },
+    "HM-10023": {
+      "expected": "GRO-PAN-NUTS",
+      "acceptable": [],
+      "kind": "straightforward",
+      "note": ""
+    },
+    "HM-10024": {
+      "expected": "GRO-BRK-CEREAL",
+      "acceptable": [],
+      "kind": "straightforward",
+      "note": ""
+    },
+    "HM-10025": {
+      "expected": "GRO-SNK-CHIPS",
+      "acceptable": [],
+      "kind": "straightforward",
+      "note": ""
+    },
+    "HM-10026": {
+      "expected": "GRO-SNK-BARS",
+      "acceptable": [],
+      "kind": "straightforward",
+      "note": ""
+    },
+    "HM-10027": {
+      "expected": "GRO-SNK-CANDY",
+      "acceptable": [],
+      "kind": "straightforward",
+      "note": ""
+    },
+    "HM-10028": {
+      "expected": "GRO-FRZ-MEAL",
+      "acceptable": [],
+      "kind": "straightforward",
+      "note": ""
+    },
+    "HM-10029": {
+      "expected": "GRO-FRZ-VEG",
+      "acceptable": [],
+      "kind": "straightforward",
+      "note": ""
+    },
+    "HM-10030": {
+      "expected": "BEV-WATER-STILL",
+      "acceptable": [],
+      "kind": "straightforward",
+      "note": ""
+    },
+    "HM-10031": {
+      "expected": "BEV-WATER-SPARK",
+      "acceptable": [],
+      "kind": "straightforward",
+      "note": ""
+    },
+    "HM-10032": {
+      "expected": "BEV-SOFT-SODA",
+      "acceptable": [],
+      "kind": "straightforward",
+      "note": ""
+    },
+    "HM-10033": {
+      "expected": "BEV-JUICE-FRUIT",
+      "acceptable": [],
+      "kind": "straightforward",
+      "note": ""
+    },
+    "HM-10034": {
+      "expected": "BEV-JUICE-DRINK",
+      "acceptable": [],
+      "kind": "straightforward",
+      "note": ""
+    },
+    "HM-10035": {
+      "expected": "BEV-HOT-COFFEE",
+      "acceptable": [],
+      "kind": "straightforward",
+      "note": ""
+    },
+    "HM-10036": {
+      "expected": "BEV-HOT-TEA",
+      "acceptable": [],
+      "kind": "straightforward",
+      "note": ""
+    },
+    "HM-10037": {
+      "expected": "BEV-SPORT-ENERGY",
+      "acceptable": [],
+      "kind": "straightforward",
+      "note": ""
+    },
+    "HM-10038": {
+      "expected": "BEV-SPORT-SPORTS",
+      "acceptable": [],
+      "kind": "straightforward",
+      "note": ""
+    },
+    "HM-10039": {
+      "expected": "HOU-CLEAN-DISH",
+      "acceptable": [],
+      "kind": "straightforward",
+      "note": ""
+    },
+    "HM-10040": {
+      "expected": "HOU-CLEAN-SURF",
+      "acceptable": [],
+      "kind": "straightforward",
+      "note": ""
+    },
+    "HM-10041": {
+      "expected": "HOU-LAUN-DET",
+      "acceptable": [],
+      "kind": "straightforward",
+      "note": ""
+    },
+    "HM-10043": {
+      "expected": "HOU-PAPER-TP",
+      "acceptable": [],
+      "kind": "straightforward",
+      "note": ""
+    },
+    "HM-10044": {
+      "expected": "HOU-PAPER-BAGS",
+      "acceptable": [],
+      "kind": "straightforward",
+      "note": ""
+    },
+    "HM-10045": {
+      "expected": "HOU-AIR-FRESH",
+      "acceptable": [],
+      "kind": "straightforward",
+      "note": ""
+    },
+    "HM-10046": {
+      "expected": "PC-HAIR-SHAMPOO",
+      "acceptable": [],
+      "kind": "straightforward",
+      "note": ""
+    },
+    "HM-10047": {
+      "expected": "PC-HAIR-STYLE",
+      "acceptable": [],
+      "kind": "straightforward",
+      "note": ""
+    },
+    "HM-10048": {
+      "expected": "PC-ORAL-PASTE",
+      "acceptable": [],
+      "kind": "straightforward",
+      "note": ""
+    },
+    "HM-10049": {
+      "expected": "PC-ORAL-RINSE",
+      "acceptable": [],
+      "kind": "straightforward",
+      "note": ""
+    },
+    "HM-10050": {
+      "expected": "PC-BATH-HAND",
+      "acceptable": [],
+      "kind": "straightforward",
+      "note": ""
+    },
+    "HM-10051": {
+      "expected": "PC-BATH-LOTION",
+      "acceptable": [],
+      "kind": "straightforward",
+      "note": ""
+    },
+    "HM-10052": {
+      "expected": "PC-BATH-SUN",
+      "acceptable": [],
+      "kind": "straightforward",
+      "note": ""
+    },
+    "HM-10053": {
+      "expected": "PC-FEM-PADS",
+      "acceptable": [],
+      "kind": "straightforward",
+      "note": ""
+    },
+    "HM-10054": {
+      "expected": "OTC-PAIN-ORAL",
+      "acceptable": [],
+      "kind": "straightforward",
+      "note": ""
+    },
+    "HM-10055": {
+      "expected": "OTC-COLD-ALLERGY",
+      "acceptable": [],
+      "kind": "straightforward",
+      "note": ""
+    },
+    "HM-10056": {
+      "expected": "OTC-COLD-COUGH",
+      "acceptable": [],
+      "kind": "straightforward",
+      "note": ""
+    },
+    "HM-10057": {
+      "expected": "OTC-VIT-MULTI",
+      "acceptable": [],
+      "kind": "straightforward",
+      "note": ""
+    },
+    "HM-10058": {
+      "expected": "OTC-VIT-SINGLE",
+      "acceptable": [],
+      "kind": "straightforward",
+      "note": ""
+    },
+    "HM-10060": {
+      "expected": "PET-DOG-FOOD",
+      "acceptable": [],
+      "kind": "straightforward",
+      "note": ""
+    },
+    "HM-10061": {
+      "expected": "PET-DOG-TREAT",
+      "acceptable": [],
+      "kind": "straightforward",
+      "note": ""
+    },
+    "HM-10062": {
+      "expected": "PET-CAT-LITTER",
+      "acceptable": [],
+      "kind": "straightforward",
+      "note": ""
+    },
+    "HM-10063": {
+      "expected": "PET-SUP-TOYS",
+      "acceptable": [],
+      "kind": "straightforward",
+      "note": ""
+    },
+    "HM-10064": {
+      "expected": "BABY-DIAPER-DIAPERS",
+      "acceptable": [],
+      "kind": "straightforward",
+      "note": ""
+    },
+    "HM-10065": {
+      "expected": "BABY-DIAPER-WIPES",
+      "acceptable": [],
+      "kind": "straightforward",
+      "note": ""
+    },
+    "HM-10066": {
+      "expected": "BABY-FEED-FORMULA",
+      "acceptable": [],
+      "kind": "straightforward",
+      "note": ""
+    },
+    "HM-10067": {
+      "expected": "BABY-FEED-FOOD",
+      "acceptable": [],
+      "kind": "straightforward",
+      "note": ""
+    },
+    "HM-10068": {
+      "expected": "BABY-CARE-WASH",
+      "acceptable": [],
+      "kind": "straightforward",
+      "note": ""
+    },
+    "HM-10069": {
+      "expected": "GM-KIT-COOK",
+      "acceptable": [],
+      "kind": "straightforward",
+      "note": ""
+    },
+    "HM-10070": {
+      "expected": "GM-KIT-TOOLS",
+      "acceptable": [],
+      "kind": "straightforward",
+      "note": ""
+    },
+    "HM-10071": {
+      "expected": "GM-KIT-DISPOSABLE",
+      "acceptable": [],
+      "kind": "straightforward",
+      "note": ""
+    },
+    "HM-10072": {
+      "expected": "GM-ELEC-ACC",
+      "acceptable": [],
+      "kind": "straightforward",
+      "note": ""
+    },
+    "HM-10073": {
+      "expected": "GM-OFF-WRITE",
+      "acceptable": [],
+      "kind": "straightforward",
+      "note": ""
+    },
+    "HM-10074": {
+      "expected": "GM-OFF-PAPER",
+      "acceptable": [],
+      "kind": "straightforward",
+      "note": ""
+    },
+    "HM-10075": {
+      "expected": "GM-HOME-TOOLS",
+      "acceptable": [],
+      "kind": "straightforward",
+      "note": ""
+    },
+    "HM-10076": {
+      "expected": "GM-SEAS-CARDS",
+      "acceptable": [],
+      "kind": "straightforward",
+      "note": ""
+    },
+    "HM-10077": {
+      "expected": "GRO-DAI-MILK",
+      "acceptable": [],
+      "kind": "straightforward",
+      "note": ""
+    },
+    "HM-10079": {
+      "expected": "GRO-DAI-EGGS",
+      "acceptable": [],
+      "kind": "straightforward",
+      "note": ""
+    },
+    "HM-10080": {
+      "expected": "GRO-PRO-VEG",
+      "acceptable": [],
+      "kind": "straightforward",
+      "note": ""
+    },
+    "HM-10081": {
+      "expected": "GRO-MEAT-BEEF",
+      "acceptable": [],
+      "kind": "straightforward",
+      "note": ""
+    },
+    "HM-10082": {
+      "expected": "GRO-BAK-BREAD",
+      "acceptable": [],
+      "kind": "straightforward",
+      "note": ""
+    },
+    "HM-10083": {
+      "expected": "GRO-PAN-PASTA",
+      "acceptable": [],
+      "kind": "straightforward",
+      "note": ""
+    },
+    "HM-10084": {
+      "expected": "GRO-PAN-CANVEG",
+      "acceptable": [],
+      "kind": "straightforward",
+      "note": ""
+    },
+    "HM-10085": {
+      "expected": "GRO-PAN-SOUP",
+      "acceptable": [],
+      "kind": "straightforward",
+      "note": ""
+    },
+    "HM-10086": {
+      "expected": "GRO-PAN-SAUCE",
+      "acceptable": [],
+      "kind": "straightforward",
+      "note": ""
+    },
+    "HM-10087": {
+      "expected": "GRO-PAN-SPREAD",
+      "acceptable": [],
+      "kind": "straightforward",
+      "note": ""
+    },
+    "HM-10088": {
+      "expected": "GRO-BRK-CEREAL",
+      "acceptable": [],
+      "kind": "straightforward",
+      "note": ""
+    },
+    "HM-10089": {
+      "expected": "GRO-SNK-CHIPS",
+      "acceptable": [],
+      "kind": "straightforward",
+      "note": ""
+    },
+    "HM-10090": {
+      "expected": "GRO-SNK-COOKIE",
+      "acceptable": [],
+      "kind": "straightforward",
+      "note": ""
+    },
+    "HM-10091": {
+      "expected": "GRO-FRZ-ICE",
+      "acceptable": [],
+      "kind": "straightforward",
+      "note": ""
+    },
+    "HM-10092": {
+      "expected": "BEV-WATER-ENH",
+      "acceptable": [],
+      "kind": "straightforward",
+      "note": ""
+    },
+    "HM-10093": {
+      "expected": "BEV-JUICE-DRINK",
+      "acceptable": [],
+      "kind": "straightforward",
+      "note": ""
+    },
+    "HM-10094": {
+      "expected": "BEV-HOT-COFFEE",
+      "acceptable": [],
+      "kind": "straightforward",
+      "note": ""
+    },
+    "HM-10095": {
+      "expected": "BEV-SPORT-SPORTS",
+      "acceptable": [],
+      "kind": "straightforward",
+      "note": ""
+    },
+    "HM-90004": {
+      "expected": "HOU-CLEAN-DISH",
+      "acceptable": [],
+      "kind": "injection",
+      "note": "Embedded instructions are catalog text, not commands."
+    },
+    "HM-90006": {
+      "expected": "PET-DOG-TREAT",
+      "acceptable": [],
+      "kind": "misleading_category",
+      "note": "Flavor term matches a pantry concept; the product is a pet treat."
+    },
+    "HM-90007": {
+      "expected": null,
+      "acceptable": [
+        "GRO-PAN-COOKMILK",
+        "BEV-JUICE-COCO"
+      ],
+      "kind": "alternative",
+      "note": "Canned cooking milk or a drinking beverage: the size hints at a can but the form is not stated."
+    },
+    "HM-90009": {
+      "expected": null,
+      "acceptable": [],
+      "kind": "missing_concept",
+      "note": "No drinkware leaf exists; not a beverage."
+    },
+    "HM-90012": {
+      "expected": null,
+      "acceptable": [],
+      "kind": "missing_concept",
+      "note": "No dips or prepared deli salads leaf exists."
+    },
+    "HM-90016": {
+      "expected": "HOU-AIR-FRESH",
+      "acceptable": [],
+      "kind": "alternative",
+      "note": "Scent terms are attributes, not the product type."
+    },
+    "HM-20001": {
+      "expected": "GRO-DAI-PLANT",
+      "acceptable": [],
+      "kind": "straightforward",
+      "note": ""
+    },
+    "HM-20002": {
+      "expected": "BEV-WATER-SPARK",
+      "acceptable": [],
+      "kind": "straightforward",
+      "note": ""
+    },
+    "HM-20003": {
+      "expected": "HOU-CLEAN-SURF",
+      "acceptable": [],
+      "kind": "straightforward",
+      "note": ""
+    },
+    "HM-20004": {
+      "expected": "PET-CAT-TREAT",
+      "acceptable": [],
+      "kind": "straightforward",
+      "note": ""
+    },
+    "HM-20005": {
+      "expected": "GM-ELEC-BATT",
+      "acceptable": [],
+      "kind": "straightforward",
+      "note": ""
+    }
+  }
+}

@@ -1,0 +1,101 @@
+merchant_sku,title,description,merchant_category_path,brand,gtin,package_size,price,currency
+DB-10001,2% Reduced Fat Milk - Meadow Lane (0.5 gal),,Dairy & Eggs/Dairy Milk,Meadow Lane,2900000000025,0.5 gal,2.89,USD
+DB-10002,Barista Oat Milk - Brightleaf (32 fl oz),,Dairy & Eggs/Plant-Based Milk,Brightleaf,2900000000056,32 fl oz,4.49,USD
+DB-10003,Shredded Mozzarella - Meadow Lane (16 oz),,Dairy & Eggs/Cheese,Meadow Lane,2900000000087,16 oz,5.49,USD
+DB-10004,Strawberry Yogurt Cups 4 Pack - Clover Ridge (4 x 5.3 oz),,Dairy & Eggs/Yogurt,Clover Ridge,2900000000117,4 x 5.3 oz,3.99,USD
+DB-10005,Plant Butter Spread - Brightleaf (13 oz),,Dairy & Eggs/Butter & Margarine,Brightleaf,2900000000148,13 oz,4.99,USD
+DB-10006,Bananas - ~ per lb (0.59),,Produce/Fresh Fruit,~ per lb,2900000000179,0.59,Fresh yellow bananas.,USD
+DB-10007,Baby Spinach - Tidewater Farms (5 oz),,Produce/Fresh Vegetables,Tidewater Farms,2900000000209,5 oz,2.99,USD
+DB-10008,Fresh Basil - Tidewater Farms (0.75 oz),,Produce/Fresh Herbs,Tidewater Farms,2900000000230,0.75 oz,2.49,USD
+DB-10009,Ground Turkey 93% Lean - Oaken Farms (16 oz),,Meat & Seafood/Poultry,Oaken Farms,2900000000261,16 oz,5.29,USD
+DB-10010,Atlantic Salmon Fillet - Tidewater (per lb),,Meat & Seafood/Seafood,Tidewater,2900000000292,per lb,11.99,USD
+DB-10011,Uncured Bacon - Oaken Farms (12 oz),,Meat & Seafood/Deli Meats,Oaken Farms,2900000000322,12 oz,6.99,USD
+DB-10012,Flour Tortillas - Sol Camino (10 ct),,Bakery/Bread & Rolls,Sol Camino,2900000000353,10 ct,2.99,USD
+DB-10013,Spaghetti - Nonna Vera (16 oz),,Pantry/Pasta & Noodles,Nonna Vera,2900000000384,16 oz,1.79,USD
+DB-10014,Jasmine Rice - Goldfield (5 lb),,Pantry/Rice & Grains,Goldfield,2900000000414,5 lb,7.99,USD
+DB-10015,Black Beans - Goldfield (15 oz),,Pantry/Canned Vegetables & Beans,Goldfield,2900000000445,15 oz,0.99,USD
+DB-10016,Coconut Milk Unsweetened Canned - Thai Lotus (13.5 fl oz),Full fat coconut milk for curries and cooking.,Pantry/Canned Cooking Milks,Thai Lotus,2900000000476,13.5 fl oz,2.29,USD
+DB-10017,Chicken Broth Low Sodium - Kettlebrook (32 oz),,Pantry/Soup & Broth,Kettlebrook,2900000000506,32 oz,2.49,USD
+DB-10018,Canola Oil - Goldfield (48 fl oz),,Pantry/Cooking Oils & Vinegars,Goldfield,2900000000537,48 fl oz,4.49,USD
+DB-10019,Tomato Ketchup - Redbarn (20 oz),,Pantry/Sauces & Condiments,Redbarn,2900000000568,20 oz,2.99,USD
+DB-10020,Granulated Sugar - Goldfield (4 lb),,Pantry/Baking Ingredients,Goldfield,2900000000599,4 lb,3.29,USD
+DB-10021,Taco Seasoning Mix - Sol Camino (1 oz),,Pantry/Spices & Seasonings,Sol Camino,2900000000629,1 oz,0.99,USD
+DB-10022,Strawberry Preserves - Redbarn (18 oz),,Pantry/Nut Butters & Spreads,Redbarn,2900000000650,18 oz,3.99,USD
+DB-10023,Seedless Raisins - Goldfield (12 oz),,Pantry/Nuts & Dried Fruit,Goldfield,2900000000681,12 oz,3.29,USD
+DB-10024,Buttermilk Pancake Mix - Morning Lark (32 oz),,Breakfast/Pancake Mixes & Syrups,Morning Lark,2900000000711,32 oz,3.49,USD
+DB-10025,Tortilla Chips Restaurant Style - Sol Camino (13 oz),,Snacks & Candy/Chips & Crackers,Sol Camino,2900000000742,13 oz,3.29,USD
+DB-10026,Peanut Protein Bar - Peakline (2.1 oz),,Snacks & Candy/Snack & Granola Bars,Peakline,2900000000773,2.1 oz,1.99,USD
+DB-10027,Chocolate Sandwich Cookies - Crispwell (14.3 oz),,Snacks & Candy/Packaged Cookies,Crispwell,2900000000803,14.3 oz,3.79,USD
+DB-10028,Chicken Alfredo Frozen Entree - Forno Uno (10 oz),,Frozen Foods/Frozen Meals & Pizza,Forno Uno,2900000000834,10 oz,3.49,USD
+DB-10029,Vanilla Bean Ice Cream - Velora (1.5 qt),,Frozen Foods/Ice Cream & Frozen Desserts,Velora,2900000000865,1.5 qt,5.49,USD
+DB-10030,Purified Water Gallon - Nimbus (1 gal),,Water/Still Water,Nimbus,2900000000896,1 gal,1.49,USD
+DB-10031,Electrolyte Water - Peakline (1 L),,Water/Enhanced & Flavored Water,Peakline,2900000000926,1 L,1.99,USD
+DB-10032,Diet Lemon Lime Soda - Fizzline (2 L),,Soft Drinks/Soda,Fizzline,2900000000957,2 L,2.29,USD
+DB-10033,Apple Juice - Sunhollow (64 fl oz),100% juice from concentrate.,Juice/Fruit Juice,Sunhollow,2900000000988,64 fl oz,3.29,USD
+DB-10034,Pure Coconut Water - Thai Lotus (33.8 fl oz),,Juice/Coconut Water & Coconut Beverages,Thai Lotus,2900000001015,33.8 fl oz,4.29,USD
+DB-10035,Dark Roast Coffee Pods - Ember & Oak (12 ct),,Coffee & Tea/Coffee,Ember & Oak,2900000001046,12 ct,7.99,USD
+DB-10036,Unsweetened Iced Tea - Stillwater Tea (59 fl oz),,Coffee & Tea/Tea,Stillwater Tea,2900000001077,59 fl oz,2.99,USD
+DB-10037,Sugar Free Energy Drink 4 Pack - Voltedge (4 x 8.4 fl oz),,Sports & Energy Drinks/Energy Drinks,Voltedge,2900000001107,4 x 8.4 fl oz,6.99,USD
+DB-10038,Dish Soap Lemon - Glint (24 fl oz),Grease-cutting liquid for hand washing dishes.,Cleaning Supplies/Dish Soap & Dishwasher Detergent,Glint,2900000001138,24 fl oz,2.99,USD
+DB-10039,All Purpose Cleaner Spray - Glint (32 fl oz),,Cleaning Supplies/Surface Cleaners,Glint,2900000001169,32 fl oz,3.49,USD
+DB-10040,Scrub Sponges 6 Pack - Glint (6 ct),,Cleaning Supplies/Cleaning Tools,Glint,2900000001190,6 ct,3.99,USD
+DB-10041,Laundry Detergent Pods - Pine & Pebble (42 ct),,Laundry/Laundry Detergent,Pine & Pebble,2900000001220,42 ct,12.99,USD
+DB-10042,Paper Towels 6 Double Rolls - Lumo (6 ct),,Paper & Plastic/Paper Towels & Napkins,Lumo,2900000001251,6 ct,8.99,USD
+DB-10043,Recycled Toilet Paper - Lumo (6 ct),,Paper & Plastic/Toilet Paper,Lumo,2900000001282,6 ct,5.99,USD
+DB-10044,Sandwich Zip Bags - Holdfast (100 ct),,Paper & Plastic/Trash & Storage Bags,Holdfast,2900000001312,100 ct,3.29,USD
+DB-10045,Vanilla Scented Candle - Hearthside (7 oz),,Air Care & Pest/Air Fresheners & Candles,Hearthside,2900000001343,7 oz,6.99,USD
+DB-10046,Volumizing Conditioner - Purely (12 fl oz),,Hair Care/Shampoo & Conditioner,Purely,2900000001374,12 fl oz,4.99,USD
+DB-10047,Flexible Hold Hairspray - Purely (10 oz),,Hair Care/Hair Styling,Purely,2900000001404,10 oz,4.49,USD
+DB-10048,Soft Toothbrush 2 Pack - Brightside (2 ct),,Oral Care/Toothbrushes & Floss,Brightside,2900000001435,2 ct,3.99,USD
+DB-10049,Body Wash Shea Butter - Purely (18 fl oz),,Bath & Body/Body Wash & Bar Soap,Purely,2900000001466,18 fl oz,5.49,USD
+DB-10050,Hand Sanitizer Gel - Purely (8 fl oz),,Bath & Body/Hand Soap & Sanitizer,Purely,2900000001497,8 fl oz,2.99,USD
+DB-10051,Antiperspirant Stick Fresh - Purely (2.6 oz),,Bath & Body/Deodorant,Purely,2900000001527,2.6 oz,4.29,USD
+DB-10052,Disposable Razors 4 Pack - Keenedge (4 ct),,Shaving & Grooming/Razors & Blades,Keenedge,2900000001558,4 ct,5.99,USD
+DB-10053,Ultra Thin Pads with Wings - Luna Day (28 ct),,Feminine Care/Pads & Tampons,Luna Day,2900000001589,28 ct,6.49,USD
+DB-10054,Pain Relief Patch - Wellmark (5 ct),,Pain & Fever/Topical Pain Relief,Wellmark,2900000001619,5 ct,6.99,USD
+DB-10055,Children's Allergy Liquid - Wellmark (4 fl oz),,"Cough, Cold & Allergy/Allergy Relief",Wellmark,2900000001640,4 fl oz,7.99,USD
+DB-10056,Antacid Chewable Tablets Berry - Wellmark (96 ct),,Digestive Health/Antacids & Heartburn Relief,Wellmark,2900000001671,96 ct,5.49,USD
+DB-10057,Kids Multivitamin Gummies - Vitalroot (60 ct),,Vitamins & Supplements/Multivitamins,Vitalroot,2900000001701,60 ct,8.99,USD
+DB-10058,Whey Protein Powder Vanilla - Peakline (2 lb),,Vitamins & Supplements/Protein & Nutrition Powders,Peakline,2900000001732,2 lb,24.99,USD
+DB-10059,Isopropyl Rubbing Alcohol 70% - Wellmark (16 fl oz),,First Aid/Antiseptics & Ointments,Wellmark,2900000001763,16 fl oz,2.49,USD
+DB-10060,Wet Dog Food Beef Stew - Tailwag (13 oz),,Dog/Dog Food,Tailwag,2900000001794,13 oz,1.99,USD
+DB-10061,Indoor Dry Cat Food Salmon - Whiskerly (7 lb),,Cat/Cat Food,Whiskerly,2900000001824,7 lb,15.99,USD
+DB-10062,Crunchy Cat Treats Chicken - Whiskerly (2.1 oz),,Cat/Cat Treats,Whiskerly,2900000001855,2.1 oz,1.99,USD
+DB-10063,Dog Waste Bags - Tailwag (120 ct),,Pet Supplies/Pet Waste & Cleanup,Tailwag,2900000001886,120 ct,5.49,USD
+DB-10064,Training Pants 3T-4T - Tiny Sprout (22 ct),,Diapering/Diapers & Training Pants,Tiny Sprout,2900000001916,22 ct,10.99,USD
+DB-10065,Diaper Rash Cream - Tiny Sprout (4 oz),,Diapering/Diaper Rash Care,Tiny Sprout,2900000001947,4 oz,6.49,USD
+DB-10066,Apple Banana Baby Food Pouch - Tiny Sprout (3.5 oz),Stage 2 fruit puree for babies.,Baby Feeding/Baby Food & Snacks,Tiny Sprout,2900000001978,3.5 oz,1.39,USD
+DB-10067,Anti-Colic Baby Bottles 3 Pack - Cubby (3 x 8 oz),,Baby Feeding/Bottles & Feeding Supplies,Cubby,2900000002005,3 x 8 oz,14.99,USD
+DB-10068,Baby Wash & Shampoo Fragrance Free - Tiny Sprout (8 fl oz),,Baby Bath & Skin Care/Baby Wash & Shampoo,Tiny Sprout,2900000002036,8 fl oz,4.49,USD
+DB-10069,Glass Baking Dish - Hearthside (3 qt),,Kitchen & Dining/Cookware & Bakeware,Hearthside,2900000002067,3 qt,12.99,USD
+DB-10070,Apple Corer and Slicer - Hearthside (1 ct),Stainless steel kitchen tool that cores and slices apples.,Kitchen & Dining/Kitchen Tools & Storage,Hearthside,2900000002098,1 ct,7.99,USD
+DB-10071,AA Alkaline Batteries 8 Pack - Voltcell (8 ct),,Electronics & Batteries/Batteries,Voltcell,2900000002128,8 ct,7.99,USD
+DB-10072,Wired Earbuds - Linkwire (1 ct),,Electronics & Batteries/Phone & Device Accessories,Linkwire,2900000002159,1 ct,12.99,USD
+DB-10073,No. 2 Pencils 12 Pack - Inkwell (12 ct),,"Office & School/Pens, Pencils & Markers",Inkwell,2900000002180,12 ct,2.49,USD
+DB-10074,LED Light Bulbs 60W Equivalent 4 Pack - Fixwell (4 ct),,Home & Hardware/Light Bulbs,Fixwell,2900000002210,4 ct,8.99,USD
+DB-10075,Birthday Candles - Hearthside (24 ct),,Seasonal & Party/Party Supplies & Gift Wrap,Hearthside,2900000002241,24 ct,1.99,USD
+DB-10076,Whole Milk - Meadow Lane (1 gal),Grade A pasteurized whole milk.,Dairy & Eggs/Dairy Milk,Meadow Lane,2900000002272,1 gal,4.29,USD
+DB-10077,Sharp Cheddar Block - Meadow Lane (8 oz),,Dairy & Eggs/Cheese,Meadow Lane,2900000002302,8 oz,3.99,USD
+DB-10078,Salted Butter Sticks - Meadow Lane (16 oz),,Dairy & Eggs/Butter & Margarine,Meadow Lane,2900000002333,16 oz,4.79,USD
+DB-10079,Blueberries - Tidewater Farms (1 pint),,Produce/Fresh Fruit,Tidewater Farms,2900000002364,1 pint,3.99,USD
+DB-10080,Boneless Skinless Chicken Breast - Oaken Farms (per lb),,Meat & Seafood/Poultry,Oaken Farms,2900000002395,per lb,4.49,USD
+DB-10081,Oven Roasted Turkey Slices - Oaken Farms (9 oz),,Meat & Seafood/Deli Meats,Oaken Farms,2900000002425,9 oz,4.99,USD
+DB-10082,Chocolate Chip Cookies Bakery Fresh - Kettlebrook (12 ct),,Bakery/Sweet Baked Goods,Kettlebrook,2900000002456,12 ct,4.49,USD
+DB-10083,Old Fashioned Rolled Oats - Goldfield (42 oz),,Pantry/Rice & Grains,Goldfield,2900000002487,42 oz,4.99,USD
+DB-10084,Sweetened Condensed Milk - Goldfield (14 oz),,Pantry/Canned Cooking Milks,Goldfield,2900000002517,14 oz,2.19,USD
+DB-10085,Marinara Pasta Sauce - Nonna Vera (24 oz),,Pantry/Sauces & Condiments,Nonna Vera,2900000002548,24 oz,3.49,USD
+DB-10086,Ground Black Pepper - Goldfield (3 oz),,Pantry/Spices & Seasonings,Goldfield,2900000002579,3 oz,3.49,USD
+DB-10087,Roasted Salted Cashews - Goldfield (8 oz),,Pantry/Nuts & Dried Fruit,Goldfield,2900000002609,8 oz,5.99,USD
+DB-10088,Sea Salt Potato Chips - Crispwell (8 oz),,Snacks & Candy/Chips & Crackers,Crispwell,2900000002630,8 oz,3.49,USD
+DB-10089,Fruit Gummy Bears - Velora (5 oz),,Snacks & Candy/Candy & Chocolate,Velora,2900000002661,5 oz,1.99,USD
+DB-10090,Frozen Mixed Berries - Goldfield (16 oz),,Frozen Foods/Frozen Fruits & Vegetables,Goldfield,2900000002692,16 oz,4.49,USD
+DB-10091,Plain Seltzer - Nimbus (1 L),,Water/Sparkling Water,Nimbus,2900000002722,1 L,0.99,USD
+DB-10092,Orange Juice No Pulp - Sunhollow (52 fl oz),,Juice/Fruit Juice,Sunhollow,2900000002753,52 fl oz,4.49,USD
+DB-10093,Medium Roast Ground Coffee - Ember & Oak (12 oz),,Coffee & Tea/Coffee,Ember & Oak,2900000002784,12 oz,8.99,USD
+DB-10094,Energy Drink Original - Voltedge (16 fl oz),,Sports & Energy Drinks/Energy Drinks,Voltedge,2900000002814,16 fl oz,2.79,USD
+DB-10095,Dish Soap Free & Clear - Pine & Pebble (16 fl oz),,Cleaning Supplies/Dish Soap & Dishwasher Detergent,Pine & Pebble,2900000002845,16 fl oz,3.49,USD
+DB-90002,Vitamin Water,,Drinks & Wellness,,,20 fl oz,1.99,USD
+DB-90005,Coconut Milk Conditioner,Hair conditioner with coconut milk extract.,Dairy Alternatives,Purely,,13 fl oz,6.49,USD
+DB-90008,Ginger Lemon Kombucha,Fermented sparkling tea drink.,Chilled Drinks,Stillwater Tea,,16 fl oz,3.49,USD
+DB-90011,Potting Soil Mix,All purpose indoor and outdoor potting mix.,Home & Garden,Fixwell,,8 qt,5.99,USD
+DB-90014,Immune Boost Shot,,Drinks & Wellness,,,2 fl oz,3.29,USD

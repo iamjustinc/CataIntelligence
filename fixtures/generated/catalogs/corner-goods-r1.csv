@@ -1,0 +1,100 @@
+merchant_sku,title,description,merchant_category_path,brand,gtin,package_size,price,currency
+CG-10001,Lactose Free Skim Milk 64oz,,Food,,,64 fl oz,4.99,USD
+CG-10002,Vanilla Soy Milk 64oz,,Food,,,64 fl oz,3.59,USD
+CG-10003,Crumbled Feta 6 oz,,Food,,,6 oz,4.29,USD
+CG-10004,Coconut Yogurt Alternative Vanilla 5.3 oz,,Food,,,5.3 oz,1.99,USD
+CG-10005,Large Brown Eggs 12ct,,Food,,,12 ct,3.99,USD
+CG-10006,Honeycrisp Apples 5.99,,Food,,,5.99,"Crisp, sweet eating apples.",USD
+CG-10007,Whole Carrots 1.99,,Food,,,1.99,,USD
+CG-10008,Cilantro Bunch 0.99,,Food,,,0.99,,USD
+CG-10009,Ground Beef 85% Lean 16 oz,,Food,,,16 oz,6.49,USD
+CG-10010,Frozen Raw Shrimp Peeled 12 oz,,Food,,,12 oz,8.99,USD
+CG-10011,Whole Wheat Sandwich Bread 20 oz,,Food,,,20 oz,3.49,USD
+CG-10012,Blueberry Muffins 4 Count 4ct,,Food,,,4 ct,4.99,USD
+CG-10013,Gluten Free Penne 12 oz,,Food,,,12 oz,3.29,USD
+CG-10014,Organic Quinoa 16 oz,,Food,,,16 oz,5.49,USD
+CG-10015,Diced Tomatoes No Salt Added 14.5 oz,,Food,,,14.5 oz,1.19,USD
+CG-10016,Evaporated Milk 12oz,,Food,,,12 fl oz,1.49,USD
+CG-10017,Tomato Soup Condensed 10.75 oz,,Food,,,10.75 oz,1.29,USD
+CG-10018,Apple Cider Vinegar 16oz,,Food,,,16 fl oz,2.99,USD
+CG-10019,Medium Salsa 16 oz,,Food,,,16 oz,3.29,USD
+CG-10020,Semi-Sweet Chocolate Chips 12 oz,,Food,,,12 oz,3.49,USD
+CG-10021,Creamy Peanut Butter 16 oz,,Food,,,16 oz,3.29,USD
+CG-10022,Whole Raw Almonds 16 oz,,Food,,,16 oz,7.49,USD
+CG-10023,Honey Oat Rings Cereal 12 oz,,Food,,,12 oz,3.99,USD
+CG-10024,Pure Maple Syrup 12oz,,Food,,,12 fl oz,8.99,USD
+CG-10025,Butter Crackers 13.7 oz,,Food,,,13.7 oz,3.99,USD
+CG-10026,Milk Chocolate Bar 3.5 oz,,Food,,,3.5 oz,2.49,USD
+CG-10027,Vanilla Wafers 11 oz,,Food,,,11 oz,2.99,USD
+CG-10028,Frozen Broccoli Florets 12 oz,,Food,,,12 oz,1.99,USD
+CG-10029,Fruit Ice Pops 12ct,,Food,,,12 ct,3.99,USD
+CG-10030,Lime Sparkling Water 8 Pack 8 x 12oz,,Drinks,,,8 x 12 fl oz,3.99,USD
+CG-10031,Berry Flavored Water Zero Sugar 20oz,,Drinks,,,20 fl oz,1.49,USD
+CG-10032,Ginger Ale 2 L,,Drinks,,,2 L,2.29,USD
+CG-10033,Classic Lemonade 52oz,,Drinks,,,52 fl oz,2.99,USD
+CG-10034,Coconut Milk Beverage Original 64oz,,Drinks,,,64 fl oz,3.99,USD
+CG-10035,Cold Brew Coffee Unsweetened 32oz,,Drinks,,,32 fl oz,4.99,USD
+CG-10036,Hot Cocoa Mix 10ct,,Drinks,,,10 ct,2.99,USD
+CG-10037,Lemon Lime Sports Drink 28oz,,Drinks,,,28 fl oz,1.79,USD
+CG-10038,Dishwasher Detergent Pods 42ct,,Essentials,,,42 ct,11.99,USD
+CG-10039,Disinfecting Wipes 75ct,,Essentials,,,75 ct,4.99,USD
+CG-10040,Microfiber Mop 1ct,,Essentials,,,1 ct,14.99,USD
+CG-10041,Dryer Sheets Lavender 120ct,,Essentials,,,120 ct,5.49,USD
+CG-10042,Paper Napkins 200ct,,Essentials,,,200 ct,2.99,USD
+CG-10043,Facial Tissue Cube 3 x 60ct,,Essentials,,,3 x 60 ct,4.49,USD
+CG-10044,Aluminum Foil 75 sq ft,,Essentials,,,75 sq ft,4.49,USD
+CG-10045,Ant & Roach Killer Spray 17.5 oz,,Essentials,,,17.5 oz,5.49,USD
+CG-10046,Coconut Milk Shampoo 13oz,,Health & Beauty,,,13 fl oz,6.49,USD
+CG-10047,Whitening Toothpaste 4.8 oz,,Health & Beauty,,,4.8 oz,3.49,USD
+CG-10048,Mint Dental Floss 55 yd,,Health & Beauty,,,55 yd,2.49,USD
+CG-10049,Bar Soap Sensitive Skin 6 Pack 6 x 4 oz,,Health & Beauty,,,6 x 4 oz,6.49,USD
+CG-10050,Daily Body Lotion 16oz,,Health & Beauty,,,16 fl oz,6.99,USD
+CG-10051,Aluminum Free Deodorant 2.7 oz,,Health & Beauty,,,2.7 oz,5.99,USD
+CG-10052,Shave Gel Sensitive 7 oz,,Health & Beauty,,,7 oz,3.49,USD
+CG-10053,Ibuprofen Tablets 200 mg 100ct,,Health & Beauty,,,100 ct,7.99,USD
+CG-10054,Muscle Rub Cream 3 oz,,Health & Beauty,,,3 oz,5.99,USD
+CG-10055,Daytime Cold & Flu Liquid 12oz,,Health & Beauty,,,12 fl oz,9.99,USD
+CG-10056,24 Hour Acid Reducer Capsules 14ct,,Health & Beauty,,,14 ct,9.99,USD
+CG-10057,Vitamin C 500 mg Tablets 100ct,,Health & Beauty,,,100 ct,7.49,USD
+CG-10058,Flexible Fabric Bandages 100ct,,Health & Beauty,,,100 ct,5.49,USD
+CG-10059,Triple Antibiotic Ointment 1 oz,,Health & Beauty,,,1 oz,4.99,USD
+CG-10060,Peanut Butter Dog Biscuits 16 oz,,Essentials,,,16 oz,4.99,USD
+CG-10061,Wet Cat Food Variety Pack 12 x 3 oz,,Essentials,,,12 x 3 oz,9.49,USD
+CG-10062,Rope Tug Dog Toy 1ct,,Essentials,,,1 ct,6.99,USD
+CG-10063,Puppy Training Pads 50ct,,Essentials,,,50 ct,14.99,USD
+CG-10064,Sensitive Baby Wipes 3 x 72ct,,Health & Beauty,,,3 x 72 ct,6.99,USD
+CG-10065,Infant Formula Powder with Iron 20.5 oz,,Health & Beauty,,,20.5 oz,26.99,USD
+CG-10066,Baby Oatmeal Cereal 8 oz,,Health & Beauty,,,8 oz,2.99,USD
+CG-10067,Spill-Proof Sippy Cup 1ct,,Health & Beauty,,,1 ct,5.99,USD
+CG-10068,Baby Lotion 13.6oz,,Health & Beauty,,,13.6 fl oz,5.49,USD
+CG-10069,Food Storage Containers 10 Piece 10 pc,,Essentials,,,10 pc,9.99,USD
+CG-10070,Paper Plates 9 Inch 100ct,,Essentials,,,100 ct,6.99,USD
+CG-10071,AAA Alkaline Batteries 8 Pack 8ct,,Essentials,,,8 ct,7.99,USD
+CG-10072,Fast Wall Charger 20W 1ct,,Essentials,,,1 ct,14.99,USD
+CG-10073,Spiral Notebook College Ruled 70 sheets,,Essentials,,,70 sheets,1.99,USD
+CG-10074,Duct Tape 20 yd,,Essentials,,,20 yd,4.99,USD
+CG-10075,Assorted Latex Balloons 25ct,,Essentials,,,25 ct,3.49,USD
+CG-10076,Barista Oat Milk 32oz,,Food,,,32 fl oz,4.49,USD
+CG-10077,Strawberry Yogurt Cups 4 Pack 4 x 5.3 oz,,Food,,,4 x 5.3 oz,3.99,USD
+CG-10078,Bananas 0.59,,Food,,,0.59,Fresh yellow bananas.,USD
+CG-10079,Fresh Basil 0.75 oz,,Food,,,0.75 oz,2.49,USD
+CG-10080,Atlantic Salmon Fillet per lb,,Food,,,per lb,11.99,USD
+CG-10081,Flour Tortillas 10ct,,Food,,,10 ct,2.99,USD
+CG-10082,Jasmine Rice 5 lb,,Food,,,5 lb,7.99,USD
+CG-10083,Coconut Milk Unsweetened Canned 13.5oz,,Food,,,13.5 fl oz,2.29,USD
+CG-10084,Canola Oil 48oz,,Food,,,48 fl oz,4.49,USD
+CG-10085,Granulated Sugar 4 lb,,Food,,,4 lb,3.29,USD
+CG-10086,Strawberry Preserves 18 oz,,Food,,,18 oz,3.99,USD
+CG-10087,Buttermilk Pancake Mix 32 oz,,Food,,,32 oz,3.49,USD
+CG-10088,Peanut Protein Bar 2.1 oz,,Food,,,2.1 oz,1.99,USD
+CG-10089,Chicken Alfredo Frozen Entree 10 oz,,Food,,,10 oz,3.49,USD
+CG-10090,Purified Water Gallon 1 gal,,Drinks,,,1 gal,1.49,USD
+CG-10091,Diet Lemon Lime Soda 2 L,,Drinks,,,2 L,2.29,USD
+CG-10092,Pure Coconut Water 33.8oz,,Drinks,,,33.8 fl oz,4.29,USD
+CG-10093,Unsweetened Iced Tea 59oz,,Drinks,,,59 fl oz,2.99,USD
+CG-10094,Dish Soap Lemon 24oz,,Essentials,,,24 fl oz,2.99,USD
+CG-90001,Apple,,Misc,,,,1.29,USD
+CG-90003,Relief 24,,Health & Beauty,,,,12.99,USD
+CG-90010,Charcoal Briquettes 8lb,,Essentials,,,,7.99,USD
+CG-90013,Night Calm Drops,,Health & Beauty,,,,9.99,USD
+CG-90015,Almond Milk Unsweet 64oz,,Food,,,,3.99,USD
