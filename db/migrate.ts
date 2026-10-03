@@ -16,6 +16,7 @@ export const APPEND_ONLY_TABLES = [
   "audit_events",
   "mapping_releases",
   "published_mappings",
+  "release_unresolved",
   "review_decisions",
   "recommendations",
   "catalog_revisions",

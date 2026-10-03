@@ -9,7 +9,22 @@ import type { CreateMerchantInput } from "@/lib/contracts/merchant";
 
 export async function listMerchants(actor: Actor) {
   if (!can(actor.role, "catalog.read")) throw forbidden();
-  return withContext(actor, (tx) => tx.select().from(merchants).orderBy(sql`lower(${merchants.name})`));
+  return withContext(actor, (tx) =>
+    tx
+      .select({
+        id: merchants.id,
+        workspaceId: merchants.workspaceId,
+        name: merchants.name,
+        externalKey: merchants.externalKey,
+        region: merchants.region,
+        active: merchants.active,
+        activeCatalogRevisionId: merchants.activeCatalogRevisionId,
+        revisionSequence: sql<number | null>`(select cr.sequence from catalog_revisions cr where cr.id = ${merchants.activeCatalogRevisionId})`,
+        activeListings: sql<number | null>`(select count(*)::int from listing_revisions lr where lr.catalog_revision_id = ${merchants.activeCatalogRevisionId} and lr.active)`,
+      })
+      .from(merchants)
+      .orderBy(sql`lower(${merchants.name})`),
+  );
 }
 
 export async function getMerchant(actor: Actor, merchantId: string) {

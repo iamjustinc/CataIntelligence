@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { Badge, Card, PageHeader, StatePanel } from "@/components/ui";
 import { can } from "@/lib/auth/permissions";
 import { requirePageSession } from "@/lib/auth/session";
@@ -24,7 +25,7 @@ export default async function CatalogsPage() {
           {merchants.length === 0 ? (
             <div className="p-5">
               <StatePanel kind="empty" title="No merchants yet">
-                {canManage ? "Add the first merchant with the form on this page, then import its catalog." : "A taxonomist or administrator can add merchants."}
+                {canManage ? "Add the first merchant with the form on this page, then open it to import its catalog." : "A taxonomist or administrator can add merchants."}
               </StatePanel>
             </div>
           ) : (
@@ -44,12 +45,14 @@ export default async function CatalogsPage() {
                   {merchants.map((m) => (
                     <tr key={m.id} className="[&>td]:px-5 [&>td]:py-3">
                       <th scope="row" className="px-5 py-3 font-medium text-ink">
-                        {m.name}
+                        <Link href={`/catalogs/${m.id}`} className="underline decoration-rule-strong underline-offset-4 hover:decoration-ink">
+                          {m.name}
+                        </Link>
                       </th>
                       <td className="font-mono text-xs text-ink-soft">{m.externalKey ?? "—"}</td>
                       <td className="text-ink-soft">{m.region ?? "—"}</td>
                       <td>{m.active ? <Badge tone="ok">Active</Badge> : <Badge>Inactive</Badge>}</td>
-                      <td className="text-muted">{m.activeCatalogRevisionId ? <span className="font-mono text-xs">{m.activeCatalogRevisionId.slice(0, 8)}</span> : "No catalog imported"}</td>
+                      <td className="text-muted">{m.activeCatalogRevisionId === null ? "No catalog imported" : <span className="text-ink">Revision {m.revisionSequence} · <span className="font-mono text-xs">{m.activeListings}</span> listings</span>}</td>
                     </tr>
                   ))}
                 </tbody>
@@ -69,9 +72,6 @@ export default async function CatalogsPage() {
               Your role can view merchants and catalogs. Adding merchants and importing catalogs requires a taxonomist or administrator.
             </StatePanel>
           )}
-          <StatePanel kind="pending" title="Catalog import: Phase 1">
-            CSV upload, column mapping, validation and revisions (TAX03, TAX04) are the next milestone. No import data is simulated.
-          </StatePanel>
         </aside>
       </div>
     </div>

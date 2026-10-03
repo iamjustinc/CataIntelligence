@@ -15,32 +15,32 @@ ROOT | All Products | Root of the canonical retail taxonomy.
       GRO-DAI-PLANT | Plant-Based Milk | Refrigerated or shelf-stable non-dairy milk beverages made from nuts, oats, soy or other plants. | almond milk;oat milk;soy milk;non-dairy milk || Unsweetened Almond Milk ~ Brightleaf ~ 64 fl oz ~ 3.79 ~ Almond beverage, no added sugar. ;; Barista Oat Milk ~ Brightleaf ~ 32 fl oz ~ 4.49 ;; Vanilla Soy Milk ~ Sunhollow ~ 64 fl oz ~ 3.59
       GRO-DAI-CHEESE | Cheese | Natural and processed cheese in blocks, slices, shreds or spreads. | cheddar;mozzarella || Sharp Cheddar Block ~ Meadow Lane ~ 8 oz ~ 3.99 ;; Shredded Mozzarella ~ Meadow Lane ~ 16 oz ~ 5.49 ;; Crumbled Feta ~ Tidewater ~ 6 oz ~ 4.29
       GRO-DAI-YOG | Yogurt | Cultured dairy and non-dairy yogurt, including Greek and drinkable styles. | greek yogurt || Plain Greek Yogurt ~ Clover Ridge ~ 32 oz ~ 5.99 ;; Strawberry Yogurt Cups 4 Pack ~ Clover Ridge ~ 4 x 5.3 oz ~ 3.99 ;; Coconut Yogurt Alternative Vanilla ~ Brightleaf ~ 5.3 oz ~ 1.99
-      GRO-DAI-BUTTER | Butter & Margarine | Butter, margarine and plant-based buttery spreads. | butter || Salted Butter Sticks ~ Meadow Lane ~ 16 oz ~ 4.79 ;; Plant Butter Spread ~ Brightleaf ~ 13 oz ~ 4.99
+      GRO-DAI-BUTTER | Butter & Margarine | Butter, margarine and plant-based buttery spreads. | butter;plant butter;margarine || Salted Butter Sticks ~ Meadow Lane ~ 16 oz ~ 4.79 ;; Plant Butter Spread ~ Brightleaf ~ 13 oz ~ 4.99
       GRO-DAI-EGGS | Eggs | Shell eggs and liquid egg products. | eggs || Large Brown Eggs ~ Henhouse Row ~ 12 ct ~ 3.99 ;; Liquid Egg Whites ~ Henhouse Row ~ 16 oz ~ 3.49
     GRO-PRO | Produce | Fresh fruits, vegetables and herbs.
-      GRO-PRO-FRUIT | Fresh Fruit | Whole or cut fresh fruit sold by weight, each or package. | apples;bananas;berries || Bananas ~ ~ per lb ~ 0.59 ~ Fresh yellow bananas. ;; Honeycrisp Apples ~ ~ 3 lb bag ~ 5.99 ~ Crisp, sweet eating apples. ;; Blueberries ~ Tidewater Farms ~ 1 pint ~ 3.99
-      GRO-PRO-VEG | Fresh Vegetables | Whole or cut fresh vegetables, including salad greens. | lettuce;carrots || Baby Spinach ~ Tidewater Farms ~ 5 oz ~ 2.99 ;; Whole Carrots ~ ~ 2 lb bag ~ 1.99 ;; Roma Tomatoes ~ ~ per lb ~ 1.49
+      GRO-PRO-FRUIT | Fresh Fruit | Whole or cut fresh fruit sold by weight, each or package. | apples;bananas;berries;blueberries || Bananas ~ ~ per lb ~ 0.59 ~ Fresh yellow bananas. ;; Honeycrisp Apples ~ ~ 3 lb bag ~ 5.99 ~ Crisp, sweet eating apples. ;; Blueberries ~ Tidewater Farms ~ 1 pint ~ 3.99
+      GRO-PRO-VEG | Fresh Vegetables | Whole or cut fresh vegetables, including salad greens. | lettuce;carrots;spinach;tomatoes || Baby Spinach ~ Tidewater Farms ~ 5 oz ~ 2.99 ;; Whole Carrots ~ ~ 2 lb bag ~ 1.99 ;; Roma Tomatoes ~ ~ per lb ~ 1.49
       GRO-PRO-HERB | Fresh Herbs | Fresh culinary herbs sold cut or potted. | basil;cilantro || Fresh Basil ~ Tidewater Farms ~ 0.75 oz ~ 2.49 ;; Cilantro Bunch ~ ~ 1 bunch ~ 0.99
     GRO-MEAT | Meat & Seafood | Fresh, frozen and packaged meat, poultry and seafood.
       GRO-MEAT-POULTRY | Poultry | Fresh or frozen raw chicken, turkey and other poultry. | chicken breast || Boneless Skinless Chicken Breast ~ Oaken Farms ~ per lb ~ 4.49 ;; Ground Turkey 93% Lean ~ Oaken Farms ~ 16 oz ~ 5.29
       GRO-MEAT-BEEF | Beef & Pork | Fresh or frozen raw beef, pork and lamb cuts and grinds. | ground beef || Ground Beef 85% Lean ~ Oaken Farms ~ 16 oz ~ 6.49 ;; Pork Loin Chops ~ Oaken Farms ~ per lb ~ 4.99
       GRO-MEAT-SEA | Seafood | Fresh, frozen or smoked fish and shellfish. | salmon;shrimp || Atlantic Salmon Fillet ~ Tidewater ~ per lb ~ 11.99 ;; Frozen Raw Shrimp Peeled ~ Tidewater ~ 12 oz ~ 8.99
-      GRO-MEAT-DELI | Deli Meats | Sliced or packaged cooked and cured meats. | lunch meat || Oven Roasted Turkey Slices ~ Oaken Farms ~ 9 oz ~ 4.99 ;; Uncured Bacon ~ Oaken Farms ~ 12 oz ~ 6.99
+      GRO-MEAT-DELI | Deli Meats | Sliced or packaged cooked and cured meats. | lunch meat;turkey slices;bacon || Oven Roasted Turkey Slices ~ Oaken Farms ~ 9 oz ~ 4.99 ;; Uncured Bacon ~ Oaken Farms ~ 12 oz ~ 6.99
     GRO-BAK | Bakery | Bread and baked goods.
-      GRO-BAK-BREAD | Bread & Rolls | Sliced bread, rolls, bagels and tortillas. | sandwich bread || Whole Wheat Sandwich Bread ~ Kettlebrook ~ 20 oz ~ 3.49 ;; Everything Bagels 6 Count ~ Kettlebrook ~ 6 ct ~ 3.99 ;; Flour Tortillas ~ Sol Camino ~ 10 ct ~ 2.99
+      GRO-BAK-BREAD | Bread & Rolls | Sliced bread, rolls, bagels and tortillas. | sandwich bread;bagels;tortillas || Whole Wheat Sandwich Bread ~ Kettlebrook ~ 20 oz ~ 3.49 ;; Everything Bagels 6 Count ~ Kettlebrook ~ 6 ct ~ 3.99 ;; Flour Tortillas ~ Sol Camino ~ 10 ct ~ 2.99
       GRO-BAK-SWEET | Sweet Baked Goods | Cakes, muffins, cookies and pastries from the bakery. | muffins;donuts || Blueberry Muffins 4 Count ~ Kettlebrook ~ 4 ct ~ 4.99 ;; Chocolate Chip Cookies Bakery Fresh ~ Kettlebrook ~ 12 ct ~ 4.49
     GRO-PAN | Pantry | Shelf-stable cooking and meal ingredients.
       GRO-PAN-PASTA | Pasta & Noodles | Dry or fresh pasta and noodles. | spaghetti;penne || Spaghetti ~ Nonna Vera ~ 16 oz ~ 1.79 ;; Gluten Free Penne ~ Nonna Vera ~ 12 oz ~ 3.29 ;; Ramen Noodle Soup Chicken Flavor ~ Quickbowl ~ 3 oz ~ 0.59
       GRO-PAN-RICE | Rice & Grains | Rice, quinoa, oats and other dry grains. | jasmine rice;quinoa || Jasmine Rice ~ Goldfield ~ 5 lb ~ 7.99 ;; Organic Quinoa ~ Goldfield ~ 16 oz ~ 5.49 ;; Old Fashioned Rolled Oats ~ Goldfield ~ 42 oz ~ 4.99
-      GRO-PAN-CANVEG | Canned Vegetables & Beans | Canned or jarred vegetables, beans and tomatoes. | canned beans;canned tomatoes || Black Beans ~ Goldfield ~ 15 oz ~ 0.99 ;; Diced Tomatoes No Salt Added ~ Goldfield ~ 14.5 oz ~ 1.19 ;; Sweet Corn Kernels ~ Goldfield ~ 15.25 oz ~ 0.99
+      GRO-PAN-CANVEG | Canned Vegetables & Beans | Canned or jarred vegetables, beans and tomatoes. | canned beans;black beans;canned tomatoes;diced tomatoes;corn kernels || Black Beans ~ Goldfield ~ 15 oz ~ 0.99 ;; Diced Tomatoes No Salt Added ~ Goldfield ~ 14.5 oz ~ 1.19 ;; Sweet Corn Kernels ~ Goldfield ~ 15.25 oz ~ 0.99
       GRO-PAN-COOKMILK | Canned Cooking Milks | Shelf-stable canned coconut milk, evaporated milk and condensed milk used as cooking ingredients. | canned coconut milk;evaporated milk;condensed milk || Coconut Milk Unsweetened Canned ~ Thai Lotus ~ 13.5 fl oz ~ 2.29 ~ Full fat coconut milk for curries and cooking. ;; Evaporated Milk ~ Goldfield ~ 12 fl oz ~ 1.49 ;; Sweetened Condensed Milk ~ Goldfield ~ 14 oz ~ 2.19
       GRO-PAN-SOUP | Soup & Broth | Canned, boxed or dry soups, broths and stocks. | chicken broth || Chicken Broth Low Sodium ~ Kettlebrook ~ 32 oz ~ 2.49 ;; Tomato Soup Condensed ~ Kettlebrook ~ 10.75 oz ~ 1.29
       GRO-PAN-OIL | Cooking Oils & Vinegars | Edible oils, cooking sprays and vinegars. | olive oil;vegetable oil || Extra Virgin Olive Oil ~ Nonna Vera ~ 16.9 fl oz ~ 8.99 ;; Canola Oil ~ Goldfield ~ 48 fl oz ~ 4.49 ;; Apple Cider Vinegar ~ Goldfield ~ 16 fl oz ~ 2.99 ~ Raw unfiltered vinegar made from apples.
       GRO-PAN-SAUCE | Sauces & Condiments | Pasta sauce, ketchup, mustard, mayonnaise, salsa and dressings. | ketchup;pasta sauce || Marinara Pasta Sauce ~ Nonna Vera ~ 24 oz ~ 3.49 ;; Tomato Ketchup ~ Redbarn ~ 20 oz ~ 2.99 ;; Medium Salsa ~ Sol Camino ~ 16 oz ~ 3.29
       GRO-PAN-BAKING | Baking Ingredients | Flour, sugar, baking mixes, leaveners and baking chips. | flour;sugar || All Purpose Flour ~ Goldfield ~ 5 lb ~ 3.49 ;; Granulated Sugar ~ Goldfield ~ 4 lb ~ 3.29 ;; Semi-Sweet Chocolate Chips ~ Kettlebrook ~ 12 oz ~ 3.49
       GRO-PAN-SPICE | Spices & Seasonings | Dried herbs, spices, salt and seasoning blends. | black pepper || Ground Black Pepper ~ Goldfield ~ 3 oz ~ 3.49 ;; Taco Seasoning Mix ~ Sol Camino ~ 1 oz ~ 0.99
-      GRO-PAN-SPREAD | Nut Butters & Spreads | Peanut butter, other nut butters, jams and honey. | peanut butter;jam || Creamy Peanut Butter ~ Redbarn ~ 16 oz ~ 3.29 ;; Almond Butter ~ Brightleaf ~ 12 oz ~ 7.99 ~ Stone-ground roasted almonds. ;; Strawberry Preserves ~ Redbarn ~ 18 oz ~ 3.99
-      GRO-PAN-NUTS | Nuts & Dried Fruit | Shelled or unshelled culinary and snacking nuts, seeds and dried fruit. | almonds;raisins || Whole Raw Almonds ~ Goldfield ~ 16 oz ~ 7.49 ;; Roasted Salted Cashews ~ Goldfield ~ 8 oz ~ 5.99 ;; Seedless Raisins ~ Goldfield ~ 12 oz ~ 3.29
+      GRO-PAN-SPREAD | Nut Butters & Spreads | Peanut butter, other nut butters, jams and honey. | peanut butter;almond butter;jam;preserves || Creamy Peanut Butter ~ Redbarn ~ 16 oz ~ 3.29 ;; Almond Butter ~ Brightleaf ~ 12 oz ~ 7.99 ~ Stone-ground roasted almonds. ;; Strawberry Preserves ~ Redbarn ~ 18 oz ~ 3.99
+      GRO-PAN-NUTS | Nuts & Dried Fruit | Shelled or unshelled culinary and snacking nuts, seeds and dried fruit. | almonds;cashews;raisins || Whole Raw Almonds ~ Goldfield ~ 16 oz ~ 7.49 ;; Roasted Salted Cashews ~ Goldfield ~ 8 oz ~ 5.99 ;; Seedless Raisins ~ Goldfield ~ 12 oz ~ 3.29
     GRO-BRK | Breakfast | Breakfast cereals and breakfast foods.
       GRO-BRK-CEREAL | Cereal & Granola | Ready-to-eat cereals, granola and muesli. | cereal || Honey Oat Rings Cereal ~ Morning Lark ~ 12 oz ~ 3.99 ;; Almond Vanilla Granola ~ Morning Lark ~ 11 oz ~ 4.79 ~ Oat clusters with almonds.
       GRO-BRK-SYRUP | Pancake Mixes & Syrups | Pancake and waffle mixes and breakfast syrups. | maple syrup || Buttermilk Pancake Mix ~ Morning Lark ~ 32 oz ~ 3.49 ;; Pure Maple Syrup ~ Morning Lark ~ 12 fl oz ~ 8.99
@@ -48,18 +48,18 @@ ROOT | All Products | Root of the canonical retail taxonomy.
       GRO-SNK-CHIPS | Chips & Crackers | Potato chips, tortilla chips, pretzels, popcorn and crackers. | potato chips || Sea Salt Potato Chips ~ Crispwell ~ 8 oz ~ 3.49 ;; Tortilla Chips Restaurant Style ~ Sol Camino ~ 13 oz ~ 3.29 ;; Butter Crackers ~ Crispwell ~ 13.7 oz ~ 3.99
       GRO-SNK-BARS | Snack & Granola Bars | Granola, cereal, protein and fruit bars. | protein bar || Chewy Granola Bars Chocolate Chip ~ Morning Lark ~ 8 ct ~ 3.29 ;; Peanut Protein Bar ~ Peakline ~ 2.1 oz ~ 1.99
       GRO-SNK-CANDY | Candy & Chocolate | Chocolate, gummies, hard candy and gum. | chocolate bar || Milk Chocolate Bar ~ Velora ~ 3.5 oz ~ 2.49 ;; Fruit Gummy Bears ~ Velora ~ 5 oz ~ 1.99
-      GRO-SNK-COOKIE | Packaged Cookies | Shelf-stable packaged cookies and snack cakes. | cookies || Chocolate Sandwich Cookies ~ Crispwell ~ 14.3 oz ~ 3.79 ;; Vanilla Wafers ~ Crispwell ~ 11 oz ~ 2.99
+      GRO-SNK-COOKIE | Packaged Cookies | Shelf-stable packaged cookies and snack cakes. | cookies;wafers || Chocolate Sandwich Cookies ~ Crispwell ~ 14.3 oz ~ 3.79 ;; Vanilla Wafers ~ Crispwell ~ 11 oz ~ 2.99
     GRO-FRZ | Frozen Foods | Foods stored and sold frozen.
       GRO-FRZ-MEAL | Frozen Meals & Pizza | Frozen entrees, pizza and prepared meals. | frozen pizza || Four Cheese Frozen Pizza ~ Forno Uno ~ 22 oz ~ 6.49 ;; Chicken Alfredo Frozen Entree ~ Forno Uno ~ 10 oz ~ 3.49
-      GRO-FRZ-VEG | Frozen Fruits & Vegetables | Plain frozen vegetables and fruit. | frozen peas || Frozen Broccoli Florets ~ Goldfield ~ 12 oz ~ 1.99 ;; Frozen Mixed Berries ~ Goldfield ~ 16 oz ~ 4.49
-      GRO-FRZ-ICE | Ice Cream & Frozen Desserts | Ice cream, frozen yogurt, sorbet and novelties. | ice cream || Vanilla Bean Ice Cream ~ Velora ~ 1.5 qt ~ 5.49 ;; Fruit Ice Pops ~ Velora ~ 12 ct ~ 3.99
+      GRO-FRZ-VEG | Frozen Fruits & Vegetables | Plain frozen vegetables and fruit. | frozen peas;frozen berries;frozen broccoli || Frozen Broccoli Florets ~ Goldfield ~ 12 oz ~ 1.99 ;; Frozen Mixed Berries ~ Goldfield ~ 16 oz ~ 4.49
+      GRO-FRZ-ICE | Ice Cream & Frozen Desserts | Ice cream, frozen yogurt, sorbet and novelties. | ice cream;ice pops;frozen yogurt || Vanilla Bean Ice Cream ~ Velora ~ 1.5 qt ~ 5.49 ;; Fruit Ice Pops ~ Velora ~ 12 ct ~ 3.99
   BEV | Beverages | Drinks other than fluid dairy and plant-based milks.
     BEV-WATER | Water | Still, sparkling and flavored waters.
       BEV-WATER-STILL | Still Water | Plain bottled still water, including spring and purified. | bottled water || Spring Water 24 Pack ~ Nimbus ~ 24 x 16.9 fl oz ~ 4.99 ;; Purified Water Gallon ~ Nimbus ~ 1 gal ~ 1.49
       BEV-WATER-SPARK | Sparkling Water | Carbonated water and seltzer, unsweetened, plain or naturally flavored. | seltzer || Lime Sparkling Water 8 Pack ~ Nimbus ~ 8 x 12 fl oz ~ 3.99 ;; Plain Seltzer ~ Nimbus ~ 1 L ~ 0.99
       BEV-WATER-ENH | Enhanced & Flavored Water | Still water with added vitamins, electrolytes or flavors, sweetened or unsweetened. | electrolyte water || Electrolyte Water ~ Peakline ~ 1 L ~ 1.99 ;; Berry Flavored Water Zero Sugar ~ Nimbus ~ 20 fl oz ~ 1.49
     BEV-SOFT | Soft Drinks | Carbonated sweetened beverages and mixers.
-      BEV-SOFT-SODA | Soda | Carbonated soft drinks, regular and diet. | cola;pop || Cola 12 Pack Cans ~ Fizzline ~ 12 x 12 fl oz ~ 6.99 ;; Diet Lemon Lime Soda ~ Fizzline ~ 2 L ~ 2.29 ;; Ginger Ale ~ Fizzline ~ 2 L ~ 2.29
+      BEV-SOFT-SODA | Soda | Carbonated soft drinks, regular and diet. | cola;soda pop;ginger ale || Cola 12 Pack Cans ~ Fizzline ~ 12 x 12 fl oz ~ 6.99 ;; Diet Lemon Lime Soda ~ Fizzline ~ 2 L ~ 2.29 ;; Ginger Ale ~ Fizzline ~ 2 L ~ 2.29
     BEV-JUICE | Juice | Fruit and vegetable juices and juice drinks.
       BEV-JUICE-FRUIT | Fruit Juice | 100% fruit juices and nectars, refrigerated or shelf-stable. | orange juice;apple juice || Orange Juice No Pulp ~ Sunhollow ~ 52 fl oz ~ 4.49 ;; Apple Juice ~ Sunhollow ~ 64 fl oz ~ 3.29 ~ 100% juice from concentrate.
       BEV-JUICE-DRINK | Juice Drinks & Lemonade | Sweetened juice drinks, lemonade and fruit punch with less than 100% juice. | lemonade || Classic Lemonade ~ Sunhollow ~ 52 fl oz ~ 2.99 ;; Fruit Punch Juice Drink Pouches ~ Sunhollow ~ 10 ct ~ 3.49
@@ -102,9 +102,9 @@ ROOT | All Products | Root of the canonical retail taxonomy.
       PC-BATH-DEO | Deodorant | Deodorants and antiperspirants. | antiperspirant || Antiperspirant Stick Fresh ~ Purely ~ 2.6 oz ~ 4.29 ;; Aluminum Free Deodorant ~ Purely ~ 2.7 oz ~ 5.99
       PC-BATH-SUN | Sun Care | Sunscreens and after-sun products. | sunscreen || Sunscreen Lotion SPF 50 ~ Solguard ~ 8 fl oz ~ 8.99
     PC-SHAVE | Shaving & Grooming | Razors, shaving cream and grooming tools.
-      PC-SHAVE-RAZOR | Razors & Blades | Disposable razors, cartridges and handles. | razor || Disposable Razors 4 Pack ~ Keenedge ~ 4 ct ~ 5.99 ;; Shave Gel Sensitive ~ Keenedge ~ 7 oz ~ 3.49
+      PC-SHAVE-RAZOR | Razors & Blades | Disposable razors, cartridges and handles. | razor;shave gel;shaving cream || Disposable Razors 4 Pack ~ Keenedge ~ 4 ct ~ 5.99 ;; Shave Gel Sensitive ~ Keenedge ~ 7 oz ~ 3.49
     PC-FEM | Feminine Care | Menstrual and feminine hygiene products.
-      PC-FEM-PADS | Pads & Tampons | Menstrual pads, liners and tampons. | tampons;pads || Regular Tampons ~ Luna Day ~ 36 ct ~ 7.99 ;; Ultra Thin Pads with Wings ~ Luna Day ~ 28 ct ~ 6.49
+      PC-FEM-PADS | Pads & Tampons | Menstrual pads, liners and tampons. | tampons;menstrual pads;pantiliners || Regular Tampons ~ Luna Day ~ 36 ct ~ 7.99 ;; Ultra Thin Pads with Wings ~ Luna Day ~ 28 ct ~ 6.49
   OTC | OTC Health | Over-the-counter medicines, supplements and first aid. Classification only: no medical advice.
     OTC-PAIN | Pain & Fever | Over-the-counter pain relievers and fever reducers.
       OTC-PAIN-ORAL | Oral Pain Relievers | Tablets, capsules and liquids for pain or fever relief taken by mouth. | ibuprofen;acetaminophen || Ibuprofen Tablets 200 mg ~ Wellmark ~ 100 ct ~ 7.99 ;; Acetaminophen Extra Strength Caplets ~ Wellmark ~ 100 ct ~ 8.49
@@ -119,7 +119,7 @@ ROOT | All Products | Root of the canonical retail taxonomy.
       OTC-VIT-SINGLE | Single Vitamins & Minerals | Individual vitamin and mineral supplements such as vitamin C, D or magnesium. | vitamin c;vitamin d || Vitamin C 500 mg Tablets ~ Vitalroot ~ 100 ct ~ 7.49 ;; Vitamin D3 2000 IU Softgels ~ Vitalroot ~ 120 ct ~ 8.99
       OTC-VIT-PROTEIN | Protein & Nutrition Powders | Protein powders and meal replacement powders. | protein powder || Whey Protein Powder Vanilla ~ Peakline ~ 2 lb ~ 24.99
     OTC-AID | First Aid | Bandages, antiseptics and first aid supplies.
-      OTC-AID-BANDAGE | Bandages & Dressings | Adhesive bandages, gauze and medical tape. | band-aids || Flexible Fabric Bandages ~ Wellmark ~ 100 ct ~ 5.49 ;; Sterile Gauze Pads ~ Wellmark ~ 25 ct ~ 3.99
+      OTC-AID-BANDAGE | Bandages & Dressings | Adhesive bandages, gauze and medical tape. | band-aids;gauze;bandages || Flexible Fabric Bandages ~ Wellmark ~ 100 ct ~ 5.49 ;; Sterile Gauze Pads ~ Wellmark ~ 25 ct ~ 3.99
       OTC-AID-ANTISEPTIC | Antiseptics & Ointments | Hydrogen peroxide, rubbing alcohol and antibiotic ointments. | rubbing alcohol || Isopropyl Rubbing Alcohol 70% ~ Wellmark ~ 16 fl oz ~ 2.49 ;; Triple Antibiotic Ointment ~ Wellmark ~ 1 oz ~ 4.99
   PET | Pet | Food and supplies for household pets.
     PET-DOG | Dog | Products for dogs.
@@ -131,7 +131,7 @@ ROOT | All Products | Root of the canonical retail taxonomy.
       PET-CAT-TREAT | Cat Treats | Treats and catnip for cats. | catnip || Crunchy Cat Treats Chicken ~ Whiskerly ~ 2.1 oz ~ 1.99
     PET-SUP | Pet Supplies | Non-food supplies for pets.
       PET-SUP-TOYS | Pet Toys | Toys for dogs, cats and small animals. | dog toy || Rope Tug Dog Toy ~ Tailwag ~ 1 ct ~ 6.99 ;; Feather Wand Cat Toy ~ Whiskerly ~ 1 ct ~ 4.99
-      PET-SUP-WASTE | Pet Waste & Cleanup | Waste bags, pads and pet stain cleaners. | poop bags || Dog Waste Bags ~ Tailwag ~ 120 ct ~ 5.49 ;; Puppy Training Pads ~ Tailwag ~ 50 ct ~ 14.99
+      PET-SUP-WASTE | Pet Waste & Cleanup | Waste bags, pads and pet stain cleaners. | poop bags;waste bags;training pads || Dog Waste Bags ~ Tailwag ~ 120 ct ~ 5.49 ;; Puppy Training Pads ~ Tailwag ~ 50 ct ~ 14.99
   BABY | Baby | Products for infants and toddlers.
     BABY-DIAPER | Diapering | Diapers, wipes and diaper care.
       BABY-DIAPER-DIAPERS | Diapers & Training Pants | Disposable diapers and training pants. | nappies || Baby Diapers Size 3 ~ Tiny Sprout ~ 84 ct ~ 24.99 ;; Training Pants 3T-4T ~ Tiny Sprout ~ 22 ct ~ 10.99
@@ -157,7 +157,7 @@ ROOT | All Products | Root of the canonical retail taxonomy.
       GM-OFF-PAPER | Notebooks & Paper | Notebooks, printer paper and sticky notes. | notebook || Spiral Notebook College Ruled ~ Inkwell ~ 70 sheets ~ 1.99 ;; Copy Paper ~ Inkwell ~ 500 sheets ~ 6.99
     GM-HOME | Home & Hardware | Light bulbs, basic tools and home goods.
       GM-HOME-LIGHT | Light Bulbs | LED and other household light bulbs. | led bulb || LED Light Bulbs 60W Equivalent 4 Pack ~ Fixwell ~ 4 ct ~ 8.99
-      GM-HOME-TOOLS | Hardware & Tools | Hand tools, tape, adhesives and fasteners. | duct tape || Duct Tape ~ Fixwell ~ 20 yd ~ 4.99 ;; Super Glue ~ Fixwell ~ 2 ct ~ 3.49
+      GM-HOME-TOOLS | Hardware & Tools | Hand tools, tape, adhesives and fasteners. | duct tape;super glue || Duct Tape ~ Fixwell ~ 20 yd ~ 4.99 ;; Super Glue ~ Fixwell ~ 2 ct ~ 3.49
     GM-SEAS | Seasonal & Party | Party supplies, gift wrap and seasonal goods.
       GM-SEAS-PARTY | Party Supplies & Gift Wrap | Balloons, candles, gift bags and wrapping paper. | balloons || Birthday Candles ~ Hearthside ~ 24 ct ~ 1.99 ;; Assorted Latex Balloons ~ Hearthside ~ 25 ct ~ 3.49
       GM-SEAS-CARDS | Greeting Cards | Greeting cards for occasions. | birthday card || Birthday Greeting Card ~ Inkwell ~ 1 ct ~ 3.99

@@ -10,6 +10,7 @@ import type { Actor } from "@/lib/auth/actor";
 import { can } from "@/lib/auth/permissions";
 import { CsvError, parseCsv } from "@/lib/csv";
 import { objectStore } from "@/lib/storage";
+import { assertUploadRate } from "./catalog-import";
 import { readTaxonomyCsv, validateTaxonomy, type ConceptInput, type TaxonomyIssue, type TaxonomyValidation } from "./taxonomy-validation";
 
 export const MAX_TAXONOMY_BYTES = 2 * 1024 * 1024;
@@ -117,6 +118,7 @@ export async function stageTaxonomyImport(actor: Actor, input: { fileName: strin
   const stagedFileKey = await objectStore().put(actor.workspaceId, "imports", "csv", input.content);
 
   return withContext(actor, async (tx) => {
+    await assertUploadRate(tx, actor);
     const base = await activeVersion(tx, actor.workspaceId);
     const baseInputs = base ? await loadConceptInputs(tx, base.id) : [];
     const parsedInputs = validation.errors.length === 0 ? validation.concepts : [];

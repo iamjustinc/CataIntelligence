@@ -595,13 +595,21 @@
       "expected": null,
       "acceptable": [],
       "kind": "missing_concept",
-      "note": "No drinkware leaf exists; not a beverage."
+      "note": "No drinkware leaf exists; not a beverage.",
+      "proposal": {
+        "name": "Drinkware & Water Bottles",
+        "parentKey": "GM-KIT"
+      }
     },
     "HM-90012": {
       "expected": null,
       "acceptable": [],
       "kind": "missing_concept",
-      "note": "No dips or prepared deli salads leaf exists."
+      "note": "No dips or prepared deli salads leaf exists.",
+      "proposal": {
+        "name": "Dips & Spreads (Refrigerated)",
+        "parentKey": "GRO"
+      }
     },
     "HM-90016": {
       "expected": "HOU-AIR-FRESH",
@@ -1199,7 +1207,11 @@
       "expected": null,
       "acceptable": [],
       "kind": "missing_concept",
-      "note": "No kombucha or fermented beverage leaf exists."
+      "note": "No kombucha or fermented beverage leaf exists.",
+      "proposal": {
+        "name": "Kombucha & Fermented Drinks",
+        "parentKey": "BEV"
+      }
     },
     "DB-90011": {
       "expected": null,
@@ -2381,13 +2393,21 @@
       "expected": null,
       "acceptable": [],
       "kind": "missing_concept",
-      "note": "No drinkware leaf exists; not a beverage."
+      "note": "No drinkware leaf exists; not a beverage.",
+      "proposal": {
+        "name": "Drinkware & Water Bottles",
+        "parentKey": "GM-KIT"
+      }
     },
     "HM-90012": {
       "expected": null,
       "acceptable": [],
       "kind": "missing_concept",
-      "note": "No dips or prepared deli salads leaf exists."
+      "note": "No dips or prepared deli salads leaf exists.",
+      "proposal": {
+        "name": "Dips & Spreads (Refrigerated)",
+        "parentKey": "GRO"
+      }
     },
     "HM-90016": {
       "expected": "HOU-AIR-FRESH",

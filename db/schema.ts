@@ -147,6 +147,8 @@ export const workspaces = pgTable(
     providerMode: providerModeEnum("provider_mode").notNull().default("off"),
     liveAiOptIn: boolean("live_ai_opt_in").notNull().default(false),
     isDemo: boolean("is_demo").notNull().default(false),
+    // The High signal band stays disabled until its precision gate is met (PRD TAX07).
+    highSignalEnabled: boolean("high_signal_enabled").notNull().default(false),
     jobTokenCap: integer("job_token_cap").notNull().default(400000),
     jobSpendCapUsd: numeric("job_spend_cap_usd", { precision: 10, scale: 2 }).notNull().default("5"),
     dailySpendCapUsd: numeric("daily_spend_cap_usd", { precision: 10, scale: 2 }).notNull().default("20"),
@@ -776,6 +778,56 @@ export const publishedMappings = pgTable(
       name: "published_mappings_decision_fk",
       columns: [t.workspaceId, t.decisionId],
       foreignColumns: [reviewDecisions.workspaceId, reviewDecisions.id],
+    }),
+  ],
+);
+
+/** Listings left out of a release, with the reason at publication time. Immutable. */
+export const releaseUnresolved = pgTable(
+  "release_unresolved",
+  {
+    workspaceId: workspaceId().references(() => workspaces.id),
+    releaseId: uuid("release_id").notNull(),
+    listingRevisionId: uuid("listing_revision_id").notNull(),
+    state: reviewStateEnum("state").notNull(),
+    reason: text("reason").notNull(),
+  },
+  (t) => [
+    primaryKey({ name: "release_unresolved_pk", columns: [t.releaseId, t.listingRevisionId] }),
+    foreignKey({
+      name: "release_unresolved_release_fk",
+      columns: [t.workspaceId, t.releaseId],
+      foreignColumns: [mappingReleases.workspaceId, mappingReleases.id],
+    }),
+    foreignKey({
+      name: "release_unresolved_listing_fk",
+      columns: [t.workspaceId, t.listingRevisionId],
+      foreignColumns: [listingRevisions.workspaceId, listingRevisions.id],
+    }),
+  ],
+);
+
+export const exportFiles = pgTable(
+  "export_files",
+  {
+    id: id(),
+    workspaceId: workspaceId().references(() => workspaces.id),
+    releaseId: uuid("release_id").notNull(),
+    kind: text("kind").notNull(),
+    fileName: text("file_name").notNull(),
+    storageKey: text("storage_key").notNull(),
+    contentType: text("content_type").notNull(),
+    rowCounts: jsonb("row_counts").notNull(),
+    createdBy: uuid("created_by")
+      .notNull()
+      .references(() => user.id),
+    createdAt: createdAt(),
+  },
+  (t) => [
+    foreignKey({
+      name: "export_files_release_fk",
+      columns: [t.workspaceId, t.releaseId],
+      foreignColumns: [mappingReleases.workspaceId, mappingReleases.id],
     }),
   ],
 );

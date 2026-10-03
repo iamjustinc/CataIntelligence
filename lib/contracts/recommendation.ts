@@ -1,8 +1,8 @@
 import { z } from "zod";
+import type { Candidate } from "@/lib/retrieval/candidates";
 
 /** Field limits sent to a provider (PRD 13.2). Originals are always retained in the database. */
 export const FIELD_LIMITS = { title: 500, description: 4000, merchantCategoryPath: 1000, candidateDefinition: 800 } as const;
-export const MAX_CANDIDATES = 10;
 export const EVIDENCE_FIELDS = ["title", "description", "merchant_category_path", "brand", "package_size", "gtin"] as const;
 
 /**
@@ -27,20 +27,11 @@ export const recommendationResponseSchema = z.strictObject({
 });
 export type RecommendationResponse = z.infer<typeof recommendationResponseSchema>;
 
-export interface CandidateConcept {
-  conceptId: string;
-  path: string;
-  name: string;
-  definition: string;
-  score: number;
-  matchedTerms: string[];
-  exactAlias: boolean;
-}
-
 export interface RecommendationRequest {
   workspaceId: string;
   listingRevisionId: string;
   taxonomyVersionId: string;
+  /** Hash of the classification-relevant fields; fixture output is bound to it. */
   contentHash: string;
   product: {
     title: string;
@@ -50,6 +41,10 @@ export interface RecommendationRequest {
     packageSize: string | null;
     gtin: string | null;
   };
+  /** Fields that exceeded FIELD_LIMITS and were shortened before being sent. */
   truncatedFields: string[];
-  candidates: CandidateConcept[];
+  /** Enumerated targets. A provider may select only from these. */
+  candidates: Candidate[];
+  /** Organizing concepts a missing-concept proposal may name as its parent. */
+  branches: { conceptId: string; stableKey: string; path: string }[];
 }

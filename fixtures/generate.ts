@@ -43,6 +43,9 @@ export interface Expected {
   acceptable: string[];
   kind: string;
   note: string;
+  /** Demo suggestion when it deliberately differs from `expected`. */
+  suggest?: string;
+  proposal?: { name: string; parentKey: string };
 }
 
 export const MERCHANTS = [
@@ -66,7 +69,8 @@ export function parseTaxonomy(source = TAXONOMY_SOURCE): ConceptSeed[] {
       .split(" ;; ")
       .filter((p) => p.trim())
       .map((p) => {
-        const [title, brand = "", size = "", price = "", description = ""] = p.split(" ~ ").map((s) => s.trim());
+        // Fields are separated by "~"; an empty field is written as two adjacent separators.
+        const [title, brand = "", size = "", price = "", description = ""] = p.split(/\s~(?=\s|$)/).map((s) => s.trim());
         return { title, brand, size, price, description };
       });
     stack.length = depth - 1;
@@ -147,7 +151,7 @@ export function buildFixtures(): Fixtures {
   for (const s of SPECIAL_CASES) {
     if (s.expected && !byKey.get(s.expected)?.products.length) throw new Error(`Special case ${s.sku} expects unknown leaf ${s.expected}`);
     catalogs[s.merchant].push({ sku: s.sku, title: s.title, description: s.description ?? "", category: s.category ?? "", brand: s.brand ?? "", gtin: "", size: s.size ?? "", price: s.price ?? "", currency: s.price ? "USD" : "" });
-    expected[s.merchant][s.sku] = { expected: s.expected, acceptable: s.acceptable ?? [], kind: s.kind, note: s.note };
+    expected[s.merchant][s.sku] = { expected: s.expected, acceptable: s.acceptable ?? [], kind: s.kind, note: s.note, ...(s.proposal ? { proposal: s.proposal } : {}) };
   }
 
   // Harbor Market revision 2 (snapshot): removals, classification-relevant edits, price-only edits, additions.

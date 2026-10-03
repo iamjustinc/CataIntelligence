@@ -17,7 +17,7 @@ export class ApiClientError extends Error {
 }
 
 interface Options {
-  method?: "GET" | "POST" | "PATCH" | "DELETE";
+  method?: "GET" | "POST" | "PUT" | "PATCH" | "DELETE";
   body?: unknown;
   /** Reuse the same key when retrying the same user action so the server can deduplicate it. */
   idempotencyKey?: string;
