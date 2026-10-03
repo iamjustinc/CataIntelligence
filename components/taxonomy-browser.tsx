@@ -321,8 +321,13 @@ export function TaxonomyBrowser({ versionId, concepts, canPropose = false }: { v
                 </div>
               </div>
             </dl>
+            <p className="mt-4 border-t border-rule pt-3 text-sm">
+              <Link href={`/review?concept=${current.conceptId}`} className="font-semibold text-stamp underline underline-offset-4">
+                Review listings under this concept
+              </Link>
+            </p>
             {canPropose ? (
-              <p className="mt-4 flex flex-wrap gap-x-4 gap-y-1 border-t border-rule pt-3 text-sm">
+              <p className="mt-2 flex flex-wrap gap-x-4 gap-y-1 text-sm">
                 <Link href={`/taxonomy/proposals/new?type=synonym&concept=${current.conceptId}`} className="font-semibold text-stamp underline underline-offset-4">
                   Propose a synonym
                 </Link>

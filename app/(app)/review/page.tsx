@@ -112,7 +112,7 @@ export default async function ReviewQueuePage({ searchParams }: { searchParams: 
 
       <p className="text-sm text-ink-soft" role="status">
         <span className="font-mono">{progress.approved}</span> approved, <span className="font-mono">{progress.remaining}</span> remaining of <span className="font-mono">{progress.total}</span> active listings
-        {params.merchant ? " for this merchant" : " across current catalogs"}.{" "}
+        {params.merchant ? " for this merchant" : " across current catalogs"}.{params.concept ? " Showing listings proposed or decided under the selected canonical concept." : ""}{" "}
         {filtered ? (
           <Link href="/review" className="font-semibold text-stamp underline underline-offset-4">
             Clear filters

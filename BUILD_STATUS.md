@@ -1,6 +1,6 @@
 # Build status
 
-Last updated: 2026-10-03 (session 1)
+Last updated: 2026-10-03 (session 2)
 
 Status values: **Not started** · **In progress** · **Implemented but unverified** · **Verified**.
 "Verified" means an automated test or a recorded manual check exercised the behavior on the server, not that a screen renders.
@@ -9,80 +9,89 @@ Status values: **Not started** · **In progress** · **Implemented but unverifie
 
 | Phase | State | Exit gate |
 | --- | --- | --- |
-| 0 Foundation and contracts | **Verified** | Met: workspace isolation tests pass; a fresh database is built from migrations on every test run |
-| 1 Deterministic taxonomy workflow | **In progress** | Not met: taxonomy import to publish works; catalog import, review, proposals, releases, export and audit UI remain |
-| 2 Live recommendation processing | Not started | |
-| 3 Shared dashboard and analytics | Not started (metric registry and AnalysisSpec contract exist) | |
+| 0 Foundation and contracts | **Verified** | Met |
+| 1 Deterministic taxonomy workflow | **Verified** | Met: a user can import, manually review, publish, refresh and reproduce the export without AI. Covered by integration tests and by the browser test from a fresh database |
+| 2 Live recommendation processing | Not started | Retrieval, validation, signal policy and the provider boundary exist and are tested with the demo provider; no live adapter, worker processing, budgets or evaluation corpus |
+| 3 Shared dashboard and analytics | Not started | Metric registry and AnalysisSpec contract only |
 | 4 Integrated release and demonstration | Not started | |
 
-Checks at the end of this session: `pnpm typecheck` clean, `pnpm lint` clean, `pnpm test` 89 passed in 7 files, `pnpm build` succeeded.
+Live AI has **not** been tested. There is no live adapter and no provider key was used. Every suggestion in this build is deterministic fixture output and is labeled Demo.
 
-Live AI has **not** been tested. No provider key was available and no provider adapter exists yet.
+## Verification run at the end of this session
 
-## Phase 0 deliverables
+| Check | Result |
+| --- | --- |
+| `pnpm typecheck` | Clean |
+| `pnpm lint` | Clean |
+| `pnpm test` | 165 passed in 13 files (run twice in a row) |
+| `pnpm test:e2e` | Rebuilds the `_e2e` database from migrations and seed, runs `next build`, then 5 Chromium tests against the production build: all passed |
+| `pnpm db:reset --yes` | Development database rebuilt from migrations and the demo seed in about 6 seconds |
 
-| Deliverable | Status | Evidence |
-| --- | --- | --- |
-| Repository structure, lockfile, lint and typecheck commands | Verified | `pnpm-lock.yaml`; commands above |
-| Database migrations | Verified | `tests/setup/global.ts` drops and recreates the test database from `db/migrations` each run; `isolation.test.ts` asserts 2 migrations and 29 tables |
-| Authentication | Verified | `api.test.ts`: 401 without session, forged cookie rejected, wrong password rejected, public sign-up disabled. Manual: browser sign-in and sign-out on localhost |
-| Workspace permissions | Verified | `permissions.test.ts` checks every cell of the PRD 3.2 matrix; `isolation.test.ts` and `api.test.ts` check enforcement in services and routes |
-| Workspace isolation | Verified | RLS on every tenant table (enumerated by test), no rows without context, foreign-workspace write rejected, forged workspace cookie ignored, by-ID read returns 404, composite FK blocks cross-workspace reference even for the owner |
-| Fixture generator | Verified | `fixtures.test.ts`: deterministic output, 153 concepts, 300 unique listings, PRD section 17 edge cases, revision 2 deltas |
-| Domain schemas and contracts | Verified (schemas only) | `contracts.test.ts`: PRD example payloads accepted; unknown keys, unregistered metrics, wrong scope and the literal `uuid-or-null` rejected. Not yet exercised by features |
-| Metric definitions | Implemented but unverified | `lib/analytics/metric-registry.ts` holds the eight PRD section 9 definitions. No query compiler yet |
-| Provider interfaces | Verified (status logic only) | Interface in `lib/ai/provider.ts`; test proves live mode without credentials reports "AI unavailable" and never demo |
-| `.env.example`, README | Verified | Setup steps were run in order on a clean directory during this session |
-| Audit foundation | Verified | Audit event commits with the change and is absent when the change fails; UPDATE and DELETE rejected for both roles |
-| Idempotency foundation | Verified | Missing key 400, repeat replays the same response with one row and one audit event, reused key with a different body 409 |
-| Worker process | In progress | Starts, verifies it runs as the restricted role, heartbeats, stops on SIGTERM (manual run). No job handlers or leases yet |
-| Application shell | Verified (manual) | Navigation, workspace selector, demo-data, provider and environment badges, sign-out, loading, error, empty and permission-denied states viewed in the browser at desktop and phone widths |
+Retrieval on the **demo fixtures** (not a held-out corpus, so not evidence for KPI01/KPI02): recall@10 286/289 (99.0%), top-1 261/289 (90.3%).
 
 ## Requirements
 
 | ID | Status | Implemented behavior | Verification | Outstanding |
 | --- | --- | --- | --- | --- |
-| TAX01 Taxonomy ingestion | Verified | CSV staged and validated; duplicate IDs, missing parents, cycles, multiple or no root, depth over eight, mapping on non-leaf or inactive all block with row-specific errors; ambiguous synonyms warn; commit creates a draft; a published version cannot be mutated; stable keys keep concept identity | `taxonomy-validation.test.ts` (12 tests), `taxonomy.test.ts` (12 tests), browser run of the import wizard with an invalid file and of publish | XLSX is P1 |
-| TAX02 Browse and search | Verified for browsing | Expandable keyboard-navigable tree, breadcrumb path, definition, synonyms, status, version selector with historical versions, search over names, paths, definitions, synonyms and IDs, published listing and pending proposal counts from live queries, expansion and selection restored on return | `taxonomy.test.ts` search cases; browser: keyboard navigation, search, restore after navigation | "Cannot select inactive or internal concepts as targets" is enforced when review lands (TAX08). Counts are zero until releases and proposals exist |
-| TAX03 Merchant and catalog management | In progress | Create and list merchants with name, external key, region, active flag; unique per workspace | `api.test.ts`, `isolation.test.ts`, browser | Catalog CSV import, column mapping, preview |
-| TAX04 Validation and revisions | Not started | Schema only (catalog and listing revisions, price and currency constraint) | Constraint definition asserted | Everything else |
-| TAX05 Candidate retrieval | Not started | | | |
-| TAX06 AI recommendations | Not started | Response contract only | `contracts.test.ts` | Adapter, semantic validation |
-| TAX07 Signal bands | Not started | | | |
-| TAX08 Review queue and detail | Not started | Schema only | | |
-| TAX09 Bulk approval | Not started | | | |
-| TAX10 Taxonomy proposals | Not started | Schema only | | |
-| TAX11 Version validation | Not started | Version binding columns exist | | Stale marking on taxonomy publish must ship with review state |
-| TAX12 Publication and rollback | Not started | Schema, immutability triggers | Trigger behavior asserted for audit events | |
-| TAX13 Export and audit | In progress | Append-only audit events written for merchant and taxonomy actions | `isolation.test.ts`, `taxonomy.test.ts` | Audit screen, exports |
-| ANA01 to ANA06 | Not started | Metric registry and AnalysisSpec contract only | `contracts.test.ts` | Metric service, dashboard, planner, UI |
+| TAX01 Taxonomy ingestion | Verified | CSV staged and validated with row-specific blocking errors; commit creates a draft; published versions immutable | `taxonomy-validation.test.ts`, `taxonomy.test.ts` | XLSX is P1 |
+| TAX02 Browse and search | Verified | Keyboard tree, breadcrumb, definition, synonyms, status, version selector, search, published listing and pending proposal counts, state restored on return; only active leaves selectable as targets | `taxonomy.test.ts`; `review.test.ts` (non-leaf and unknown targets rejected, concept search returns leaves only); browser | |
+| TAX03 Merchant and catalog management | Verified | Merchants; catalog upload with column mapping (aliases suggested, user-editable), 20-row preview, source row number, raw payload and normalized fields kept; price requires currency; no commit before confirmation | `catalog-validation.test.ts`, `catalog-import.test.ts`, e2e | Merchant edit and deactivate UI |
+| TAX04 Validation and revisions | Verified | 10 MB and 5,000-row limits, UTF-8 only; blocking row errors; exact duplicates collapsed, conflicting SKUs need a selection; count conservation; snapshot deactivates missing SKUs, delta carries forward; unchanged listings keep decisions with provenance, changed ones return to review; same-file re-upload returns the existing import; commit idempotent | `catalog-import.test.ts` (13), `review.test.ts` carry-forward case, e2e | Staged files are refused after 24 hours but not yet deleted by a job |
+| TAX05 Candidate retrieval | Verified | At most 10 active leaves from one version; whole-phrase aliases, token overlap, ancestor and merchant-category hints; scores and matched terms stored; product type beats ingredient term; empty set leads to abstention | `retrieval.test.ts` | Evaluated on demo fixtures only. Semantic retrieval is P1 |
+| TAX06 AI recommendations | In progress | Bounded request with field limits and truncation flags; strict response contract; server validation of IDs, candidate membership, evidence excerpts and contradictions; provider can only pick an enumerated candidate; proposals name a missing concept without minting an ID | `retrieval.test.ts` (validation and all 300 fixture listings), `review.test.ts` | Live Claude adapter, refusal and truncation handling against a real provider (Phase 2) |
+| TAX07 Signal bands | Verified | High, Medium, Low, No recommendation from a server policy with a stated basis and policy version; no percentages; High disabled by a workspace gate; provider can only lower | `retrieval.test.ts`, `review.test.ts`, `scenario.test.ts` | Precision gate needs the Phase 2 evaluation |
+| TAX08 Review queue and detail | Verified | Filters (merchant, revision, status, band, category, warning, search), three sorts, keyset pagination; item view with source fields, original values, evidence, alternatives, history; Approve, Change mapping, Reject, Defer, No suitable category; lock version checked; queue position kept; saves announced; J/K/A/C/Esc | `review.test.ts` (18), e2e | Catalog-revision filter is URL-only; category filter is reached from a taxonomy concept |
+| TAX09 Bulk approval | Verified (server), implemented (UI) | Up to 100 explicitly selected High rows on the page, preview dialog, all-or-nothing with conflict list, batch ID, per-item decisions | `review.test.ts` AT10 cases | Not exercised in the browser: High is disabled in the demo workspace, so no row is selectable |
+| TAX10 Taxonomy proposals | Verified | New leaf and synonym proposals with duplicate, structural and ambiguity checks; administrator approve, modify or reject with explanation; approval changes the draft only | `releases.test.ts`, e2e | Changing the parent during a modified approval is API-only. Reparent, merge, delete are P1 |
+| TAX11 Version validation | Verified | Recommendations and decisions bound to versions; publication marks dependents stale; explicit revalidation keeps compatible human decisions, returns others to review; later recommendations never replace a decision | `releases.test.ts`, `review.test.ts` AT09, e2e | After a taxonomy publication, analysis must be run again to get new suggestions |
+| TAX12 Publication and rollback | Verified | Preview with counts, unresolved by reason, blockers and change summary; full or acknowledged partial release; atomic with pointer and audit; idempotent by stored key; rollback with compatibility rule | `releases.test.ts` (19), `scenario.test.ts`, e2e | |
+| TAX13 Export and audit | Verified | Mapping CSV, unresolved CSV, metadata JSON, ZIP; formula-safe cells; reproducible bytes; exports audited; audit screen with filters and pagination | `releases.test.ts`, e2e | Exports are refused after 7 days but not yet deleted by a job |
+| ANA01 to ANA06 | Not started | Overview shows three live counts only | `contracts.test.ts` | Phase 3 |
 
 ## Acceptance scenarios
 
-| Test | Status | Note |
+| Test | Status | Evidence |
 | --- | --- | --- |
-| AT04 Taxonomy cycle or invalid leaf eligibility blocks publish | Verified | Blocked at import and again at publish against the stored tree |
-| AT24 Foreign workspace ID in endpoint | Verified for existing endpoints | Merchants, taxonomy versions, workspace switch. Jobs, reports and exports do not exist yet |
-| AT27 Keyboard-only operation | In progress | Taxonomy tree and dialogs checked manually; no automated accessibility test |
-| AT28 Fresh install and refresh | In progress | Migrations and seed verified; taxonomy state survives refresh. Decisions, releases, jobs and reports do not exist yet |
-| AT18 Missing key in live mode | In progress | Status logic verified; no live adapter to exercise |
-| All others (AT01 to AT03, AT05 to AT17, AT19 to AT23, AT25, AT26) | Not started | |
+| AT01 Malformed CSV and mixed-validity rows | Verified | `catalog-import.test.ts`, e2e |
+| AT02 Repeat import or commit | Verified | `catalog-import.test.ts`, e2e |
+| AT03 Snapshot removes, delta retains | Verified | `catalog-import.test.ts` |
+| AT04 Taxonomy cycle or invalid leaf eligibility | Verified | `taxonomy.test.ts` |
+| AT05 AI selects nonexistent or foreign concept | Verified with the validation layer | `retrieval.test.ts`. Not yet exercised with a live provider |
+| AT06 Prompt injection in product title | Verified for the demo path | `retrieval.test.ts`: treated as data; the provider has no database or publishing capability. Live prompt behavior is Phase 2 |
+| AT07 Reviewer corrects a suggestion | Verified | `review.test.ts`, e2e |
+| AT08 Two reviewers, same row version | Verified | `review.test.ts` (truly concurrent requests), e2e conflict UI |
+| AT09 Recommendation after human approval | Verified | `review.test.ts` |
+| AT10 Stale row in bulk selection | Verified | `review.test.ts` |
+| AT11 New concept proposed and approved | Verified | `releases.test.ts`, e2e |
+| AT12 Taxonomy changes after recommendation | Verified | `releases.test.ts`, e2e |
+| AT13 Partial release with deferred items | Verified | `releases.test.ts`, e2e |
+| AT14 Publication fails mid-write | Verified | `releases.test.ts` (failure injected before the pointer moves) |
+| AT15 Rollback to incompatible revision | Verified | `releases.test.ts` |
+| AT16 Export historical release after new revisions | Verified | `releases.test.ts` (byte-identical) |
+| AT17 Provider timeout, 429, worker restart, cancellation | Not started | Phase 2 |
+| AT18 Missing key in live mode | Verified at the service level | `review.test.ts`: 503, no fixture output, manual mapping works. No live adapter yet |
+| AT19 to AT23 Analytics | Not started | Phase 3 |
+| AT24 Foreign workspace ID | Verified for all existing endpoints | Each integration file asserts 404 or empty for another workspace; e2e |
+| AT25 Formula-leading CSV cell | Verified | `releases.test.ts`, e2e |
+| AT26 Viewer requests approval or publication via analytics | Not started | Phase 3. Viewer mutation attempts are refused today (e2e) |
+| AT27 Keyboard-only operation | In progress | Tree navigation checked manually; A-to-approve in e2e. No automated accessibility audit |
+| AT28 Fresh install and refresh | Verified for Phase 1 scope | e2e rebuilds the database from migrations and seed; decisions and releases persist across reloads |
 
 ## Known gaps and limitations
 
-- The demo seed creates identities, workspaces and merchants only. Taxonomy and catalogs will be seeded through the import services once catalog import exists, so the full PRD section 17 scenario is not yet reproducible from `pnpm db:seed` alone.
-- No rate limiting on uploads yet (PRD 14.3). Authentication rate limiting is enabled in production builds only.
-- No browser automation suite yet; browser checks so far were manual and are listed above.
-- Staged files are not yet expired by a job; commit refuses staged imports older than 24 hours.
-- Publishing a new taxonomy version does not yet mark dependent review state stale, because review state does not exist yet (TAX11).
-- Members, provider mode and budgets are read-only in Settings.
+- **Analysis is not a background job yet.** Demo analysis runs inside the request. The job tables are in use, but there is no worker claim, lease, retry or cancel (Phase 2).
+- **No live AI.** Live mode reports "AI unavailable"; manual mapping is unaffected.
+- **Bulk approval has no eligible rows in the demo**, because the High band stays disabled until a precision evaluation exists. There is no settings control for that gate.
+- **Evaluation corpus not built.** The 200 labeled products and 40 analytics questions (PRD 13.5) do not exist; retrieval figures above are from demo fixtures.
+- **Settings are read-only**: members, provider mode and budgets.
+- **Housekeeping jobs missing**: expired staged files and exports are refused on access but not deleted.
+- **Browser coverage is Chromium only**, one end-to-end path plus isolation, read-only and conflict cases.
+- **`pnpm setup` on a clean clone was not re-run this session.** Its steps were run individually, and `pnpm db:reset` and the e2e preparation rebuild databases from migrations and seed.
 - Configuration is validated on first use by each process, not by a dedicated startup hook.
 
-## Next steps (Phase 1, in order)
+## Next steps (Phase 2)
 
-1. Catalog CSV import: stage, column mapping, preview, validation with count conservation, snapshot and delta revisions, idempotent commit (TAX03, TAX04; AT01 to AT03).
-2. Review queue and item detail with manual decisions and optimistic locking (TAX08; AT07, AT08).
-3. Deterministic fixture adapter and candidate retrieval for labeled demo suggestions (TAX05, part of TAX06 and TAX07).
-4. Proposals and version revalidation (TAX10, TAX11; AT11, AT12).
-5. Publication, rollback, export, audit screen (TAX12, TAX13; AT13 to AT16, AT25).
-6. Seed the full demo scenario through those services and add the browser test for import, review, publish, refresh.
+1. Worker: lease-based claiming, per-item commit, bounded retries, cancel and retry endpoints (AT17).
+2. Claude adapter behind the existing provider interface, with structured output, prompt versioning, usage and cost records, token and spend caps.
+3. Evaluation corpus and harness; report retrieval, ranking, abstention and band precision; decide the High gate.
+4. Settings: provider mode, live opt-in with the list of fields sent, budgets, member management.
