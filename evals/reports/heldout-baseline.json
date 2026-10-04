@@ -1,0 +1,229 @@
+{
+  "meta": {
+    "split": "heldout",
+    "dataset version": "5147b9366d6ac8b4",
+    "items evaluated": "153 of 153",
+    "labeling": "PRELIMINARY: 153 of 153 labels are provisional (written by the model that built this application, not by an independent expert)",
+    "provider": "baseline",
+    "model": "none (deterministic)",
+    "prompt version": "baseline-unique-exact-v1",
+    "retrieval policy": "lexical-v1",
+    "signal policy": "signal-v1",
+    "provider usage": "none",
+    "generated": "2026-10-04T00:29:08.244Z"
+  },
+  "metrics": {
+    "items": 153,
+    "labelable": 108,
+    "shouldAbstain": 45,
+    "retrievalRecallAt10": {
+      "n": 108,
+      "hits": 89,
+      "rate": 0.8240740740740741
+    },
+    "retrievalMisses": [
+      "held-skyr",
+      "held-lemons",
+      "held-bell-peppers",
+      "held-mushrooms",
+      "held-parsley",
+      "held-garlic-powder",
+      "held-cinnamon-rolls",
+      "held-breath-mints",
+      "held-gelato",
+      "held-kale-injection",
+      "held-cold-brew-injection",
+      "held-steel-wool",
+      "held-parchment",
+      "held-reed-diffuser",
+      "held-fly-ribbons",
+      "held-chest-rub",
+      "held-cast-iron",
+      "held-measuring-cups",
+      "held-screwdriver"
+    ],
+    "top1Accuracy": {
+      "n": 108,
+      "hits": 33,
+      "rate": 0.3055555555555556
+    },
+    "top1AccuracyLenient": {
+      "n": 108,
+      "hits": 37,
+      "rate": 0.3425925925925926
+    },
+    "rankingAccuracyGivenRetrieved": {
+      "n": 89,
+      "hits": 33,
+      "rate": 0.3707865168539326
+    },
+    "abstention": {
+      "correctAbstention": {
+        "n": 45,
+        "hits": 41,
+        "rate": 0.9111111111111111
+      },
+      "falseSelection": {
+        "n": 45,
+        "hits": 4,
+        "rate": 0.08888888888888889
+      },
+      "overAbstention": {
+        "n": 108,
+        "hits": 69,
+        "rate": 0.6388888888888888
+      },
+      "abstentionRate": {
+        "n": 153,
+        "hits": 110,
+        "rate": 0.7189542483660131
+      }
+    },
+    "evidenceFaithfulness": {
+      "n": 153,
+      "hits": 153,
+      "rate": 1
+    },
+    "selectionsWithEvidence": {
+      "n": 43,
+      "hits": 43,
+      "rate": 1
+    },
+    "providerFailures": {
+      "n": 153,
+      "hits": 0,
+      "rate": 0
+    },
+    "bands": {
+      "high": {
+        "precision": {
+          "n": 43,
+          "hits": 33,
+          "rate": 0.7674418604651163
+        },
+        "coverage": {
+          "n": 153,
+          "hits": 43,
+          "rate": 0.28104575163398693
+        }
+      },
+      "medium": {
+        "precision": {
+          "n": 0,
+          "hits": 0,
+          "rate": null
+        },
+        "coverage": {
+          "n": 153,
+          "hits": 0,
+          "rate": 0
+        }
+      },
+      "low": {
+        "precision": {
+          "n": 0,
+          "hits": 0,
+          "rate": null
+        },
+        "coverage": {
+          "n": 153,
+          "hits": 0,
+          "rate": 0
+        }
+      }
+    },
+    "byIssue": {
+      "ambiguous": {
+        "n": 24,
+        "hits": 20,
+        "rate": 0.8333333333333334
+      },
+      "attribute_trap": {
+        "n": 24,
+        "hits": 8,
+        "rate": 0.3333333333333333
+      },
+      "injection": {
+        "n": 3,
+        "hits": 1,
+        "rate": 0.3333333333333333
+      },
+      "misleading_category": {
+        "n": 6,
+        "hits": 2,
+        "rate": 0.3333333333333333
+      },
+      "missing_concept": {
+        "n": 21,
+        "hits": 21,
+        "rate": 1
+      },
+      "none": {
+        "n": 60,
+        "hits": 17,
+        "rate": 0.2833333333333333
+      },
+      "overlapping_label": {
+        "n": 21,
+        "hits": 8,
+        "rate": 0.38095238095238093
+      },
+      "sparse": {
+        "n": 6,
+        "hits": 6,
+        "rate": 1
+      }
+    },
+    "byDomain": {
+      "baby": {
+        "n": 12,
+        "hits": 3,
+        "rate": 0.25
+      },
+      "beverages": {
+        "n": 18,
+        "hits": 10,
+        "rate": 0.5555555555555556
+      },
+      "general_merchandise": {
+        "n": 17,
+        "hits": 9,
+        "rate": 0.5294117647058824
+      },
+      "grocery": {
+        "n": 41,
+        "hits": 12,
+        "rate": 0.2926829268292683
+      },
+      "household": {
+        "n": 18,
+        "hits": 9,
+        "rate": 0.5
+      },
+      "otc_health": {
+        "n": 18,
+        "hits": 10,
+        "rate": 0.5555555555555556
+      },
+      "personal_care": {
+        "n": 17,
+        "hits": 12,
+        "rate": 0.7058823529411765
+      },
+      "pet": {
+        "n": 12,
+        "hits": 9,
+        "rate": 0.75
+      }
+    }
+  },
+  "gate": {
+    "met": false,
+    "reasons": [
+      "The gate requires results from the live model, not a baseline or fixture provider.",
+      "153 of 153 records are not independently expert-labeled.",
+      "Only 43 High selections; at least 50 are needed for a meaningful precision estimate.",
+      "High precision is 76.7%; the target is at least 95%."
+    ]
+  }
+}

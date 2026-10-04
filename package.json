@@ -19,7 +19,10 @@
     "fixtures:generate": "tsx fixtures/generate.ts",
     "setup": "pnpm setup:env && pnpm db:up && pnpm db:migrate && pnpm db:seed",
     "db:reset": "node scripts/db-reset.mjs",
-    "test:e2e": "tsx tests/e2e/prepare.ts && next build && playwright test"
+    "test:e2e": "tsx tests/e2e/prepare.ts && next build && playwright test",
+    "eval": "tsx evals/run.ts",
+    "eval:check": "tsx evals/leakage.ts",
+    "smoke:live": "tsx scripts/live-smoke.ts"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.131.0",
