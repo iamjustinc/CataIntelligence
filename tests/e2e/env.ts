@@ -1,6 +1,7 @@
 import "dotenv/config";
 
 export const E2E_PORT = 3100;
+export const E2E_WORKER_HEALTH_PORT = 3101;
 export const E2E_BASE_URL = `http://localhost:${E2E_PORT}`;
 
 function e2eUrl(raw: string | undefined): string {

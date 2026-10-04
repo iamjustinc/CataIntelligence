@@ -25,6 +25,7 @@ interface ItemView {
     id: string;
     isDemo: boolean;
     provider: string;
+    modelId: string | null;
     band: SignalBand;
     basis: string;
     stale: boolean;
@@ -38,6 +39,7 @@ interface ItemView {
     missingInformation: string[];
     proposedConcept: { name: string; parentConceptId: string | null; rationale: string } | null;
   } | null;
+  recommendationHistory: { id: string; createdAt: string; provider: string; isDemo: boolean; modelId: string | null; band: SignalBand; explanation: string; taxonomySequence: number; selectedPath: string | null; stale: boolean; current: boolean }[];
   textMatches: CandidateView[];
   history: { id: string; action: keyof typeof ACTION_LABELS; origin: keyof typeof ORIGIN_LABELS; reason: string | null; createdAt: string; actorName: string; conceptPath: string | null }[];
   canDecide: boolean;
@@ -314,6 +316,10 @@ export function ReviewWorkspace({
                 <Badge tone="warn" title="Deterministic fixture output for seeded fixture data. Not live model output.">
                   Demo fixture
                 </Badge>
+              ) : rec ? (
+                <Badge tone="ok" title={`Live model output from ${rec.modelId ?? rec.provider}. A proposal, not a decision.`}>
+                  Live AI{rec.modelId ? ` · ${rec.modelId}` : ""}
+                </Badge>
               ) : null}
               {rec ? (
                 <Badge tone={BAND_TONES[rec.band]} title="Review priority, not a probability.">
@@ -398,6 +404,30 @@ export function ReviewWorkspace({
               </div>
             )}
           </div>
+
+          {item.recommendationHistory.some((r) => !r.current) ? (
+            <details className="rounded-md border border-rule bg-surface px-5 py-3 text-sm">
+              <summary className="cursor-pointer font-medium">
+                Suggestion history ({item.recommendationHistory.length}). Earlier suggestions are kept and cannot be changed.
+              </summary>
+              <ol className="mt-2 space-y-2">
+                {item.recommendationHistory.map((r) => (
+                  <li key={r.id} className="border-l-2 border-rule-strong pl-3">
+                    <span className="font-medium">{r.selectedPath ? short(r.selectedPath) : "No recommendation"}</span>
+                    <span className="ml-2 inline-flex flex-wrap gap-1 align-middle">
+                      {r.current ? <Badge tone="info">Shown above</Badge> : null}
+                      {r.stale ? <Badge tone="warn">Stale · taxonomy v{r.taxonomySequence}</Badge> : <Badge>Taxonomy v{r.taxonomySequence}</Badge>}
+                      {r.isDemo ? <Badge tone="warn">Demo</Badge> : <Badge tone="ok">Live{r.modelId ? ` · ${r.modelId}` : ""}</Badge>}
+                    </span>
+                    <span className="block text-xs text-muted">
+                      {BAND_LABELS[r.band]} · {r.createdAt.slice(0, 16).replace("T", " ")} UTC
+                    </span>
+                    <span className="block text-xs text-ink-soft">{r.explanation}</span>
+                  </li>
+                ))}
+              </ol>
+            </details>
+          ) : null}
 
           <div className="rounded-md border border-rule bg-surface px-5 py-4">
             <h2 className="font-display text-lg font-medium">Decision</h2>

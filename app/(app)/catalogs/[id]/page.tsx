@@ -133,12 +133,12 @@ export default async function MerchantCatalogPage({ params, searchParams }: { pa
 
           {isCurrent && selected ? (
             <AnalysisPanel
+              key={job?.id ?? "none"}
               revisionId={selected.id}
-              activeListings={(selected.counts as RevisionCounts).active}
               provider={provider}
               canRun={can(actor.role, "analysis.run")}
               hasTaxonomy={workspace.activeTaxonomyVersionId !== null}
-              job={job ? { id: job.id, status: job.status, progress: job.progress, createdAt: job.createdAt.toISOString() } : null}
+              job={job ? JSON.parse(JSON.stringify(job)) : null}
             />
           ) : null}
 

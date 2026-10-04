@@ -1,7 +1,9 @@
 import { Badge, Card, PageHeader, StatePanel } from "@/components/ui";
 import { can, ROLE_LABELS } from "@/lib/auth/permissions";
 import { requirePageSession } from "@/lib/auth/session";
-import { getProviderStatus, getWorkspace, listMembers } from "@/lib/domain/workspace";
+import { getSettings } from "@/lib/domain/settings";
+import { getWorkspace, listMembers } from "@/lib/domain/workspace";
+import { SettingsForm } from "./settings-form";
 
 export const metadata = { title: "Settings" };
 
@@ -17,41 +19,14 @@ export default async function SettingsPage() {
       </div>
     );
   }
-  const [workspace, members, provider] = await Promise.all([getWorkspace(actor), listMembers(actor), getProviderStatus(actor)]);
+  const [workspace, members, settings] = await Promise.all([getWorkspace(actor), listMembers(actor), getSettings(actor)]);
 
   return (
     <div className="space-y-8">
-      <PageHeader eyebrow="Settings" title="Workspace settings" description="Read-only in this build. Editing members, provider mode and budgets arrives with the live AI phase." />
-      <div className="grid gap-6 lg:grid-cols-2">
-        <Card className="rise rise-1 p-5">
-          <h2 className="font-display text-lg font-medium">Workspace</h2>
-          <dl className="mt-3 grid grid-cols-[9rem_1fr] gap-y-2 text-sm">
-            <dt className="text-muted">Name</dt>
-            <dd>{workspace.name}</dd>
-            <dt className="text-muted">Timezone</dt>
-            <dd className="font-mono text-xs">{workspace.timezone}</dd>
-            <dt className="text-muted">Data</dt>
-            <dd>{workspace.isDemo ? "Synthetic demo data" : "Workspace data"}</dd>
-          </dl>
-        </Card>
-        <Card className="rise rise-2 p-5">
-          <h2 className="font-display text-lg font-medium">AI provider</h2>
-          <dl className="mt-3 grid grid-cols-[9rem_1fr] gap-y-2 text-sm">
-            <dt className="text-muted">Mode</dt>
-            <dd>
-              <Badge tone={provider.state === "demo" ? "warn" : provider.state === "live" ? "ok" : provider.state === "unavailable" ? "danger" : "neutral"}>{provider.label}</Badge>
-            </dd>
-            <dt className="text-muted">Status</dt>
-            <dd className="leading-relaxed text-ink-soft">{provider.detail}</dd>
-            <dt className="text-muted">Per-job token cap</dt>
-            <dd className="font-mono text-xs">{workspace.jobTokenCap.toLocaleString("en-US")}</dd>
-            <dt className="text-muted">Per-job spend cap</dt>
-            <dd className="font-mono text-xs">USD {workspace.jobSpendCapUsd}</dd>
-            <dt className="text-muted">Daily spend cap</dt>
-            <dd className="font-mono text-xs">USD {workspace.dailySpendCapUsd}</dd>
-          </dl>
-        </Card>
-      </div>
+      <PageHeader eyebrow="Settings" title="Workspace settings" description={`${workspace.name} · timezone ${workspace.timezone} · ${workspace.isDemo ? "synthetic demo data" : "workspace data"}. Changes are recorded in the audit log.`} />
+      <Card className="rise rise-1 p-5">
+        <SettingsForm settings={settings} />
+      </Card>
       <Card className="rise rise-3 overflow-hidden">
         <h2 className="border-b border-rule px-5 py-3 font-display text-lg font-medium">Members</h2>
         <div className="overflow-x-auto">

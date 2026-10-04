@@ -11,6 +11,7 @@ export function ConfirmDialog({
   confirmLabel,
   pending,
   error,
+  confirmDisabled = false,
   onConfirm,
   onClose,
 }: {
@@ -20,6 +21,7 @@ export function ConfirmDialog({
   confirmLabel: string;
   pending: boolean;
   error?: string | null;
+  confirmDisabled?: boolean;
   onConfirm: () => void;
   onClose: () => void;
 }) {
@@ -50,7 +52,7 @@ export function ConfirmDialog({
           <button type="button" onClick={onClose} disabled={pending} className={buttonClass.secondary}>
             Cancel
           </button>
-          <button type="button" onClick={onConfirm} disabled={pending} className={buttonClass.primary}>
+          <button type="button" onClick={onConfirm} disabled={pending || confirmDisabled} className={buttonClass.primary}>
             {pending ? "Working…" : confirmLabel}
           </button>
         </div>

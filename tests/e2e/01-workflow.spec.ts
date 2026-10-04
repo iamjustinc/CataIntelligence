@@ -2,38 +2,11 @@ import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
 import { expect, test, type Page } from "@playwright/test";
 import { e2eEnv } from "./env";
+import { signIn, signOut, USERS } from "./helpers";
 import { unzip } from "./unzip";
 
-const PASSWORD = e2eEnv().SEED_USER_PASSWORD;
 const WALKTHROUGH = resolve(process.cwd(), "fixtures/generated/catalogs/walkthrough-pier-pantry.csv");
-const USERS = {
-  admin: "avery.admin@catalog-intelligence.test",
-  taxonomist: "rin.taxonomist@catalog-intelligence.test",
-  viewer: "sam.viewer@catalog-intelligence.test",
-  outsider: "dana.admin@fennel-sandbox.test",
-};
 
-/**
- * Signs in through the real form. The production build rate-limits sign-in attempts; when the
- * limiter answers, the helper waits for the window to pass and tries again rather than bypassing it.
- */
-async function signIn(page: Page, email: string) {
-  await page.goto("/login");
-  for (let attempt = 0; attempt < 4; attempt++) {
-    await page.getByLabel("Email").fill(email);
-    await page.getByLabel("Password").fill(PASSWORD);
-    await page.getByRole("button", { name: "Sign in" }).click();
-    const limited = page.getByText("Too many attempts. Wait a minute and try again.");
-    const outcome = await Promise.race([page.waitForURL(/\/overview$/).then(() => "ok" as const), limited.waitFor().then(() => "limited" as const)]);
-    if (outcome === "ok") return;
-    await page.waitForTimeout(11_000);
-  }
-  throw new Error(`Could not sign in as ${email}`);
-}
-async function signOut(page: Page) {
-  await page.getByRole("button", { name: "Sign out" }).click();
-  await expect(page).toHaveURL(/\/login$/);
-}
 const title = (page: Page) => page.locator("#listing-title");
 const progress = (page: Page) => page.locator("footer");
 /** Decision history entries of the open listing. */
@@ -129,7 +102,10 @@ test("import a catalog, review it, publish a partial release and export it", asy
     await page.getByRole("button", { name: "Run demo analysis" }).click();
     await page.getByRole("dialog").getByRole("button", { name: "Run demo analysis" }).click();
     const panel = page.locator("section[aria-labelledby='analysis-heading']");
-    await expect(panel).toContainText("Completed");
+    // The job is queued by the request and processed by the worker process; the panel polls real status.
+    await expect(panel.getByText("Completed", { exact: true })).toBeVisible({ timeout: 30_000 });
+    await expect(panel).toContainText("9 of 9 listings processed");
+    await expect(panel.getByText("Demo fixtures")).toBeVisible();
     await expect(panel.locator("div", { has: page.getByText("Suggested", { exact: true }) }).locator("dd").first()).toHaveText("9");
   });
 
