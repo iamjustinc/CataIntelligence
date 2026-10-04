@@ -418,7 +418,7 @@ export async function readExport(actor: Actor, exportId: string) {
   if (!can(actor.role, "catalog.read")) throw forbidden();
   const [row] = await withContext(actor, (tx) => tx.select().from(exportFiles).where(and(eq(exportFiles.id, exportId))));
   if (!row) throw notFound("Export");
-  if (Date.now() - row.createdAt.getTime() > EXPORT_TTL_MS) throw new ApiError("not_found", "This export has expired. Create it again from the release.");
+  if (row.deletedAt || Date.now() - row.createdAt.getTime() > EXPORT_TTL_MS) throw new ApiError("not_found", "This export has expired. Create it again from the release.");
   return { fileName: row.fileName, contentType: row.contentType, content: await objectStore().get(actor.workspaceId, row.storageKey) };
 }
 

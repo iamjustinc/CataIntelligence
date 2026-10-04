@@ -1,5 +1,6 @@
 import type pg from "pg";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
+import { GET as jobRoute } from "@/app/api/analysis-jobs/[id]/route";
 import { POST as analysisRoute } from "@/app/api/analysis-jobs/route";
 import { POST as bulkRoute } from "@/app/api/review/bulk-approve/route";
 import { POST as decisionRoute } from "@/app/api/review-items/[id]/decisions/route";
@@ -10,8 +11,9 @@ import { closeDb, withContext } from "@/db/client";
 import { buildFixtures, catalogCsv, WALKTHROUGH_CSV } from "@/fixtures/generate";
 import { FixtureProvider } from "@/lib/ai/fixture-adapter";
 import { buildRequest, loadVersionIndex, storeRecommendation } from "@/lib/domain/analysis";
+import { drainJobs } from "@/lib/jobs/analysis-worker";
 import { adminClient, createTestWorkspace, ctx, idemKey, request, type TestWorkspace } from "../setup/helpers";
-import { conceptIds, importCatalog, listingIds, publishTaxonomy } from "../setup/scenario";
+import { conceptIds, FAST, importCatalog, listingIds, publishTaxonomy } from "../setup/scenario";
 
 let admin: pg.Client;
 let ws: TestWorkspace;
@@ -25,8 +27,16 @@ let C: Record<string, string>;
 type Role = keyof TestWorkspace["cookie"];
 const decide = (listing: string, body: Record<string, unknown>, role: Role = "taxonomist", w = ws) =>
   decisionRoute(request(`/api/review-items/${listing}/decisions`, { method: "POST", cookie: w.cookie[role], body, headers: { "idempotency-key": idemKey("decide") } }), ctx(listing));
-const analyze = (revision: string, w = ws, role: Role = "taxonomist") =>
+const startJob = (revision: string, w = ws, role: Role = "taxonomist") =>
   analysisRoute(request("/api/analysis-jobs", { method: "POST", cookie: w.cookie[role], body: { catalogRevisionId: revision }, headers: { "idempotency-key": idemKey("analyze") } }));
+/** Queues a job through the API, lets the worker engine process it, and returns the finished job. */
+const analyze = async (revision: string, w = ws) => {
+  const started = await startJob(revision, w);
+  if (started.status !== 202) throw new Error(`start failed: ${started.status} ${await started.text()}`);
+  const { data } = await started.json();
+  await drainJobs(FAST);
+  return (await (await jobRoute(request(`/api/analysis-jobs/${data.id}`, { cookie: w.cookie.taxonomist }), ctx(data.id))).json()).data;
+};
 const queue = async (qs = "", role: Role = "viewer", w = ws) => (await (await queueRoute(request(`/api/review-items${qs}`, { cookie: w.cookie[role] }))).json()).data;
 const stateOf = async (listing: string) => (await admin.query("select state, lock_version, latest_decision_id, latest_recommendation_id, ambiguous from review_states where listing_revision_id = $1", [listing])).rows[0];
 const count = async (sql: string, params: unknown[]) => (await admin.query(`select count(*)::int as n from ${sql}`, params)).rows[0].n as number;
@@ -87,12 +97,12 @@ describe("manual mapping without AI (TAX08)", () => {
 
 describe("demo analysis (TAX05 to TAX07, AT09, AT18)", () => {
   it("is refused for viewers and for workspaces without a usable provider, leaving manual work intact", async () => {
-    expect((await analyze(revisionId, ws, "viewer")).status).toBe(403);
+    expect((await startJob(revisionId, ws, "viewer")).status).toBe(403);
     await publishTaxonomy(other);
     const elsewhere = await importCatalog(other, { merchantName: "Elsewhere", content: WALKTHROUGH_CSV, resolutions: { "PP-004": 5 } });
     for (const mode of ["off", "live"]) {
       await admin.query("update workspaces set provider_mode = $2 where id = $1", [other.id, mode]);
-      const res = await analyze(elsewhere.revisionId, other);
+      const res = await startJob(elsewhere.revisionId, other);
       expect(res.status, mode).toBe(503);
       expect((await res.json()).error.message).toMatch(mode === "live" ? /AI unavailable/ : /AI off/);
     }
@@ -103,10 +113,17 @@ describe("demo analysis (TAX05 to TAX07, AT09, AT18)", () => {
     expect((await decide(otherListings["PP-001"], { action: "approve", selectedConceptId: otherConcepts["GRO-DAI-MILK"], expectedVersion: 0 }, "taxonomist", other)).status).toBe(201);
   });
   it("creates labeled demo suggestions for fixture listings and skips reviewed ones", async () => {
-    const res = await analyze(revisionId);
-    expect(res.status).toBe(202);
-    const { data } = await res.json();
-    expect(data).toMatchObject({ status: "completed", isDemo: true, provider: "fixture", progress: { total: 9, succeeded: 8, failed: 0, skippedReviewed: 1, skippedNoFixture: 0 } });
+    // The request only queues the job: nothing is analyzed until a worker picks it up.
+    const queued = await startJob(revisionId);
+    expect(queued.status).toBe(202);
+    const started = (await queued.json()).data;
+    expect(started).toMatchObject({ status: "queued", isDemo: true, provider: "fixture", progress: { total: 9, pending: 8, succeeded: 0, skippedReviewed: 1 } });
+    expect(await count("recommendations where workspace_id = $1", [ws.id])).toBe(0);
+    expect((await startJob(revisionId)).status).toBe(409);
+    await drainJobs(FAST);
+    const data = (await (await jobRoute(request(`/api/analysis-jobs/${started.id}`, { cookie: ws.cookie.viewer }), ctx(started.id))).json()).data;
+    expect(data).toMatchObject({ status: "completed", isDemo: true, provider: "fixture", progress: { total: 9, pending: 0, succeeded: 8, failed: 0, skippedReviewed: 1, skippedNoFixture: 0 }, usage: { inputTokens: 0, outputTokens: 0, costUsd: 0 } });
+    expect((await jobRoute(request(`/api/analysis-jobs/${started.id}`, { cookie: other.cookie.administrator }), ctx(started.id))).status).toBe(404);
     const recs = (await admin.query("select distinct provider, is_demo, taxonomy_version_id from recommendations where workspace_id = $1", [ws.id])).rows;
     expect(recs).toEqual([{ provider: "fixture", is_demo: true, taxonomy_version_id: versionId }]);
     // The High band is disabled until its precision gate is met.
@@ -137,8 +154,8 @@ describe("demo analysis (TAX05 to TAX07, AT09, AT18)", () => {
   });
   it("fabricates nothing for uploaded products that are not fixtures; they stay manually reviewable", async () => {
     const custom = await importCatalog(ws, { merchantName: "Own Upload", content: "merchant_sku,title\nX-1,Oat Milk Barista Blend 1L\nX-2,Mystery Item\n" });
-    const { data } = await (await analyze(custom.revisionId)).json();
-    expect(data.progress).toMatchObject({ total: 2, succeeded: 0, skippedNoFixture: 2 });
+    const data = await analyze(custom.revisionId);
+    expect(data).toMatchObject({ status: "completed", progress: { total: 2, succeeded: 0, skippedNoFixture: 2 } });
     expect(await count("recommendations r join listing_revisions lr on lr.id = r.listing_revision_id where lr.catalog_revision_id = $1", [custom.revisionId])).toBe(0);
     const ids = await listingIds(admin, custom.revisionId);
     expect((await stateOf(ids["X-1"])).state).toBe("needs_analysis");

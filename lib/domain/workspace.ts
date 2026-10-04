@@ -15,7 +15,8 @@ export async function getWorkspace(actor: Actor) {
 
 export async function getProviderStatus(actor: Actor): Promise<ProviderStatus> {
   const ws = await getWorkspace(actor);
-  return resolveProviderStatus(ws.providerMode, env(), ws.liveAiOptIn);
+  const config = env();
+  return resolveProviderStatus(ws.providerMode, { ANTHROPIC_API_KEY: config.ANTHROPIC_API_KEY, AI_MODEL_ID: ws.aiModelId ?? config.AI_MODEL_ID }, ws.liveAiOptIn);
 }
 
 export interface SetupProgress {

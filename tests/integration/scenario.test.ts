@@ -81,6 +81,6 @@ describe("demo scenario seed", () => {
     expect(await rows("select type, state from taxonomy_proposals where workspace_id = $1")).toEqual([{ type: "new_leaf", state: "submitted" }]);
     const audit = await rows("select action, count(*)::int as n from audit_events where workspace_id = $1 group by 1 order by 1");
     const count = Object.fromEntries(audit.map((a) => [a.action, a.n]));
-    expect(count).toMatchObject({ "taxonomy.publish": 1, "catalog.revision.create": 4, "analysis.run": 4, "release.publish": 4, "review.approve": 178, "review.defer": 1, "review.no_suitable": 1, "taxonomy.proposal.submit": 1 });
+    expect(count).toMatchObject({ "taxonomy.publish": 1, "catalog.revision.create": 4, "analysis.start": 4, "release.publish": 4, "review.approve": 178, "review.defer": 1, "review.no_suitable": 1, "taxonomy.proposal.submit": 1 });
   });
 });

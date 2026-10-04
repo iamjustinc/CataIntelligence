@@ -47,6 +47,8 @@ export async function migrateDatabase(adminUrl: string, appUrl: string): Promise
     await client.query(`GRANT CONNECT ON DATABASE ${db} TO ${role}`);
     await client.query(`GRANT USAGE ON SCHEMA public TO ${role}`);
     await client.query(`GRANT SELECT, INSERT, UPDATE, DELETE ON ALL TABLES IN SCHEMA public TO ${role}`);
+    await client.query(`GRANT EXECUTE ON FUNCTION claim_analysis_job(text, integer) TO ${role}`);
+    await client.query(`GRANT EXECUTE ON FUNCTION expired_storage_objects(timestamptz) TO ${role}`);
     for (const table of APPEND_ONLY_TABLES) {
       await client.query(`REVOKE UPDATE, DELETE, TRUNCATE ON ${client.escapeIdentifier(table)} FROM ${role}`);
     }

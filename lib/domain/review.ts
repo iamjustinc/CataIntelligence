@@ -1,7 +1,7 @@
 import { randomUUID } from "node:crypto";
-import { and, asc, eq, inArray, sql, type SQL } from "drizzle-orm";
+import { and, asc, desc, eq, inArray, sql, type SQL } from "drizzle-orm";
 import { withContext, type Tx } from "@/db/client";
-import { catalogRevisions, conceptRevisions, concepts, listingRevisions, merchantListings, merchants, recommendations, reviewDecisions, reviewStates, user, workspaces } from "@/db/schema";
+import { catalogRevisions, conceptRevisions, concepts, listingRevisions, merchantListings, merchants, recommendations, reviewDecisions, reviewStates, taxonomyVersions, user, workspaces } from "@/db/schema";
 import { ApiError, conflict, forbidden, notFound } from "@/lib/api/errors";
 import { recordAudit } from "@/lib/audit";
 import type { Actor } from "@/lib/auth/actor";
@@ -239,6 +239,26 @@ export async function getReviewItem(actor: Actor, listingRevisionId: string) {
     let textMatches: Candidate[] = [];
     if (ws.active) textMatches = buildRequest(actor.workspaceId, { id: row.id, contentHash: row.contentHash, fields }, await loadVersionIndex(tx, ws.active)).candidates;
 
+    // Every recommendation ever made for this listing revision stays stored and inspectable.
+    const recommendationHistory = await tx
+      .select({
+        id: recommendations.id,
+        createdAt: recommendations.createdAt,
+        provider: recommendations.provider,
+        isDemo: recommendations.isDemo,
+        modelId: recommendations.modelId,
+        band: recommendations.signalBand,
+        explanation: recommendations.explanation,
+        taxonomyVersionId: recommendations.taxonomyVersionId,
+        taxonomySequence: taxonomyVersions.sequence,
+        selectedPath: conceptRevisions.path,
+      })
+      .from(recommendations)
+      .innerJoin(taxonomyVersions, eq(taxonomyVersions.id, recommendations.taxonomyVersionId))
+      .leftJoin(conceptRevisions, and(eq(conceptRevisions.conceptId, recommendations.selectedConceptId), eq(conceptRevisions.taxonomyVersionId, recommendations.taxonomyVersionId)))
+      .where(eq(recommendations.listingRevisionId, listingRevisionId))
+      .orderBy(desc(recommendations.createdAt), desc(recommendations.id));
+
     const stale = !!rec && rec.taxonomyVersionId !== ws.active;
     return {
       listing: { id: row.id, sku: row.sku, title: row.title, sourceRow: row.sourceRow, fields, raw: row.raw as Record<string, string>, active: row.active },
@@ -250,6 +270,7 @@ export async function getReviewItem(actor: Actor, listingRevisionId: string) {
         ? {
             id: rec.id,
             provider: rec.provider,
+            modelId: rec.modelId,
             isDemo: rec.isDemo,
             band: rec.signalBand,
             basis: rec.signalBasis,
@@ -267,6 +288,7 @@ export async function getReviewItem(actor: Actor, listingRevisionId: string) {
             createdAt: rec.createdAt,
           }
         : null,
+      recommendationHistory: recommendationHistory.map((r) => ({ ...r, stale: r.taxonomyVersionId !== ws.active, current: r.id === rec?.id })),
       textMatches,
       history,
       canDecide: can(actor.role, "review.decide"),

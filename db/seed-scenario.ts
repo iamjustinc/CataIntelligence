@@ -9,6 +9,7 @@ import { fileURLToPath } from "node:url";
 import { buildFixtures, catalogCsv, MERCHANTS } from "@/fixtures/generate";
 import type { Actor } from "@/lib/auth/actor";
 import { startAnalysis } from "@/lib/domain/analysis";
+import { drainJobs } from "@/lib/jobs/analysis-worker";
 import { commitCatalogImport, stageCatalogImport } from "@/lib/domain/catalog-import";
 import { createMerchant, listMerchants } from "@/lib/domain/merchants";
 import { submitProposal } from "@/lib/domain/proposals";
@@ -18,6 +19,12 @@ import { commitTaxonomyImport, getTaxonomyVersion, listTaxonomyVersions, publish
 
 const REQ = "seed-scenario";
 const TAXONOMY_CSV = () => readFileSync(fileURLToPath(new URL("../fixtures/generated/taxonomy.csv", import.meta.url)), "utf8");
+
+/** Queues demo analysis and processes it with the same job engine the worker process runs. */
+async function analyze(reviewer: Actor, catalogRevisionId: string): Promise<void> {
+  await startAnalysis(reviewer, { catalogRevisionId }, REQ);
+  await drainJobs({ workerId: "seed" });
+}
 
 async function allItems(actor: Actor, merchantId: string): Promise<ReviewQueueItem[]> {
   const out: ReviewQueueItem[] = [];
@@ -76,11 +83,11 @@ export async function seedScenario(admin: Actor, reviewer: Actor): Promise<Scena
   // Harbor Market: two catalog revisions and three releases. Releases 2 and 3 share revision 2.
   const harbor = merchants["harbor-market"];
   revisions["harbor-r1"] = await importCatalog(reviewer, harbor, catalogCsv(fx.catalogs["harbor-market"]), "harbor-market-r1.csv");
-  await startAnalysis(reviewer, { catalogRevisionId: revisions["harbor-r1"] }, REQ);
+  await analyze(reviewer, revisions["harbor-r1"]);
   await approveSuggested(reviewer, harbor, (i) => i % 4 !== 3);
   await publish(admin, harbor, "Initial Harbor Market release.", `${scope}:harbor:1`);
   revisions["harbor-r2"] = await importCatalog(reviewer, harbor, catalogCsv(fx.catalogs["harbor-market-r2"]), "harbor-market-r2.csv");
-  await startAnalysis(reviewer, { catalogRevisionId: revisions["harbor-r2"] }, REQ);
+  await analyze(reviewer, revisions["harbor-r2"]);
   await publish(admin, harbor, "Catalog revision 2: carried-forward decisions only.", `${scope}:harbor:2`);
   await approveSuggested(reviewer, harbor, (i) => i % 2 === 0);
   await publish(admin, harbor, "Revision 2 after further review.", `${scope}:harbor:3`);
@@ -88,7 +95,7 @@ export async function seedScenario(admin: Actor, reviewer: Actor): Promise<Scena
   // Daily Basket: one release, a deferral, a missing concept and a pending proposal.
   const daily = merchants["daily-basket"];
   revisions["daily-r1"] = await importCatalog(reviewer, daily, catalogCsv(fx.catalogs["daily-basket"]), "daily-basket-r1.csv");
-  await startAnalysis(reviewer, { catalogRevisionId: revisions["daily-r1"] }, REQ);
+  await analyze(reviewer, revisions["daily-r1"]);
   await approveSuggested(reviewer, daily, (i) => i % 5 < 3);
   const dailyItems = await allItems(reviewer, daily);
   const bySku = (sku: string) => dailyItems.find((i) => i.sku === sku)!;
@@ -102,7 +109,7 @@ export async function seedScenario(admin: Actor, reviewer: Actor): Promise<Scena
   // Corner Goods: imported and partly reviewed, never published (zero published coverage).
   const corner = merchants["corner-goods"];
   revisions["corner-r1"] = await importCatalog(reviewer, corner, catalogCsv(fx.catalogs["corner-goods"]), "corner-goods-r1.csv");
-  await startAnalysis(reviewer, { catalogRevisionId: revisions["corner-r1"] }, REQ);
+  await analyze(reviewer, revisions["corner-r1"]);
   await approveSuggested(reviewer, corner, (i) => i % 3 === 0);
 
   return { taxonomyVersionId: versionId, merchants, revisions };

@@ -149,6 +149,12 @@ export const workspaces = pgTable(
     isDemo: boolean("is_demo").notNull().default(false),
     // The High signal band stays disabled until its precision gate is met (PRD TAX07).
     highSignalEnabled: boolean("high_signal_enabled").notNull().default(false),
+    // Live provider configuration. The API key itself is never stored: it lives in server environment only.
+    aiModelId: text("ai_model_id"),
+    // Administrator-entered provider prices (USD per million tokens). NULL means unknown, never zero.
+    inputPricePerMtok: numeric("input_price_per_mtok", { precision: 10, scale: 4 }),
+    outputPricePerMtok: numeric("output_price_per_mtok", { precision: 10, scale: 4 }),
+    jobItemCap: integer("job_item_cap").notNull().default(5000),
     jobTokenCap: integer("job_token_cap").notNull().default(400000),
     jobSpendCapUsd: numeric("job_spend_cap_usd", { precision: 10, scale: 2 }).notNull().default("5"),
     dailySpendCapUsd: numeric("daily_spend_cap_usd", { precision: 10, scale: 2 }).notNull().default("20"),
@@ -480,6 +486,15 @@ export const analysisJobs = pgTable(
     cancelRequested: boolean("cancel_requested").notNull().default(false),
     idempotencyKey: text("idempotency_key"),
     errorCode: text("error_code"),
+    errorMessage: text("error_message"),
+    provider: text("provider"),
+    modelId: text("model_id"),
+    heartbeatAt: ts("heartbeat_at"),
+    inputTokens: integer("input_tokens").notNull().default(0),
+    outputTokens: integer("output_tokens").notNull().default(0),
+    // Actual provider cost so far. NULL while unknown (no pricing configured), never zero by default.
+    costUsd: numeric("cost_usd", { precision: 12, scale: 6 }),
+    reservedCostUsd: numeric("reserved_cost_usd", { precision: 12, scale: 6 }),
     createdBy: uuid("created_by")
       .notNull()
       .references(() => user.id),
@@ -513,6 +528,7 @@ export const analysisJobItems = pgTable(
     status: jobItemStatusEnum("status").notNull().default("pending"),
     attempt: integer("attempt").notNull().default(0),
     errorCode: text("error_code"),
+    errorMessage: text("error_message"),
     recommendationId: uuid("recommendation_id"),
     updatedAt: ts("updated_at").notNull().defaultNow(),
   },
@@ -596,6 +612,8 @@ export const aiUsage = pgTable("ai_usage", {
   outputTokens: integer("output_tokens"),
   // NULL means unknown, never zero (PRD section 16).
   costEstimateUsd: numeric("cost_estimate_usd", { precision: 12, scale: 6 }),
+  listingRevisionId: uuid("listing_revision_id"),
+  errorCode: text("error_code"),
   status: text("status").notNull(),
   latencyMs: integer("latency_ms"),
   createdAt: createdAt(),
@@ -818,6 +836,7 @@ export const exportFiles = pgTable(
     storageKey: text("storage_key").notNull(),
     contentType: text("content_type").notNull(),
     rowCounts: jsonb("row_counts").notNull(),
+    deletedAt: ts("deleted_at"),
     createdBy: uuid("created_by")
       .notNull()
       .references(() => user.id),

@@ -5,7 +5,19 @@ import { suggestColumnMap } from "@/lib/domain/catalog-validation";
 import { parseCsv } from "@/lib/csv";
 import { createMerchant } from "@/lib/domain/merchants";
 import { commitTaxonomyImport, publishTaxonomyVersion, stageTaxonomyImport } from "@/lib/domain/taxonomy";
+import { startAnalysis } from "@/lib/domain/analysis";
+import { drainJobs, type WorkerOptions } from "@/lib/jobs/analysis-worker";
 import { actorFor, type TestWorkspace } from "./helpers";
+
+/** Worker options for tests: no real waiting between retries. */
+export const FAST: Partial<WorkerOptions> = { sleep: async () => undefined, backoffMs: () => 0 };
+
+/** Queues an analysis job and processes it with the worker engine, as the worker process would. */
+export async function runAnalysis(ws: TestWorkspace, catalogRevisionId: string, overrides: Partial<WorkerOptions> = {}) {
+  const job = await startAnalysis(await actorFor(ws, "taxonomist"), { catalogRevisionId }, "test");
+  const outcomes = await drainJobs({ ...FAST, ...overrides });
+  return { jobId: job.id, outcome: outcomes.find((o) => o.jobId === job.id)?.outcome };
+}
 
 export const FIXTURE_TAXONOMY = readFileSync(new URL("../../fixtures/generated/taxonomy.csv", import.meta.url), "utf8");
 

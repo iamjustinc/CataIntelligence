@@ -15,11 +15,10 @@ import { POST as revalidateRoute } from "@/app/api/taxonomy/revalidate/route";
 import { POST as publishTaxonomyRoute } from "@/app/api/taxonomy/versions/[id]/publish/route";
 import { closeDb } from "@/db/client";
 import { WALKTHROUGH_CSV } from "@/fixtures/generate";
-import { startAnalysis } from "@/lib/domain/analysis";
 import { publishRelease } from "@/lib/domain/releases";
 import { recordDecision } from "@/lib/domain/review";
 import { actorFor, adminClient, createTestWorkspace, ctx, idemKey, request, type TestWorkspace } from "../setup/helpers";
-import { conceptIds, importCatalog, listingIds, publishTaxonomy } from "../setup/scenario";
+import { conceptIds, importCatalog, listingIds, publishTaxonomy, runAnalysis } from "../setup/scenario";
 
 let admin: pg.Client;
 let ws: TestWorkspace;
@@ -66,7 +65,7 @@ beforeAll(async () => {
   L = await listingIds(admin, revisionId);
   C = await conceptIds(admin, ws.id);
   const reviewer = await actorFor(ws, "taxonomist");
-  await startAnalysis(reviewer, { catalogRevisionId: revisionId }, "test");
+  await runAnalysis(ws, revisionId);
   for (const sku of ["PP-001", "PP-002", "PP-003", "PP-004", "PP-011"]) await recordDecision(reviewer, L[sku], { action: "approve", expectedVersion: 1 }, "test");
   await recordDecision(reviewer, L["PP-005"], { action: "change", selectedConceptId: C["PC-HAIR-SHAMPOO"], reason: "Title says shampoo.", expectedVersion: 1 }, "test");
   await recordDecision(reviewer, L["PP-006"], { action: "defer", reason: "Ask the merchant.", expectedVersion: 1 }, "test");
@@ -354,7 +353,7 @@ describe("audit log (TAX13)", () => {
     expect((await audit("", "analyst")).status).toBe(403);
     const { data } = await (await audit("?limit=200", "administrator")).json();
     const actions = new Set(data.items.map((i: { action: string }) => i.action));
-    for (const a of ["catalog.revision.create", "analysis.run", "review.approve", "review.change", "taxonomy.proposal.submit", "taxonomy.proposal.modify", "taxonomy.publish", "taxonomy.revalidate", "release.publish", "release.export", "release.activate"]) expect(actions.has(a), a).toBe(true);
+    for (const a of ["catalog.revision.create", "analysis.start", "review.approve", "review.change", "taxonomy.proposal.submit", "taxonomy.proposal.modify", "taxonomy.publish", "taxonomy.revalidate", "release.publish", "release.export", "release.activate"]) expect(actions.has(a), a).toBe(true);
     const foreign = await (await audit("?limit=200", "administrator", other)).json();
     expect(foreign.data.items.some((i: { entityId: string }) => i.entityId === release1)).toBe(false);
   });
