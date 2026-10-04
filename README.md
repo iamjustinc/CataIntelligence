@@ -6,7 +6,7 @@ Reconcile merchant catalogs with a canonical taxonomy, publish reproducible mapp
 - What is built and how it was verified: [BUILD_STATUS.md](BUILD_STATUS.md)
 - Architecture decisions: [DECISIONS.md](DECISIONS.md)
 
-> **Status:** Phases 0 and 1 are verified. The full deterministic workflow works end to end: import a merchant catalog, review demo or manual mappings, propose and publish taxonomy changes, revalidate, publish a mapping release and export it. Live AI (Phase 2) and analytics (Phase 3) are not built yet, and the app says so on those screens. See BUILD_STATUS.md.
+> **Status:** Phases 0 and 1 are verified. Phase 2 is implemented and verified with deterministic providers: analysis runs as durable background jobs in the worker, with a Claude adapter, budgets and settings. **No live provider call has been made yet**, because no credentials were available; see BUILD_STATUS.md for exactly what remains unverified. Analytics (Phase 3) is not built.
 
 All merchants, brands, people and products in this repository are fictional.
 
@@ -55,9 +55,11 @@ pnpm dev
 pnpm worker
 ```
 
-Open http://localhost:3000. For a production build use `pnpm build` then `pnpm start`, plus `pnpm worker`. A static-only deployment cannot run this application.
+Open http://localhost:3000. **Analysis jobs are processed by the worker**: without it a job stays "Queued". For a production build use `pnpm build` then `pnpm start`, plus `pnpm worker`. A static-only deployment cannot run this application.
 
-`GET /api/health` reports process and database reachability.
+`GET /api/health` reports web process and database reachability. Set `WORKER_HEALTH_PORT` to give the worker a `/health` endpoint.
+
+Restart `pnpm dev` after installing or removing dependencies. Changing packages under a running dev server can hot-load a second copy of React into an open page ("Invalid hook call" in the browser console).
 
 ### Sign in
 
@@ -81,10 +83,14 @@ Open http://localhost:3000. For a production build use `pnpm build` then `pnpm s
 | `APP_BASE_URL` | Yes | Public origin; also the allowed origin for state-changing requests. |
 | `SEED_USER_PASSWORD` | For seeding | Password given to seeded demo identities. |
 | `AI_PROVIDER_MODE` | No | Default provider mode: `demo`, `live` or `off`. |
-| `ANTHROPIC_API_KEY`, `AI_MODEL_ID` | For live AI | Server-side only. When missing, live mode shows "AI unavailable" and manual workflows keep working; fixtures are never substituted. |
+| `ANTHROPIC_API_KEY` | For live AI | Read by the web server and worker only. Never stored in the database, returned by an API or logged. When missing, live mode shows "AI unavailable" and manual workflows keep working; fixtures are never substituted. |
+| `AI_MODEL_ID` | For live AI | Default model for workspaces that set none in Settings, for example `claude-opus-5-5`. The application assumes no model. |
 | `STORAGE_DIR` | No | Private directory for staged imports and exports. Not served over HTTP. |
 | `UPLOAD_RATE_LIMIT_PER_MINUTE` | No | Catalog and taxonomy uploads allowed per user per minute. Default 30. |
-| `JOB_CONCURRENCY`, `JOB_TOKEN_CAP`, `JOB_SPEND_CAP_USD`, `DAILY_WORKSPACE_SPEND_CAP_USD` | No | Worker concurrency and spending caps (enforced from Phase 2). |
+| `JOB_CONCURRENCY` | No | Provider calls in flight per job (default 2). |
+| `WORKER_POLL_MS`, `WORKER_LEASE_SECONDS`, `WORKER_ITEM_DELAY_MS`, `WORKER_HEALTH_PORT` | No | Worker poll interval, lease length, pause between provider calls, and health port. |
+
+Provider mode, live opt-in, model, prices and the per-job and daily caps are workspace settings, changed by an administrator under **Settings** and recorded in the audit log.
 | `PG_LOCAL_PORT`, `PG_BIN_DIR` | No | Port and binary location for the optional local cluster. |
 
 The web server and worker fail with a clear message when database or authentication configuration is missing or invalid. No secret is ever sent to the browser.
@@ -109,11 +115,39 @@ pnpm test:e2e
 
 `pnpm test` needs the database server running (`pnpm db:up`). It drops and recreates a separate `<database>_test` database from migrations on every run and never touches development data. Tests never call a live AI provider.
 
-`pnpm test:e2e` rebuilds a third database (`<database>_e2e`) from migrations and the demo seed, makes a production build, starts it on port 3100 and runs the Chromium browser tests. The first run needs the browser once:
+`pnpm test:e2e` rebuilds a third database (`<database>_e2e`) from migrations and the demo seed, makes a production build, starts it on port 3100 together with the real worker process, and runs the Chromium browser tests. The first run needs the browser once:
 
 ```bash
 pnpm exec playwright install chromium
 ```
+
+## Live AI
+
+1. Put `ANTHROPIC_API_KEY` (and optionally `AI_MODEL_ID`) in the server environment and restart the web server and worker.
+2. As an administrator open **Settings**: choose Live, enter the model ID and provider prices, tick the opt-in that lists the fields sent, and save.
+3. Open a merchant and choose **Run live analysis**. The dialog shows the estimated tokens and cost and the caps before anything is sent.
+
+A separately budgeted smoke test makes three real calls and prints actual usage. It exits with code 2 and makes no call when credentials are missing:
+
+```bash
+pnpm smoke:live
+```
+
+## Evaluation
+
+`evals/corpus/` holds a development set and a held-out set (304 records, three fictional merchants, eight domains) that share no product family, and no title, with each other or with the demo fixtures.
+
+```bash
+pnpm eval:check
+```
+
+```bash
+pnpm eval --split development --provider baseline
+```
+
+`baseline` is a deterministic lexical yardstick, not a model. `--provider claude --max-items <n>` runs the live adapter and spends money. Reports are written to `evals/reports/`.
+
+**The labels are provisional.** They were written by the model that built this application, not by an independent expert, so results on them are preliminary and cannot satisfy a launch gate. To make them ground truth, have a domain expert correct `evals/corpus/*.jsonl` and set `labeling.source` to `expert`, with a second reviewer adjudicating ambiguous items.
 
 ## Fixtures
 
@@ -132,7 +166,7 @@ After `pnpm db:seed` the demo workspace already holds a published taxonomy, thre
 1. Sign in as **Rin Castellanos** (taxonomist). The Overview shows live counts: 300 active listings, 172 approved, 128 pending.
 2. **Merchants & Catalogs:** add a merchant named `Pier Pantry`, open it and choose **Import catalog**. Pick `fixtures/generated/catalogs/walkthrough-pier-pantry.csv`.
 3. The file uses its own header names; the mapping is suggested and editable. The summary shows 14 input rows = 8 accepted + 5 rejected + 1 collapsed, with the reason for every rejected row. Choose the row to keep for the conflicting SKU `PP-004`, tick the exclusion box and commit. Revision 1 has 9 listings.
-4. **Run demo analysis.** Nine demo suggestions appear. Upload a file of your own products instead and you get none: they stay available for manual mapping.
+4. **Run demo analysis.** The dialog shows what will be analyzed and that demo mode has no provider cost; the job is queued and the worker processes it while the panel shows live progress. Nine demo suggestions appear. Upload a file of your own products instead and you get none: they stay available for manual mapping.
 5. **Review listings.** Press `A` to approve the first item. On *Coconut Milk Shampoo* the demo suggestion was misled by the merchant category: search for `shampoo`, choose the hair care leaf, give a reason and **Change mapping**. **Defer** *Apple*. Mark *Ginger Kombucha* **No suitable category**, then reopen it and **Propose this leaf**.
 6. Sign in as **Avery Okafor** (administrator). **Taxonomy → Proposals:** approve the proposal; it lands in draft version 2. Open the draft and **Publish version 2**.
 7. Every earlier approval and suggestion is now stale and releases are blocked. On **Taxonomy**, choose **Revalidate dependencies**: unchanged decisions are kept, and the kombucha listing returns to review. Map it to the new leaf.
@@ -155,7 +189,9 @@ lib/domain/     domain services (catalog import, review, analysis, taxonomy, pro
 lib/retrieval/  deterministic candidate retrieval
 lib/export/     spreadsheet-safe CSV and ZIP writers
 lib/analytics/  governed metric registry
-lib/ai/         provider interface, fixture provider, response validation and signal policy
+lib/ai/         provider interface, Claude adapter, fixture provider, response validation and signal policy
+lib/jobs/       job engine the worker runs (leases, retries, cancellation) and storage cleanup
+evals/          evaluation corpus, leakage checks, metrics, runner and reports
 lib/storage/    private object storage adapter
 worker/         durable job worker process
 fixtures/       synthetic sources, generator and generated files

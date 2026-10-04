@@ -97,3 +97,51 @@ A release is compatible with a merchant when it was made from the merchant's cur
 
 ## D32 Demo data is produced by the services, and tests own their workspaces
 `db/seed-scenario.ts` builds the demo through the same service calls a user triggers. Integration test files create their own workspaces, and browser tests use a third database (`_e2e`) rebuilt from migrations and seed before every run, against a production build on its own port.
+
+## D33 Analysis is a queued job; the worker is the only processor
+`startAnalysis` writes the job and one item per active listing and returns 202. Nothing is analyzed in the request. The worker (and the seed and tests, through the same `processJob`) does the work. This supersedes D24.
+
+## D34 Cross-workspace job discovery through one narrow SECURITY DEFINER function
+The worker runs as the restricted application role, so it cannot see any tenant's rows without a workspace context. `claim_analysis_job(worker, lease_seconds)` runs as the owner, picks the oldest claimable job with `FOR UPDATE SKIP LOCKED`, takes the lease and returns only the job ID and workspace ID. The worker then sets that workspace as its row-security context. `expired_storage_objects` follows the same pattern for cleanup. Execute is revoked from PUBLIC and granted to the application role.
+
+## D35 Leases, heartbeats and recovery
+A claim sets `lease_owner` and `lease_expires_at`. Every batch renews the lease and publishes progress. A job whose lease expired is claimable again; on claim, items left `running` go back to `pending`. On SIGTERM the worker finishes the items in flight, returns the rest to `pending` and expires its own lease so another worker continues at once.
+
+## D36 Idempotent item commits and one lock order
+Each item's outcome commits in its own transaction: lock the job row, check that this worker still holds the lease, lock the item, and stop if it is no longer `running`. A second worker or a late result therefore cannot write. The unique index on (job, listing) is the last line of defence. Every path locks the job before the item, after an early version deadlocked by upgrading a shared job lock.
+
+## D37 Retry policy lives in the worker, not the SDK
+The SDK client is created with `maxRetries: 0`. The worker allows three attempts per item: transient failures (timeout, rate limit, overload, network) back off about 1, 2, then up to 8 seconds with jitter; an invalid answer gets one repair attempt inside the same limit; refusals and truncated answers are not retried; authentication and configuration failures stop the job at once and leave unprocessed items pending for a later retry.
+
+## D38 Job outcome definitions
+Completed: no failures and nothing pending. Canceled: cancellation was honoured. Otherwise partially completed when at least one recommendation was produced, failed when none was. Progress is always recomputed from item rows.
+
+## D39 Eligibility: analysis leaves settled listings alone
+A listing is skipped as already reviewed when a reviewer approved, deferred or marked it no suitable category, or rejected a suggestion and is investigating. It is skipped as up to date when its latest recommendation is for the active taxonomy version, the same provider and model, and did not fail. Listings back in Needs review are analyzed again; the new recommendation is stored without touching the earlier decision. Eligibility is rechecked just before each provider call, so a decision made while the job runs saves the call.
+
+## D40 A recommendation is checked against the active version when it is written
+`storeRecommendation` takes a share lock on the workspace row and refuses a recommendation whose taxonomy version is no longer active; the item fails with `stale_dependency`. The job also stops at the next batch boundary when the taxonomy version or catalog revision changed, and such a job cannot be retried: a new analysis is required.
+
+## D41 Claude adapter shape
+One `messages.create` call per listing with `output_config.format` built from a per-request Zod schema in which every concept ID is an enum of the retrieved candidates. The system prompt is constant; all catalog text travels as JSON in the user turn; there are no tools. `stop_reason` `refusal` and `max_tokens` are processing failures. Unparseable text is handed to server validation, which rejects it. The model ID is configuration (workspace setting, else `AI_MODEL_ID`); the application assumes none. `thinking` and `effort` are left at the model's defaults because their accepted values differ by model. A listing with no retrieved candidates abstains without a provider call.
+
+## D42 No server-side refusal fallback
+The provider's fallback option would let a different model answer after a refusal. It is not enabled: a refusal is recorded as a failed item, and `model_id` on a recommendation always names the model that produced it. Revisit if refusals turn out to be common on real catalogs.
+
+## D43 Budgets
+An estimate (about 3.5 characters per token for the prompt plus 600 output tokens per listing) is shown before start and stored on the job with a cost reservation. A job is refused when the estimate exceeds the per-job item, token or spend cap, or when today's committed spend plus the estimate exceeds the daily cap. The same caps are checked with actual usage between batches. Prices are entered by an administrator; without them cost is NULL everywhere and only the token cap can be enforced. Demo jobs cost nothing and say so.
+
+## D44 Settings store configuration, never secrets
+Provider mode, live opt-in, model ID, prices and caps are workspace columns changed by administrators with a version check and an audit event. The API key exists only in the server environment; the application reports whether one is configured. The settings contract rejects unknown fields, including an API key.
+
+## D45 Cleanup removes bytes, not records
+The worker deletes staged files of imports that were not committed within 24 hours and export objects older than 7 days. Import rows become `expired`; export rows get `deleted_at`. Files of committed imports are retained. A release can always be exported again from its immutable rows.
+
+## D46 Evaluation data is separate from demo data and labeled by provenance
+`evals/corpus/development.jsonl` and `heldout.jsonl` use product families and one merchant that do not appear in the demo fixtures. `pnpm eval:check` fails on shared families, duplicate or near-duplicate titles (token Jaccard of 0.8 or more) across splits or against the fixtures, labels that are not mappable leaves, and missing composition minimums. Every record states who labeled it; results on `provisional_model_authored` labels are reported as preliminary.
+
+## D47 The High gate is computed, never applied automatically
+`highSignalGate` requires the held-out split, the live model, expert labels on every record, at least 50 High selections and 95% precision. The evaluation computes bands as if High were enabled so its precision can be measured first. Nothing in the application sets `high_signal_enabled`; the settings page shows it read-only.
+
+## D48 One retry on a lost database connection
+A pooled connection closed by the server (restart, failover) fails the next query. The failed transaction was rolled back, so `withContext` runs it once more on a fresh connection, and the pool has an error listener so an idle-connection error is logged instead of unhandled.
