@@ -150,3 +150,41 @@ A pooled connection closed by the server (restart, failover) fails the next quer
 
 ## D49 Test runs hold a lock on the test database and cannot overlap
 Every Vitest run drops and recreates `<database>_test`, and the worker's `claim_analysis_job` claims queued jobs across all workspaces in the database it is connected to. Two runs at once therefore destroy each other's schema and process each other's jobs: on 2026-10-04 two deliberately overlapping runs produced 12 and 3 failures, while seven shuffled-order runs of the same code alone passed 212 of 212. Overlap happened in practice when a timed-out command kept running in the background. Global setup now takes a session advisory lock for the whole run and a second run fails immediately with the holder's PID. Test files within a run still execute in the configured order and share the database by using their own workspaces (D32).
+
+## D50 One metric service; queries are assembled from fixed fragments
+`lib/analytics/metric-service.ts` is the only place a governed metric is computed. Dashboard cards, analytics answers, charts, exports and report refreshes all call `runSpecInTx`, so they cannot disagree. A validated AnalysisSpec selects SQL fragments by registry key; every value (merchant IDs, branch names, states, bands, timestamps) is bound as a parameter after being checked against an allowed set. No text from a question or a model reaches SQL. The workspace is never part of a spec: it comes from the session through row-level security. Grouping uses output positions because a repeated expression with bound parameters is not recognised by PostgreSQL as the same expression.
+
+## D51 Published versus draft, and what a category breakdown may claim
+A listing counts as published when its merchant's current release was made from the merchant's current catalog revision and contains a mapping for that listing revision. A release for a superseded revision contributes nothing, and the result says so. A listing counts as draft-approved when its state is Approved under the active taxonomy version. Totals sum numerators and denominators; rates are never averaged (AT19).
+
+A canonical branch exists only for a mapped listing. A breakdown by branch therefore always includes an "Unmapped" bucket, and the mapping scope (published or draft) must be stated because it decides which mapping the branch comes from. Coverage cannot be grouped by branch: every branch would show only its already-mapped listings. A branch filter on coverage is allowed, as PRD 6.4 describes, and carries a warning that the denominator is now only the listings classified there.
+
+## D52 Review activity metrics
+Reviewed listing count is the number of distinct listing revisions with a decision of origin manual, suggestion or bulk. Carried-forward and revalidated records are not reviews. Median review time uses individual decisions with a recorded duration; bulk approvals and decisions without a duration are excluded and counted in the result. Time ranges are half-open and stored in UTC. Named periods ("last month") are computed in the workspace timezone with weeks starting on Monday, and the interpretation shows the resulting instants. Day and week grouping is in UTC, as the PRD's dimensions specify, and the result says so. A listing reviewed on two days appears in both days and once in the total.
+
+## D53 Snapshot metrics have no history
+Listing count, coverage, pending, ambiguous and failed counts are as-of counts of current catalogs. The application does not record periodic snapshots, so "compared with last week", "has coverage improved" and a time range on those metrics are answered with an explanation or a clarification, never with numbers reconstructed from current data. The PRD's publication-day trend is not built; the dashboard shows the most recent publication and review completions by day.
+
+## D54 Guards, then a planner; the demo planner is rules, not AI
+Every question first passes fixed guards for requests that no planner may interpret: SQL, other workspaces, changes to data, transaction or engagement data, and comparisons with unrecorded history. They run before any provider call and answer identically in every mode.
+
+The demo planner is a phrase matcher. It accepts a question only when every word outside a small stopword list was consumed by a rule; otherwise it lists the words it could not account for and refuses. This is stricter than a list of fixed example sentences but has the same property: an arbitrary question never receives an invented interpretation. It is labeled "Demo planner (rule-based, not AI)" wherever its output appears. The live planner sends the question as data with the registry and the workspace's merchant and branch names to Claude with structured output; the server converts the answer to a spec and validates it against the registry and that vocabulary. A provider error, refusal or invalid answer is reported as not interpreted. Live mode without credentials is "AI unavailable"; it never falls back to the demo planner. The analysis builder needs no planner at all.
+
+"Coverage" without a scope produces a clarification offering published and draft, each as a complete interpretation. PRD 6.4 shows published being proposed directly while ANA03 requires asking; asking was chosen, with published listed first.
+
+## D55 Interpreting never runs anything
+`POST /api/analytics/interpret` returns an outcome only. Execution is a separate call with a spec the user has seen and may have edited. A run stores its validated spec, data scope and full result and is append-only (trigger), which is what makes a saved report's snapshot trustworthy. A run executed from an edited interpretation is recorded as built with controls, not as the planner's.
+
+## D56 Conversations are private in the service layer; reports are shared explicitly
+Row-level security isolates workspaces. Within a workspace, a conversation and its runs are readable only by their owner, enforced in `lib/domain/analytics.ts`; another member, including an administrator, gets the same 404 as for a missing ID. A saved report is private until its owner, in a role with `report.share`, shares it. A shared report exposes the runs it points to and nothing else of the owner's conversation. Refresh creates a new run and leaves the saved snapshot untouched; a non-owner's refresh is shown to them and not stored on the report.
+
+## D57 Drilldowns are exact or absent
+A result cell links to the review queue only when queue filters express exactly the listings it counts. The queue gained filters for ambiguous, failed analysis, published or not, and unanalyzed listings, and reports how many listings match. A canonical branch has no exact queue filter, so those rows say so instead of linking to an approximation. Tests assert that every offered link opens a queue with the metric's count.
+
+## D58 The analytics benchmark and what it does and does not show
+`evals/analytics/benchmark.ts` holds 40 questions with a reference spec or an expected clarification or refusal, and hand-written reference SQL that does not use the metric service. A supported question passes only when the planner's spec equals the reference and the executed rows equal the reference rows. Date boundaries are literals, with decisions arranged at the first and last instants of each interval.
+
+The demo planner's rules and these questions were written by the same author in the same session, so 40 of 40 shows that the rules, compiler and metric SQL agree with independent queries and that nothing unauthorized runs. It is a regression check, not a measurement of how well free-form questions are understood. The live planner has not been run against it.
+
+## D59 The held-out evaluation set is inspected
+The held-out set's baseline misses were printed and read while building the Phase 2 harness. Nothing was tuned against it, but it is no longer untouched. `HELDOUT_STATUS` records this, reports on that split are labeled INSPECTED, and the High gate refuses an inspected set. Tuning uses the development set. An independent assessment needs a new set, authored and labeled by someone else, in `evals/corpus/reserved.jsonl`; it does not exist yet.

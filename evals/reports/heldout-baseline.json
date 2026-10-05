@@ -4,13 +4,14 @@
     "dataset version": "5147b9366d6ac8b4",
     "items evaluated": "153 of 153",
     "labeling": "PRELIMINARY: 153 of 153 labels are provisional (written by the model that built this application, not by an independent expert)",
+    "set status": "INSPECTED since 2026-10-04: not an untouched evaluation. Baseline misses on this set were printed and read during harness development. Use the development set for tuning; a new reserved set is needed for independent assessment",
     "provider": "baseline",
     "model": "none (deterministic)",
     "prompt version": "baseline-unique-exact-v1",
     "retrieval policy": "lexical-v1",
     "signal policy": "signal-v1",
     "provider usage": "none",
-    "generated": "2026-10-04T00:29:08.244Z"
+    "generated": "2026-10-05T01:23:36.189Z"
   },
   "metrics": {
     "items": 153,
@@ -220,6 +221,7 @@
   "gate": {
     "met": false,
     "reasons": [
+      "This held-out set has been inspected, so it is not an untouched evaluation. The gate needs a new, independently labeled reserved set.",
       "The gate requires results from the live model, not a baseline or fixture provider.",
       "153 of 153 records are not independently expert-labeled.",
       "Only 43 High selections; at least 50 are needed for a meaningful precision estimate.",

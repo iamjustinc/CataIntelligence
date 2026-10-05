@@ -6,7 +6,7 @@ Reconcile merchant catalogs with a canonical taxonomy, publish reproducible mapp
 - What is built and how it was verified: [BUILD_STATUS.md](BUILD_STATUS.md)
 - Architecture decisions: [DECISIONS.md](DECISIONS.md)
 
-> **Status:** Phases 0 and 1 are verified. Phase 2 is implemented and verified with deterministic providers: analysis runs as durable background jobs in the worker, with a Claude adapter, budgets and settings. **No live provider call has been made yet**, because no credentials were available; see BUILD_STATUS.md for exactly what remains unverified. Analytics (Phase 3) is not built.
+> **Status:** Phases 0 and 1 are verified. Phase 2 is implemented with deterministic verification; live provider verification and independent quality evaluation remain pending. Phase 3 (dashboard and governed analytics) is implemented and verified deterministically; its live question planner has not been run against a real model. **No live provider call has been made**, because no credentials were available. See BUILD_STATUS.md for exactly what is and is not verified.
 
 All merchants, brands, people and products in this repository are fictional.
 
@@ -133,6 +133,28 @@ A separately budgeted smoke test makes three real calls and prints actual usage.
 pnpm smoke:live
 ```
 
+## Analytics
+
+The **Overview** dashboard and the **Analytics** page read the same metric service (`lib/analytics/metric-service.ts`). Eight registered metrics are computed from stored records, scoped to the signed-in workspace.
+
+A question goes through three steps, and nothing runs until the last one:
+
+1. **Interpret.** Fixed rules first refuse what analytics may never do: run SQL, read another workspace, change data, or report sales and revenue that are not recorded. Then a planner proposes an analysis.
+2. **Check or edit** the interpretation with the controls. The controls also work on their own, with no planner.
+3. **Run.** The server validates the analysis against the metric registry, builds the query itself and stores the run.
+
+Which planner answers depends on the workspace's AI mode, and every result says which one produced it:
+
+| Mode | Planner | What it is |
+| --- | --- | --- |
+| Demo | Demo planner | Rule-based phrase matching, **not AI**. It refuses any question it cannot match completely |
+| Live, with a server key | Live AI | Claude proposes a structured analysis; the server validates it. Usage is recorded. **Not yet run against a real model** |
+| Off, or live without a key | None | Only the fixed rules and the controls. There is no fallback to the demo planner |
+
+Results can be saved as reports. A report keeps the result as it was when saved; **Refresh** computes a separate result from current data. Reports are private until their owner shares them, and conversations are always private to their owner.
+
+The 40-question benchmark runs as part of `pnpm test` (`tests/integration/analytics-benchmark.test.ts`) and writes `evals/reports/analytics-benchmark-demo.json`. It checks the demo planner and the metric SQL against hand-written reference queries. It was written by the same author as the planner rules, so it is a regression check, not an independent accuracy measurement.
+
 ## Evaluation
 
 `evals/corpus/` holds a development set and a held-out set (304 records, three fictional merchants, eight domains) that share no product family, and no title, with each other or with the demo fixtures.
@@ -144,6 +166,8 @@ pnpm eval:check
 ```bash
 pnpm eval --split development --provider baseline
 ```
+
+**The held-out set has been inspected.** Its baseline misses were printed and read while the harness was built, so it is no longer an untouched evaluation: reports on it say INSPECTED and it cannot open the High signal gate. Tune against the development set only. An independent assessment needs a new set from an independent labeler in `evals/corpus/reserved.jsonl`, which does not exist yet.
 
 `baseline` is a deterministic lexical yardstick, not a model. `--provider claude --max-items <n>` runs the live adapter and spends money. Reports are written to `evals/reports/`.
 
@@ -163,7 +187,7 @@ Demo suggestions are bound to the content of these fixture rows. Change a fixtur
 
 After `pnpm db:seed` the demo workspace already holds a published taxonomy, three merchants (Harbor Market with two catalog revisions and three releases, Daily Basket with one release, Corner Goods reviewed but unpublished), 300 active listings and one proposal awaiting a decision. Every suggestion is deterministic fixture output and is labeled **Demo**.
 
-1. Sign in as **Rin Castellanos** (taxonomist). The Overview shows live counts: 300 active listings, 172 approved, 128 pending.
+1. Sign in as **Rin Castellanos** (taxonomist). The Overview dashboard shows 300 active listings, published coverage 46.7% (140 of 300), approved draft coverage 57.3% (172 of 300) and 128 pending. Each card links to the same listings in the review queue.
 2. **Merchants & Catalogs:** add a merchant named `Pier Pantry`, open it and choose **Import catalog**. Pick `fixtures/generated/catalogs/walkthrough-pier-pantry.csv`.
 3. The file uses its own header names; the mapping is suggested and editable. The summary shows 14 input rows = 8 accepted + 5 rejected + 1 collapsed, with the reason for every rejected row. Choose the row to keep for the conflicting SKU `PP-004`, tick the exclusion box and commit. Revision 1 has 9 listings.
 4. **Run demo analysis.** The dialog shows what will be analyzed and that demo mode has no provider cost; the job is queued and the worker processes it while the panel shows live progress. Nine demo suggestions appear. Upload a file of your own products instead and you get none: they stay available for manual mapping.
@@ -174,7 +198,9 @@ After `pnpm db:seed` the demo workspace already holds a published taxonomy, thre
 9. **Audit** lists every step with actor, reason and before/after references. In **Releases**, try **Make current (rollback)** on Harbor Market release 2.
 10. Sign in as **Sam Whitlock** to see read-only states, and as **Dana Mbeki** to confirm the second workspace sees none of this.
 
-The browser test `tests/e2e/workflow.spec.ts` performs steps 2 to 9 automatically. Analytics questions (the last step of PRD section 17) are not built yet.
+11. Sign in as **Jo Lindqvist** (analyst) and open **Analytics**. Ask "Which merchant has the lowest published coverage?", read the interpretation, run it, then follow up with "Only grocery products". Corner Goods shows 0% with a note that it has never published. Save the result as a report, publish another release as the administrator, and use **Refresh** to see the new figure beside the saved snapshot.
+
+The browser tests `tests/e2e/01-workflow.spec.ts` (steps 2 to 9), `02-jobs.spec.ts` and `03-analytics.spec.ts` (dashboard reconciliation, question to drilldown, report refresh, permissions) perform these automatically.
 
 ## Project layout
 
@@ -188,10 +214,10 @@ lib/contracts/  Zod contracts (API bodies, recommendation, AnalysisSpec)
 lib/domain/     domain services (catalog import, review, analysis, taxonomy, proposals, releases, audit)
 lib/retrieval/  deterministic candidate retrieval
 lib/export/     spreadsheet-safe CSV and ZIP writers
-lib/analytics/  governed metric registry
+lib/analytics/  metric registry, metric service (query compiler), planners (guards, demo rules, Claude), time and formatting
 lib/ai/         provider interface, Claude adapter, fixture provider, response validation and signal policy
 lib/jobs/       job engine the worker runs (leases, retries, cancellation) and storage cleanup
-evals/          evaluation corpus, leakage checks, metrics, runner and reports
+evals/          evaluation corpus, leakage checks, metrics, runner, reports and the analytics benchmark (evals/analytics)
 lib/storage/    private object storage adapter
 worker/         durable job worker process
 fixtures/       synthetic sources, generator and generated files

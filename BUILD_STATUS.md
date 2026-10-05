@@ -1,6 +1,6 @@
 # Build status
 
-Last updated: 2026-10-03 (session 3)
+Last updated: 2026-10-04 (session 4)
 
 Status values: **Not started** · **In progress** · **Implemented but unverified** · **Verified**.
 "Verified" means an automated test or a recorded manual check exercised the behavior on the server, not that a screen renders.
@@ -11,27 +11,75 @@ Status values: **Not started** · **In progress** · **Implemented but unverifie
 | --- | --- | --- |
 | 0 Foundation and contracts | **Verified** | Met |
 | 1 Deterministic taxonomy workflow | **Verified** | Met |
-| 2 Live recommendation processing | **Implemented; verified with deterministic providers. Live provider NOT verified** | Partly met. See "Phase 2 exit gate" below for what is met and what is blocked |
-| 3 Shared dashboard and analytics | Not started | Metric registry and AnalysisSpec contract only |
+| 2 Live recommendation processing | **Implemented with deterministic verification. Live provider verification and independent quality evaluation are pending** | Partly met. See "Phase 2 exit gate" below for what is met and what is blocked |
+| 3 Shared dashboard and analytics | **Implemented; verified deterministically. Live question planner NOT verified** | Met for the deterministic path: the 40 benchmark questions reconcile with reference queries and unsupported or malicious questions cause no execution. The live planner has not been run against the benchmark. See "Phase 3 exit gate" |
 | 4 Integrated release and demonstration | Not started | |
 
-**No live provider call has been made.** This machine has no `ANTHROPIC_API_KEY`, no `ANTHROPIC_AUTH_TOKEN` and no `ant` profile. The Claude adapter is tested against a deterministic stand-in for the SDK client only. Nothing in this document claims live verification.
+**No live provider call has been made, in any phase.** This machine has no `ANTHROPIC_API_KEY`, no `ANTHROPIC_AUTH_TOKEN` and no `ant` profile. The Claude recommendation adapter and the Claude analytics planner are tested against a deterministic stand-in for the SDK client only. Nothing in this document claims live verification.
+
+Two kinds of verification are kept apart throughout this document:
+
+- **Deterministic verification:** automated tests against PostgreSQL with fixture, scripted or stand-in providers, and the rule-based demo planner.
+- **Live-model verification:** a real, successful provider call. **None has happened.**
 
 ## Verification run at the end of this session
 
-| Check | Result |
-| --- | --- |
-| `pnpm typecheck` | Clean |
-| `pnpm lint` | Clean |
-| `pnpm test` | 208 passed in 17 files (run twice in a row) |
-| `pnpm test:e2e` | Rebuilds the `_e2e` database, runs `next build`, starts the web server **and the real worker process**, then 8 Chromium tests: all passed (5 Phase 1, 3 Phase 2) |
-| `pnpm eval:check` | Corpus passes leakage and composition checks |
-| `pnpm eval --split development --provider baseline` | Ran; report in `evals/reports/development-baseline.md` |
-| `pnpm eval --split heldout --provider baseline` | Ran; report in `evals/reports/heldout-baseline.md` |
-| `pnpm eval --split heldout --provider claude` | **Not run**: exits with "needs ANTHROPIC_API_KEY and AI_MODEL_ID" |
-| `pnpm smoke:live` | **Not run**: exits with code 2, "No provider call was made" |
+| Check | Kind | Result |
+| --- | --- | --- |
+| `pnpm typecheck` | Deterministic | Clean |
+| `pnpm lint` | Deterministic | Clean |
+| Connection tests (`connection-retry.test.ts`) | Deterministic | 4 passed |
+| Isolation tests (`isolation.test.ts`) | Deterministic | 19 passed |
+| `pnpm test` (unit and integration, isolated `_test` database) | Deterministic | 297 passed in 22 files, run twice on the final code (212 in 18 files before Phase 3, also run in seven shuffled orders) |
+| `pnpm build` (as part of `pnpm test:e2e`) | Deterministic | Production build succeeded |
+| `pnpm test:e2e` (isolated `_e2e` database, production build, real worker) | Deterministic | 13 Chromium tests passed: 5 Phase 1, 3 Phase 2, 5 Phase 3. Server log clean. Two earlier runs this session failed on one new analytics test each time (a dropped test attribute, then a wrong expectation about which merchants were unpublished); both were test defects and are fixed |
+| Analytics benchmark (inside `pnpm test`) | Deterministic, demo planner | 40 of 40; report in `evals/reports/analytics-benchmark-demo.json` |
+| `pnpm eval:check` | Deterministic | Corpus passes leakage and composition checks |
+| `pnpm eval --split heldout --provider baseline` | Deterministic | Re-run; report now labeled INSPECTED and the High gate lists that as a reason |
+| Manual browser check on the development server | Manual | Dashboard and one question-to-result flow viewed as the seeded analyst against development data; no console errors |
+| `pnpm smoke:live` | Live model | **Not run**: no credentials |
+| `pnpm eval --split heldout --provider claude` | Live model | **Not run**: no credentials |
+| Live analytics planner | Live model | **Not run**: no credentials. Tested only with a stand-in client |
 
-The development database was **not** reset this session; the Phase 2 migration is additive and was applied with `pnpm db:migrate`.
+The development database was **not** reset. Migration `0004_phase3` is additive (three columns, one foreign key, one append-only trigger) and was applied with `pnpm db:migrate`. Destructive setup happened only in the `_test` and `_e2e` databases.
+
+## Connection fix (start of this session)
+
+The Phase 2 commit retried a whole transaction after a lost connection, which could have replayed a mutation whose commit had already succeeded.
+
+| Item | Result |
+| --- | --- |
+| Retry rule | `withContext` retries once only if the failure happened before the caller's function started (checkout, `BEGIN`, setting the session context). Nothing is replayed after the body starts, including when `COMMIT` fails with an unknown outcome |
+| Connection release | `withContext` checks the connection out itself and releases it in `finally`, destroying it after a lost connection. Drizzle's `transaction` sends `BEGIN` outside its own try/finally, which leaked the pool slot when `BEGIN` failed and made `pool.end()` hang |
+| Error events | Pool-level and per-client listeners; a wait for a pool slot is bounded at 15 seconds |
+| Tests | `connection-retry.test.ts`: retry before the body; no replay after mid-transaction termination; no checked-out or waiting clients afterwards; no retry once the body started |
+| The suite stall | Not reproducible on the fixed code alone: seven shuffled-order runs and repeated ordered runs all passed. Reproduced as a class by overlapping runs: two runs at once drop each other's `_test` database and the worker engine claims the other run's jobs (12 and 3 failures in a deliberate overlap). Overlap happened in practice when a timed-out command kept running in the background. Global setup now holds an advisory lock and a second run stops immediately, naming the holder |
+| Not established | The exact trigger of the first stall was not captured. The leaked connection on a failed `BEGIN` could also hang teardown and is fixed; which of the two occurred that time is unknown |
+
+No test was skipped, no timeout was raised and no process exit is forced. Tests still run in the configured order; serial execution across runs is required because every run recreates one shared database (DECISIONS D49).
+
+## Phase 3 exit gate
+
+| Gate condition (PRD section 18) | Status | Evidence |
+| --- | --- | --- |
+| Benchmark questions reconcile with reference queries | Met with the demo planner (deterministic). **Not run with a live model** | `analytics-benchmark.test.ts`: 26 of 26 supported questions produce the reference AnalysisSpec and the same rows as hand-written reference SQL; report in `evals/reports/analytics-benchmark-demo.json` |
+| Unsupported or malicious questions cause no unauthorized execution | Met (deterministic) | 14 of 14 clarification, refusal and attack questions are declined and none produces a run; row counts of decisions, releases, concepts and review-state versions are unchanged after the whole benchmark; `analytics-api.test.ts`; `03-analytics.spec.ts` |
+
+### Analytics benchmark (deterministic, demo planner)
+
+| Measure | Result |
+| --- | --- |
+| Supported-question accuracy (spec and numbers both correct) | 26 of 26 |
+| Correct clarification or refusal | 14 of 14 |
+| Questions that should not run but produced an executable spec | 0 |
+| By category | totals 3/3, rates 4/4, merchants 3/3, publication scope 5/5, follow-ups 8/8, time 9/9, unsupported 3/3, zero denominators 2/2, permission attacks 3/3 |
+| Live planner on the same questions | **Not run** (no credentials) |
+
+How to read this: the planner rules and the benchmark were written by the same author in the same session. The result shows that the rules, the query compiler and the metric SQL agree with independent reference queries, and that nothing unauthorized runs. It is a regression check. It does not measure how well free-form questions are understood, and it says nothing about the live model.
+
+### What "demo planner" means
+
+In demo mode a question is interpreted by rule-based phrase matching, labeled "Demo planner (rule-based, not AI)" on the interpretation and "Demo planner · not AI" on the result. It accepts a question only when every meaningful word matched a rule; otherwise it names the words it could not account for and refuses. Live mode without credentials shows "AI unavailable" and never falls back to these rules. The analysis builder (fixed controls) and the dashboard need no planner.
 
 ## Phase 2 exit gate
 
@@ -39,7 +87,7 @@ The development database was **not** reset this session; the Phase 2 migration i
 | --- | --- | --- |
 | Provider failures preserve work | Verified with scripted providers | `jobs.test.ts`: transient, invalid, refusal, truncation, fatal auth, provider unavailable. Completed items and decisions are kept; failed listings stay reviewable |
 | Concurrent updates cannot overwrite decisions | Verified | `jobs.test.ts` (approval during an in-flight call, lost lease), `review.test.ts` AT08 and AT09, e2e |
-| Benchmark results are reported | Partly met | Lexical baseline reported on development and held-out sets. **Live-model results are blocked on credentials; all labels are provisional** |
+| Benchmark results are reported | Partly met | Lexical baseline reported on development and held-out sets. **Live-model results are blocked on credentials; all labels are provisional; the held-out set has been inspected** |
 | Production configuration has no exposed secrets | Verified | `settings-cleanup.test.ts`: the key never appears in API responses or audit events; settings reject an `apiKey` field; the worker logs only whether a key is present |
 
 ### Blocked verification, precisely
@@ -47,11 +95,13 @@ The development database was **not** reset this session; the Phase 2 migration i
 1. **Live provider call.** Needs `ANTHROPIC_API_KEY` and a model ID. Then: `pnpm smoke:live` (three calls), and a live job from the UI with the worker running.
 2. **Live-model benchmark.** Needs the same credentials and a budget: `pnpm eval --split heldout --provider claude --max-items <n>`.
 3. **Independent expert labels.** All 304 evaluation records are marked `provisional_model_authored`: I wrote them. They are not expert ground truth. A domain expert must label or correct them, and a second reviewer must adjudicate the ambiguous ones, by editing `evals/corpus/*.jsonl` (`labeling.source`, `labelers`, `adjudicated`, `disagreement`).
-4. **High signal band.** Stays disabled. The gate needs items 2 and 3 plus at least 50 High selections at 95% precision.
+4. **An untouched evaluation set.** The held-out set's baseline misses were printed and read while the harness was built (2026-10-04). Nothing was tuned against it, but it is **inspected, not untouched**: its reports are labeled INSPECTED and the High gate now refuses it. Tuning must use the development set. Independent assessment needs a new set written and labeled by someone else (`evals/corpus/reserved.jsonl`), which does not exist.
+5. **Live analytics planner.** Needs the same credentials. Then set the workspace to live mode and ask the benchmark questions; no automated live benchmark run exists yet.
+6. **High signal band.** Stays disabled (`high_signal_enabled` is false and nothing sets it). The gate needs items 2 and 3 plus at least 50 High selections at 95% precision.
 
-### Preliminary evaluation results (deterministic lexical baseline, provisional labels)
+### Preliminary evaluation results (deterministic lexical baseline, provisional labels, inspected held-out set)
 
-| Measure | Development (151) | Held-out (153) | Target |
+| Measure | Development (151) | Held-out, inspected (153) | Target |
 | --- | --- | --- | --- |
 | Retrieval recall at 10 | 86.1% (99/115) | 82.4% (89/108) | 95% (KPI01): **not met** |
 | Unique-exact-match precision (would-be High) | 79.1% (34/43) | 76.7% (33/43) | 95% (KPI03): **not met** |
@@ -60,7 +110,13 @@ The development database was **not** reset this session; the Phase 2 migration i
 
 What this does and does not show: retrieval alone misses the correct leaf for roughly one labelable listing in six on product families it was not tuned on, against 99% on the demo fixtures. That is a real finding about the retriever. It says nothing yet about the live model's accuracy (KPI02), and because the labels are provisional none of it is launch evidence.
 
-## Integrity findings from the start of this session
+## Integrity findings
+
+- **Server log line "The destination stream closed early"** during browser tests is the framework reporting a cancelled render, not a data error. Reproduced with a real browser against the production build (`.data/diag/abort-probe2.ts`): it appears when the browser leaves a page whose client-side navigation is still streaming (4 of 4 on Review Queue, 2 of 4 on Releases, both untouched by Phase 3, and 4 of 4 on Overview) and never when the navigation settles (0 of 12). Aborted plain HTTP requests do not produce it (0 of 120). The tests triggered it by navigating immediately after sign-in; the sign-in helper now waits for the page to finish.
+- **A dropped test attribute** made the first analytics browser run fail: `Card` did not forward `data-testid`. The interpretation was on screen; the test could not find it. Fixed in the component.
+
+### From earlier sessions
+
 
 - **"Suggestions do not survive a taxonomy publication"** meant stale, not deleted. Recommendations are append-only (trigger, no UPDATE or DELETE grant). After a publication and revalidation, every earlier recommendation is still stored and the listing still points at it; the workflow state moves to Needs analysis and a stale suggestion cannot be approved. Two gaps were fixed: the review screen now lists the full suggestion history, and a new analysis now covers listings that returned to Needs review. Covered by `jobs.test.ts` ("history is kept across taxonomy versions and re-analysis").
 - **React console errors** were caused by a dependency install while the dev server was running, not by application code. `@playwright/test` is an optional peer dependency of `next`; installing it made pnpm re-link `node_modules/next`, and the open page received a hot update from a second copy of React. The dev server log recorded "node_modules is being reorganized by a concurrent install". Normal navigation, hot reload, a concurrent production build and installing an unrelated package do not reproduce it; after a restart there are no errors.
@@ -86,8 +142,14 @@ What this does and does not show: retrieval alone misses the correct leaf for ro
 | Jobs (PRD 12.2, section 16) | Verified with deterministic providers | Queued jobs processed by the worker: leases, heartbeat, restart recovery, three attempts with backoff, one repair retry, immediate stop on auth or configuration failure, cancellation that keeps completed work, retry of failed items, stale-dependency stop, idempotent commits, per-item progress | `jobs.test.ts` (16), e2e `02-jobs.spec.ts` | One worker processes one job at a time; run more workers for more throughput |
 | Budgets and settings (PRD 14.4, section 16) | Verified | Estimate before start; per-job item, token and spend caps and a daily workspace cap, checked before start and between batches; actual usage per call; unknown cost stored as NULL; administrator settings with version check and audit | `jobs.test.ts`, `settings-cleanup.test.ts`, e2e | Member management is still not built |
 | File lifecycle (PRD 14.5) | Verified | Uncommitted staged files deleted after 24 hours, export objects after 7 days, by the worker | `settings-cleanup.test.ts` | Workspace deletion is not built |
-| Evaluation (PRD 13.5) | In progress | Corpus format, 304 records in separate development and held-out sets, leakage checks, metrics, runner, High gate | `evals.test.ts`, reports | Expert labels, adjudication, live-model run, 40 analytics questions |
-| ANA01 to ANA06 | Not started | Overview shows three live counts only | `contracts.test.ts` | Phase 3 |
+| Evaluation (PRD 13.5) | In progress | Corpus format, 304 records in separate development and held-out sets, leakage checks, metrics, runner, High gate; held-out set marked inspected; 40-question analytics benchmark | `evals.test.ts`, `analytics-benchmark.test.ts`, reports | Expert labels, adjudication, live-model runs, a new untouched reserved set |
+| Metric service (PRD section 9) | Verified | Eight registered metrics from stored records in one service used by dashboard, analytics, exports and report refresh. Coverage is summed numerators over summed denominators. Published coverage uses each merchant's current release for its current catalog revision; no release means zero with a stated reason. Zero denominators return Not applicable. Branch breakdowns carry an Unmapped bucket | `analytics-metrics.test.ts` (16): every metric against independently written SQL; unregistered metrics, values and combinations rejected with 422 | Spec allows two group-by dimensions; the UI offers one |
+| ANA01 Operational dashboard | Verified | Active listings, published and approved-draft coverage, pending, ambiguous, failed analysis, most recent publication; merchant comparison with a summed Total row; review-state distribution; review completions by UTC day. Every card states scope and denominator and links to the review queue | `analytics-metrics.test.ts` (dashboard equals the service and the pinned scenario; every drilldown link opens a queue with exactly the metric's count), `03-analytics.spec.ts` (cards equal direct SQL on the e2e database) | "Review completions over time" covers the last 30 days. No historical coverage trend: past values are not recorded |
+| ANA02 Governed interpretation | Verified deterministically; live planner unverified | A question becomes a validated AnalysisSpec or is declined. The server compiles the query from fixed fragments with bound values; workspace comes from the session. Guards refuse SQL, other workspaces, mutations and unrecorded data before any planner or provider call | `analytics-planner.test.ts` (46), `analytics-api.test.ts`, benchmark | **No live model call.** The Claude planner is tested with a stand-in client: request shape, validation of nine kinds of bad answers, failure handling |
+| ANA03 Clarification and time | Verified deterministically | Clarifies coverage without a scope, periods without dates, months without a year, improvement without a baseline; nothing runs until resolved; the interpretation is editable before execution; named periods use the workspace timezone and show the interpreted instants; half-open intervals; comparisons with unrecorded history are reported as unavailable | `analytics-planner.test.ts` (daylight-saving and month boundaries), benchmark time questions with decisions placed at interval edges, e2e | Publication-day trend metric is not built |
+| ANA04 Results and evidence | Verified | Template summary built only from result cells, bar or line chart, paginated table with totals, metric definition, population, filters, release and revision per merchant, timestamp, warnings, run ID. Not applicable for zero denominators; "No matching records" for empty sets | `analytics-metrics.test.ts`, `analytics-api.test.ts`, e2e (chart and table cells equal the reference query) | Narrative text is template-only; no model-written summary |
+| ANA05 Follow-ups and saved reports | Verified deterministically | A follow-up derives from the conversation's last executed spec and lists what changed; a complete new question does not inherit filters; conversations are private to their owner; reports save name, spec, chart type and visibility; refresh computes a new run and keeps the saved snapshot; CSV export includes interpreted scope and run time | `analytics-planner.test.ts`, `analytics-api.test.ts` (17), e2e | A non-owner's refresh of a shared report is shown to them but not stored on the report |
+| ANA06 Cross-module actions | Verified | Results link to the review queue, releases and taxonomy. Analytics has no write path to listings, decisions, taxonomy or releases; a request to approve or publish gets an explanation and navigation links | `analytics-api.test.ts` and benchmark (row counts unchanged), e2e | Branch rows have no exact queue filter, so they show no link |
 
 ## Acceptance scenarios
 
@@ -111,10 +173,14 @@ What this does and does not show: retrieval alone misses the correct leaf for ro
 | AT16 Export historical release after new revisions | Verified | `releases.test.ts` (byte-identical) |
 | AT17 Provider timeout, 429, worker restart, cancellation | Verified with scripted providers | `jobs.test.ts`; restart and retry also in the browser with the real worker (`02-jobs.spec.ts`) |
 | AT18 Missing key in live mode | Verified | `review.test.ts`, `jobs.test.ts` (provider unavailable at processing time), e2e: "AI unavailable", 503, no fixture output, manual mapping works |
-| AT19 to AT23 Analytics | Not started | Phase 3 |
-| AT24 Foreign workspace ID | Verified for all existing endpoints | Each integration file asserts 404 or empty for another workspace; e2e |
+| AT19 Coverage aggregated across merchants | Verified | `analytics-metrics.test.ts`: total is 140 of 300 and differs from the average of merchant rates; dashboard Total row in e2e |
+| AT20 Metric without scope, or an absent sales metric | Verified deterministically | Benchmark S1, S2, U1; `analytics-planner.test.ts`; e2e. Live planner unverified |
+| AT21 Follow-up changes merchant or date | Verified deterministically | Benchmark F1 to F8 and D5; changes listed in the interpretation; e2e |
+| AT22 Category coverage including unmapped items | Verified | Benchmark S5 and F1; branch filter warning; coverage cannot be grouped by branch (`analytics-metrics.test.ts`) |
+| AT23 Empty dataset or zero denominator | Verified | `analytics-metrics.test.ts`, benchmark Z1 and Z2: Not applicable and "No matching records" |
+| AT24 Foreign workspace ID | Verified for all existing endpoints | Each integration file asserts 404 or empty for another workspace, now including conversations, runs, reports and exports; e2e |
 | AT25 Formula-leading CSV cell | Verified | `releases.test.ts`, e2e |
-| AT26 Viewer requests approval or publication via analytics | Not started | Phase 3. Viewer mutation attempts are refused today (e2e) |
+| AT26 Viewer requests approval or publication via analytics | Verified | `analytics-api.test.ts`, e2e: explanation and navigation links, no rows changed |
 | AT27 Keyboard-only operation | In progress | Tree navigation checked manually; A-to-approve in e2e. No automated accessibility audit |
 | AT28 Fresh install and refresh | Verified for Phase 1 scope | e2e rebuilds the database from migrations and seed; decisions and releases persist across reloads |
 
@@ -127,13 +193,20 @@ What this does and does not show: retrieval alone misses the correct leaf for ro
 - **One job at a time per worker**, items processed with `JOB_CONCURRENCY` calls in flight. Caps are checked between batches of ten, so in-flight calls can exceed a cap slightly; the UI says so.
 - **Bulk approval still has no eligible rows in the demo**, because the High band is disabled.
 - **Member management, merchant deactivation and workspace deletion** are not built.
-- **The 40-question analytics benchmark** belongs to Phase 3 and does not exist.
+- **The live analytics planner is unverified**, like the live recommendation adapter. Its prompt and request shape have never met the real API.
+- **The analytics benchmark is not independent of the planner it tests** (same author). A fair measure of question understanding needs questions written by someone else, and a live run.
+- **The held-out evaluation set is inspected**; an untouched reserved set does not exist.
+- **The demo planner is strict.** Phrasings outside its rules are refused with the unmatched words listed; the controls are the fallback. That is deliberate, and it will feel rigid.
+- **No history for as-of metrics.** Coverage and backlog over time cannot be shown because snapshots are not recorded. The dashboard's only time series is review completions.
+- **Conversation privacy is enforced in the service layer**, not by row-level security (which isolates workspaces). Every read goes through one owner check.
+- **Charts are hand-built HTML and SVG** with text equivalents; a single-day series renders as one point.
+- **Result export is CSV of up to 1,000 rows.** The PRD's separate bounded job for larger exports is not built.
 - **Browser coverage is Chromium only**; retry and restart recovery in the browser start from failure states arranged in the test database, because a healthy demo run cannot produce them.
 - **`pnpm setup` on a clean clone** was still not re-run end to end; its steps and the e2e preparation were.
 - Configuration is validated on first use by each process, not by a dedicated startup hook.
 
 ## Next steps
 
-1. With credentials: `pnpm smoke:live`, a live job from the UI, then a budgeted live evaluation on the development set.
-2. Expert labeling and adjudication of the corpus; then the held-out run and the High gate decision.
-3. Phase 3: metric service, dashboard, AnalysisSpec planner, governed query compiler, analytics benchmark.
+1. With credentials: `pnpm smoke:live`, a live analysis job from the UI, a live analytics question, then a budgeted live evaluation on the development set and a live run of the analytics benchmark.
+2. Expert labeling and adjudication of the corpus, and a new reserved set from an independent labeler; then the High gate decision.
+3. Phase 4: integrated release and demonstration (PRD section 18), including benchmark questions written by someone other than the planner's author.

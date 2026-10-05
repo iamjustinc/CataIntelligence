@@ -21,7 +21,7 @@ import { SIGNAL_POLICY_VERSION, signalBand, validateRecommendation } from "@/lib
 import type { RecommendationRequest } from "@/lib/contracts/recommendation";
 import { classificationHash, clean } from "@/lib/domain/catalog-validation";
 import { RETRIEVAL_POLICY_VERSION, retrieveCandidates } from "@/lib/retrieval/candidates";
-import { evaluationTaxonomy, loadDataset, type Dataset, type EvalRecord, type Split } from "./corpus";
+import { evaluationTaxonomy, HELDOUT_STATUS, loadDataset, type Dataset, type EvalRecord, type Split } from "./corpus";
 import { computeMetrics, highSignalGate, type ItemOutcome, type Metrics, type Rate } from "./metrics";
 
 /** Deterministic lexical yardstick. Clearly not a model: it only restates what retrieval found. */
@@ -158,12 +158,14 @@ async function main() {
   else throw new Error(`Unknown provider "${providerName}". Use baseline or claude.`);
 
   const { metrics, usage, evaluated } = await evaluate(dataset, provider, { maxItems, onItem: (done, total) => done % 25 === 0 && console.error(`${done}/${total}`) });
-  const gate = highSignalGate({ split, provider: provider.id, expertLabeled: dataset.labeling.expert, items: dataset.records.length, metrics });
+  const inspected = split === "heldout" && HELDOUT_STATUS.inspected;
+  const gate = highSignalGate({ split, provider: provider.id, expertLabeled: dataset.labeling.expert, items: dataset.records.length, metrics, inspected });
   const meta = {
     split,
     "dataset version": dataset.version,
     "items evaluated": `${evaluated} of ${dataset.records.length}`,
     labeling: dataset.labeling.expert === dataset.records.length ? "expert" : `PRELIMINARY: ${dataset.labeling.provisional} of ${dataset.records.length} labels are provisional (written by the model that built this application, not by an independent expert)`,
+    "set status": split === "heldout" ? (inspected ? `INSPECTED since ${HELDOUT_STATUS.since}: not an untouched evaluation. ${HELDOUT_STATUS.reason} Use the development set for tuning; a new reserved set is needed for independent assessment` : "untouched") : "development set, used for tuning",
     provider: provider.id,
     model: provider.modelId ?? "none (deterministic)",
     "prompt version": provider.id === "claude" ? CLAUDE_PROMPT_VERSION : provider.promptVersion,

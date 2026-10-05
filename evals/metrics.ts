@@ -122,10 +122,11 @@ export interface GateDecision {
  * held-out split, independent expert labels and enough High selections at 95% precision. This
  * function only reports; nothing in the application enables the band automatically.
  */
-export function highSignalGate(input: { split: string; provider: string; expertLabeled: number; items: number; metrics: Metrics }): GateDecision {
+export function highSignalGate(input: { split: string; provider: string; expertLabeled: number; items: number; metrics: Metrics; /** The evaluated set was looked at before this run. */ inspected?: boolean }): GateDecision {
   const reasons: string[] = [];
   const { precision } = input.metrics.bands.high;
   if (input.split !== "heldout") reasons.push("The gate is evaluated on the held-out split only.");
+  if (input.inspected) reasons.push("This held-out set has been inspected, so it is not an untouched evaluation. The gate needs a new, independently labeled reserved set.");
   if (input.provider !== "claude") reasons.push("The gate requires results from the live model, not a baseline or fixture provider.");
   if (input.expertLabeled < input.items) reasons.push(`${input.items - input.expertLabeled} of ${input.items} records are not independently expert-labeled.`);
   if (precision.n < HIGH_GATE.minSelections) reasons.push(`Only ${precision.n} High selections; at least ${HIGH_GATE.minSelections} are needed for a meaningful precision estimate.`);

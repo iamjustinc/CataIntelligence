@@ -3,7 +3,9 @@
  *
  * Three datasets are kept apart:
  *   development  evals/corpus/development.jsonl   for tuning retrieval, prompts and policies
- *   heldout      evals/corpus/heldout.jsonl       scored only to report results, never tuned against
+ *   heldout      evals/corpus/heldout.jsonl       scored only to report results, never tuned against.
+ *                                                 INSPECTED: see HELDOUT_STATUS below
+ *   reserved     (not authored yet)               a new independent set for the next assessment
  *   demo         fixtures/generated/*             what the demo provider answers for; not an evaluation set
  *
  * Every record carries who labeled it. Records labeled `provisional_model_authored` are NOT expert
@@ -15,6 +17,16 @@ import { resolve } from "node:path";
 import { z } from "zod";
 import { buildFixtures, parseTaxonomy } from "@/fixtures/generate";
 import type { RetrievalConcept } from "@/lib/retrieval/candidates";
+
+/**
+ * The held-out set is no longer untouched. Its baseline run was scored and its individual misses
+ * were printed and read on 2026-10-04 while building the harness. Nothing was tuned against it,
+ * but results on it must be reported as "inspected held-out", it cannot open the High gate, and
+ * retrieval or prompt work must use the development set only. The next independent assessment
+ * needs a new set written and labeled by someone other than this application's author, kept in
+ * evals/corpus/reserved.jsonl and not opened until that assessment.
+ */
+export const HELDOUT_STATUS = { inspected: true, since: "2026-10-04", reason: "Baseline misses on this set were printed and read during harness development." } as const;
 
 export const ISSUES = ["ambiguous", "sparse", "misleading_category", "injection", "attribute_trap", "missing_concept", "overlapping_label"] as const;
 
