@@ -19,6 +19,8 @@
   --color-rail-text: #cfc8b6;
   --color-stamp: #b93a16;
   --color-stamp-dark: #962d0f;
+  /* The accent on the dark navigation rail, where the base vermilion is too dim to read. */
+  --color-stamp-on-dark: #f08a66;
   --color-ok: #2f6b4f;
   --color-ok-bg: #e3efe6;
   --color-warn: #8a5a00;

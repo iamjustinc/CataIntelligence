@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { useState, useTransition } from "react";
+import { useEffect, useRef, useState, useTransition } from "react";
 import { api, ApiClientError } from "@/lib/client/api";
 
 export interface NavItem {
@@ -13,8 +13,20 @@ export interface NavItem {
 
 export function NavLinks({ items }: { items: NavItem[] }) {
   const pathname = usePathname();
+  const list = useRef<HTMLUListElement>(null);
+  // On narrow screens the links are one scrolling row: keep the current section in view. The row is
+  // scrolled directly; scrollIntoView would also move the browser's keyboard starting point to the
+  // link, so the first Tab would skip the "Skip to content" link.
+  useEffect(() => {
+    const row = list.current;
+    const current = row?.querySelector<HTMLElement>("[aria-current='page']");
+    if (!row || !current || row.scrollWidth <= row.clientWidth) return;
+    const item = current.getBoundingClientRect();
+    const box = row.getBoundingClientRect();
+    row.scrollLeft += item.left - box.left - (box.width - item.width) / 2;
+  }, [pathname]);
   return (
-    <ul className="flex gap-1 overflow-x-auto px-3 pb-2 lg:block lg:space-y-0.5 lg:overflow-visible lg:px-3 lg:pb-0">
+    <ul ref={list} className="flex gap-1 overflow-x-auto px-3 pb-2 lg:block lg:space-y-0.5 lg:overflow-visible lg:px-3 lg:pb-0">
       {items.map((item) => {
         const active = pathname === item.href || pathname.startsWith(`${item.href}/`);
         return (
@@ -26,7 +38,7 @@ export function NavLinks({ items }: { items: NavItem[] }) {
                 active ? "bg-rail-soft text-white" : "text-rail-text hover:bg-rail-soft/60 hover:text-white"
               }`}
             >
-              <span className={`font-mono text-[0.65rem] tracking-widest ${active ? "text-stamp" : "text-rail-text/50"}`}>{item.index}</span>
+              <span className={`font-mono text-[0.65rem] tracking-widest ${active ? "text-stamp-on-dark" : "text-rail-text/70"}`}>{item.index}</span>
               <span className={active ? "font-semibold" : ""}>{item.label}</span>
             </Link>
           </li>

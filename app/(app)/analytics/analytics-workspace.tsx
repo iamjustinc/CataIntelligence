@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Badge, buttonClass, Card, inputClass } from "@/components/ui";
 import { describeSpec } from "@/lib/analytics/format";
 import { DEMO_EXAMPLES, spec as defaultSpec, type Vocabulary } from "@/lib/analytics/planner";
@@ -42,11 +42,20 @@ export function AnalyticsWorkspace({ planner, vocabulary, initialRuns, initialCo
   const canAsk = planner.mode !== "none";
   const last = runs[runs.length - 1] ?? null;
 
+  const focusDraft = useRef(false);
   const propose = (next: Draft) => {
+    focusDraft.current = true;
     setDraft(next);
     setNotice(null);
-    requestAnimationFrame(() => draftRef.current?.focus());
   };
+  // Move focus to a newly shown interpretation once it is on the page, so keyboard and
+  // screen-reader users land on it. Edits to the same interpretation leave focus alone.
+  useEffect(() => {
+    if (draft && focusDraft.current) {
+      focusDraft.current = false;
+      draftRef.current?.focus();
+    }
+  }, [draft]);
 
   async function interpret(text: string) {
     const q = text.trim();

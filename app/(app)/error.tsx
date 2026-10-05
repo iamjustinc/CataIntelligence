@@ -2,13 +2,14 @@
 
 import { buttonClass, StatePanel } from "@/components/ui";
 
-export default function AppError({ error, reset }: { error: Error & { digest?: string }; reset: () => void }) {
+/** `retry` re-fetches the failed server render; clearing the error alone would show the same failure again. */
+export default function AppError({ error, retry }: { error: Error & { digest?: string }; retry: () => void }) {
   return (
     <StatePanel
       kind="error"
       title="This view failed to load"
       action={
-        <button type="button" onClick={reset} className={buttonClass.secondary}>
+        <button type="button" onClick={() => retry()} className={buttonClass.secondary}>
           Try again
         </button>
       }

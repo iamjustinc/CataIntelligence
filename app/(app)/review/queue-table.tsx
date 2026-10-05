@@ -59,6 +59,7 @@ export function QueueTable({ items, linkQuery, canDecide }: { items: QueueItem[]
     <>
       {showBulk ? (
         <div className="flex flex-wrap items-center justify-between gap-3 border-b border-rule bg-sunken/40 px-5 py-2.5 text-sm">
+          <p className="w-full text-xs text-muted md:hidden">Bulk approval is easier on a wider screen: the queue scrolls sideways here. Individual review works on a phone.</p>
           <span>
             <span className="font-mono">{selected.size}</span> of {selectable.length} High signal suggestion{selectable.length === 1 ? "" : "s"} on this page selected
           </span>
