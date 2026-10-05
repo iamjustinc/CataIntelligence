@@ -1,5 +1,5 @@
 import { and, eq } from "drizzle-orm";
-import { retryOnceOnLostConnection, withContext } from "@/db/client";
+import { withContext } from "@/db/client";
 import { memberships, workspaces } from "@/db/schema";
 import { auth } from "./auth";
 import type { Role } from "./permissions";
@@ -31,10 +31,10 @@ export interface Actor {
 }
 
 export async function getSessionUser(headers: Headers): Promise<SessionUser | null> {
+  // Reading a session is idempotent, so one retry on a dropped pooled connection is safe. The auth
+  // library reports that failure without the underlying cause, hence the check on its error code.
   const read = () => auth().api.getSession({ headers });
-  // The auth library reports a dropped pooled connection as a generic failure without the
-  // underlying cause, so that specific failure is retried once on a fresh connection.
-  const session = await retryOnceOnLostConnection(read).catch((err: { body?: { code?: string } }) => {
+  const session = await read().catch((err: { body?: { code?: string } }) => {
     if (err?.body?.code === "FAILED_TO_GET_SESSION") return read();
     throw err;
   });

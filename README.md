@@ -113,7 +113,7 @@ pnpm test
 pnpm test:e2e
 ```
 
-`pnpm test` needs the database server running (`pnpm db:up`). It drops and recreates a separate `<database>_test` database from migrations on every run and never touches development data. Tests never call a live AI provider.
+`pnpm test` needs the database server running (`pnpm db:up`). It drops and recreates a separate `<database>_test` database from migrations on every run and never touches development data. Tests never call a live AI provider. Only one run can use the test database at a time: a second `pnpm test` started while another is running stops immediately and names the process holding the lock.
 
 `pnpm test:e2e` rebuilds a third database (`<database>_e2e`) from migrations and the demo seed, makes a production build, starts it on port 3100 together with the real worker process, and runs the Chromium browser tests. The first run needs the browser once:
 
