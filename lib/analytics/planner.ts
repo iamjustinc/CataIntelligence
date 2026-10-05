@@ -220,7 +220,7 @@ function parse(question: string, vocab: Vocabulary, now: Date): Parsed {
     [/\b(were|was|got|been|have been) reviewed\b|\breviewed( listing)?( count)?\b|\breviews? (completed|done|recorded)\b|\b(review completions|completed reviews|review activity|review throughput)\b/, "reviewed_listing_count"],
     [/\b(failed|failing)( analys[ie]s)?( count)?\b|\banalysis (failures?|errors?)\b|\bprovider (failures?|errors?)\b|\bfailures?\b/, "failed_analysis_count"],
     [/\b(ambiguous|ambiguity|ambiguities)( count)?\b/, "ambiguous_count"],
-    [/\bpending( review)?( count)?\b|\b(backlog|unresolved|unreviewed|outstanding)\b|\b(left|remaining|waiting)( to (be )?review(ed)?)?\b|\bnot (yet )?approved\b|\bstill needs? review\b/, "pending_review_count"],
+    [/\bpending( review)?( count)?\b|\b(backlog|unresolved|unreviewed|outstanding)\b|\b(left|remaining|waiting)( to (be )?review(ed)?)?\b|\bnot (yet )?approved\b|\b(still )?needs?(?= (the )?(most |least |more |less )?review(ing)?\b)/, "pending_review_count"],
     [/\b(mapping )?coverage\b|\bcovered\b|\b(percent|percentage|share|proportion|rate) (of (listings |products |items )?)?mapped\b|\bmapped\b/, "coverage"],
     [/\b(how many |number of )?mappings( were| was| got)? published\b|\bpublished mappings( count)?\b/, "mappings_published_count"],
     [/\b(how many |number of )?(mapping )?releases?( were| was| got)?( published| made)?\b|\bpublications?( trend| activity| history)?\b/, "releases_published_count"],

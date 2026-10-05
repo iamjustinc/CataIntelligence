@@ -112,6 +112,17 @@ export function computeMetrics(outcomes: ItemOutcome[]): Metrics {
 
 export const HIGH_GATE = { minPrecision: 0.95, minSelections: 50 } as const;
 
+/** 95% Wilson score interval for a proportion. Null when there are no trials. */
+export function wilson(hits: number, n: number): { low: number; high: number } | null {
+  if (n === 0) return null;
+  const z = 1.959964;
+  const p = hits / n;
+  const centre = p + (z * z) / (2 * n);
+  const margin = z * Math.sqrt((p * (1 - p)) / n + (z * z) / (4 * n * n));
+  const denominator = 1 + (z * z) / n;
+  return { low: Math.max(0, (centre - margin) / denominator), high: Math.min(1, (centre + margin) / denominator) };
+}
+
 export interface GateDecision {
   met: boolean;
   reasons: string[];
@@ -119,14 +130,14 @@ export interface GateDecision {
 
 /**
  * Whether the High signal band may be enabled (PRD TAX07, KPI03). It requires a live model, the
- * held-out split, independent expert labels and enough High selections at 95% precision. This
+ * frozen split (evals/PROTOCOL.md), independent expert labels and enough High selections at 95% precision. This
  * function only reports; nothing in the application enables the band automatically.
  */
 export function highSignalGate(input: { split: string; provider: string; expertLabeled: number; items: number; metrics: Metrics; /** The evaluated set was looked at before this run. */ inspected?: boolean }): GateDecision {
   const reasons: string[] = [];
   const { precision } = input.metrics.bands.high;
-  if (input.split !== "heldout") reasons.push("The gate is evaluated on the held-out split only.");
-  if (input.inspected) reasons.push("This held-out set has been inspected, so it is not an untouched evaluation. The gate needs a new, independently labeled reserved set.");
+  if (input.split !== "frozen") reasons.push("The gate is evaluated on the frozen test set only (evals/PROTOCOL.md). Development and inspected sets cannot open it.");
+  if (input.inspected) reasons.push("This set has been inspected, so it is development data, not an untouched evaluation.");
   if (input.provider !== "claude") reasons.push("The gate requires results from the live model, not a baseline or fixture provider.");
   if (input.expertLabeled < input.items) reasons.push(`${input.items - input.expertLabeled} of ${input.items} records are not independently expert-labeled.`);
   if (precision.n < HIGH_GATE.minSelections) reasons.push(`Only ${precision.n} High selections; at least ${HIGH_GATE.minSelections} are needed for a meaningful precision estimate.`);

@@ -77,6 +77,8 @@ describe("demo planner (rule-based)", () => {
   it("builds registry-valid specs for the documented example forms", () => {
     expect(specOf("Which merchant has the lowest published coverage?").spec).toEqual(spec("published_mapping_coverage", { groupBy: ["merchant"], sort: { field: "published_mapping_coverage", direction: "asc" }, chartType: "bar" }));
     expect(specOf("How many listings are not yet approved?").spec.metricIds).toEqual(["pending_review_count"]);
+    // The closing question of the PRD's five-minute walkthrough (section 17).
+    expect(specOf("Which merchant still needs the most review?").spec).toEqual(spec("pending_review_count", { groupBy: ["merchant"], sort: { field: "pending_review_count", direction: "desc" }, chartType: "bar" }));
     expect(specOf("top 2 merchants by failed analyses").spec).toMatchObject({ metricIds: ["failed_analysis_count"], groupBy: ["merchant"], limit: 2, sort: { direction: "desc" } });
     expect(specOf("How many deferred listings does Daily Basket have?").spec.filters).toEqual([{ dimension: "merchant", operator: "eq", values: [DAILY] }, { dimension: "decision_status", operator: "eq", values: ["deferred"] }]);
     for (const outcome of [specOf("pending review by signal band"), specOf("median review time by week"), specOf("reviewed listings today")]) expect(analysisSpecSchema.safeParse(outcome.spec).success).toBe(true);

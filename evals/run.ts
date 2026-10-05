@@ -12,7 +12,7 @@
  * Writes a JSON report and a Markdown summary to evals/reports/.
  */
 import "dotenv/config";
-import { mkdirSync, writeFileSync } from "node:fs";
+import { appendFileSync, mkdirSync, writeFileSync } from "node:fs";
 import { resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { ClaudeProvider, CLAUDE_PROMPT_VERSION } from "@/lib/ai/claude-adapter";
@@ -21,8 +21,8 @@ import { SIGNAL_POLICY_VERSION, signalBand, validateRecommendation } from "@/lib
 import type { RecommendationRequest } from "@/lib/contracts/recommendation";
 import { classificationHash, clean } from "@/lib/domain/catalog-validation";
 import { RETRIEVAL_POLICY_VERSION, retrieveCandidates } from "@/lib/retrieval/candidates";
-import { evaluationTaxonomy, HELDOUT_STATUS, loadDataset, type Dataset, type EvalRecord, type Split } from "./corpus";
-import { computeMetrics, highSignalGate, type ItemOutcome, type Metrics, type Rate } from "./metrics";
+import { evaluationTaxonomy, HELDOUT_STATUS, loadDataset, readManifest, type Dataset, type EvalRecord, type Split } from "./corpus";
+import { computeMetrics, highSignalGate, wilson, type ItemOutcome, type Metrics, type Rate } from "./metrics";
 
 /** Deterministic lexical yardstick. Clearly not a model: it only restates what retrieval found. */
 export class BaselineProvider implements RecommendationProvider {
@@ -93,7 +93,13 @@ export async function evaluate(dataset: Dataset, provider: RecommendationProvide
 const pct = (r: Rate) => (r.rate === null ? "n/a" : `${(r.rate * 100).toFixed(1)}%`);
 const row = (label: string, r: Rate, note = "") => `| ${label} | ${pct(r)} | ${r.hits}/${r.n} | ${note} |`;
 
-export function markdownReport(meta: Record<string, unknown>, m: Metrics, gate: { met: boolean; reasons: string[] }): string {
+const interval = (r: Rate) => {
+  const w = wilson(r.hits, r.n);
+  return w ? `95% interval ${(w.low * 100).toFixed(1)}% to ${(w.high * 100).toFixed(1)}%` : "no selections";
+};
+
+/** `aggregateOnly` leaves out anything that names individual records, as the frozen set requires. */
+export function markdownReport(meta: Record<string, unknown>, m: Metrics, gate: { met: boolean; reasons: string[] }, aggregateOnly = false): string {
   return [
     `# Evaluation report`,
     "",
@@ -112,7 +118,7 @@ export function markdownReport(meta: Record<string, unknown>, m: Metrics, gate: 
     row("Evidence faithfulness", m.evidenceFaithfulness, "Responses passing server validation, including literal excerpts"),
     row("Selections citing evidence", m.selectionsWithEvidence),
     row("Provider failures", m.providerFailures, "Refusals, truncation, errors, invalid output"),
-    row("High band precision", m.bands.high.precision, `KPI03 target 95%. Coverage ${pct(m.bands.high.coverage)}`),
+    row("High band precision", m.bands.high.precision, `KPI03 target 95%. Coverage ${pct(m.bands.high.coverage)}. ${interval(m.bands.high.precision)}`),
     row("Medium band precision", m.bands.medium.precision, `Coverage ${pct(m.bands.medium.coverage)}`),
     row("Low band precision", m.bands.low.precision, `Coverage ${pct(m.bands.low.coverage)}`),
     "",
@@ -126,7 +132,7 @@ export function markdownReport(meta: Record<string, unknown>, m: Metrics, gate: 
     "",
     gate.met ? "**Met.** An administrator may enable the High band." : `**Not met.** The High band stays disabled.\n\n${gate.reasons.map((r) => `- ${r}`).join("\n")}`,
     "",
-    m.retrievalMisses.length ? `Retrieval misses: ${m.retrievalMisses.join(", ")}` : "No retrieval misses.",
+    aggregateOnly ? "Per-record results are withheld for the frozen test set." : m.retrievalMisses.length ? `Retrieval misses: ${m.retrievalMisses.join(", ")}` : "No retrieval misses.",
     "",
   ].join("\n");
 }
@@ -139,7 +145,13 @@ async function main() {
   const split = (arg("split") ?? "development") as Split;
   const providerName = arg("provider") ?? "baseline";
   const maxItems = arg("max-items") ? Number(arg("max-items")) : undefined;
-  const dataset = loadDataset(split);
+  let dataset: Dataset;
+  try {
+    dataset = loadDataset(split);
+  } catch (err) {
+    console.error(err instanceof Error ? err.message : err);
+    process.exit(2);
+  }
 
   let provider: RecommendationProvider;
   if (providerName === "claude") {
@@ -159,13 +171,14 @@ async function main() {
 
   const { metrics, usage, evaluated } = await evaluate(dataset, provider, { maxItems, onItem: (done, total) => done % 25 === 0 && console.error(`${done}/${total}`) });
   const inspected = split === "heldout" && HELDOUT_STATUS.inspected;
+  const frozen = split === "frozen";
   const gate = highSignalGate({ split, provider: provider.id, expertLabeled: dataset.labeling.expert, items: dataset.records.length, metrics, inspected });
   const meta = {
     split,
     "dataset version": dataset.version,
     "items evaluated": `${evaluated} of ${dataset.records.length}`,
     labeling: dataset.labeling.expert === dataset.records.length ? "expert" : `PRELIMINARY: ${dataset.labeling.provisional} of ${dataset.records.length} labels are provisional (written by the model that built this application, not by an independent expert)`,
-    "set status": split === "heldout" ? (inspected ? `INSPECTED since ${HELDOUT_STATUS.since}: not an untouched evaluation. ${HELDOUT_STATUS.reason} Use the development set for tuning; a new reserved set is needed for independent assessment` : "untouched") : "development set, used for tuning",
+    "set status": frozen ? "FROZEN test set: hash verified against its manifest, aggregate results only" : inspected ? `INSPECTED since ${HELDOUT_STATUS.since}: development data, not an untouched evaluation. ${HELDOUT_STATUS.reason}` : "development set, used for tuning",
     provider: provider.id,
     model: provider.modelId ?? "none (deterministic)",
     "prompt version": provider.id === "claude" ? CLAUDE_PROMPT_VERSION : provider.promptVersion,
@@ -177,8 +190,14 @@ async function main() {
   const dir = resolve(process.cwd(), "evals/reports");
   mkdirSync(dir, { recursive: true });
   const name = `${split}-${provider.id}`;
-  writeFileSync(resolve(dir, `${name}.json`), JSON.stringify({ meta, metrics, gate }, null, 2) + "\n");
-  const md = markdownReport(meta, metrics, gate);
+  writeFileSync(resolve(dir, `${name}.json`), JSON.stringify({ meta, metrics: frozen ? { ...metrics, retrievalMisses: [] } : metrics, gate }, null, 2) + "\n");
+  // Every look at the frozen set is recorded; the protocol retires it after a fixed number of runs.
+  if (frozen) appendFileSync(resolve(dir, "frozen-access-log.jsonl"), JSON.stringify({ at: meta.generated, datasetVersion: dataset.version, provider: provider.id, model: provider.modelId ?? null, promptVersion: meta["prompt version"], items: evaluated, gateMet: gate.met }) + "\n");
+  if (frozen) {
+    const manifest = readManifest()!;
+    writeFileSync(resolve(process.cwd(), "evals/corpus/frozen.manifest.json"), JSON.stringify({ ...manifest, scoredRuns: manifest.scoredRuns + 1 }, null, 2) + "\n");
+  }
+  const md = markdownReport(meta, metrics, gate, frozen);
   writeFileSync(resolve(dir, `${name}.md`), md);
   console.log(md);
 }

@@ -1,7 +1,11 @@
 import { describe, expect, it } from "vitest";
-import { HELDOUT_STATUS, loadDataset, type EvalRecord } from "@/evals/corpus";
+import { createHash } from "node:crypto";
+import { mkdtempSync, rmSync, writeFileSync } from "node:fs";
+import { tmpdir } from "node:os";
+import { join } from "node:path";
+import { DEVELOPMENT_SPLITS, HELDOUT_STATUS, loadDataset, MAX_FROZEN_RUNS, type EvalRecord, type FrozenManifest } from "@/evals/corpus";
 import { checkCorpus, jaccard } from "@/evals/leakage";
-import { computeMetrics, highSignalGate, type ItemOutcome } from "@/evals/metrics";
+import { computeMetrics, highSignalGate, wilson, type ItemOutcome } from "@/evals/metrics";
 import { BaselineProvider, evaluate } from "@/evals/run";
 
 const development = loadDataset("development");
@@ -94,14 +98,16 @@ describe("evaluation metrics", () => {
     expect(computeMetrics([]).top1Accuracy.rate).toBeNull();
   });
   it("keeps the High gate closed without a live model, expert labels, enough selections and 95% precision", () => {
-    const gate = highSignalGate({ split: "heldout", provider: "baseline", expertLabeled: 0, items: 8, metrics: m });
+    const gate = highSignalGate({ split: "frozen", provider: "baseline", expertLabeled: 0, items: 8, metrics: m });
     expect(gate.met).toBe(false);
     expect(gate.reasons).toHaveLength(4);
     const perfect = computeMetrics(Array.from({ length: 60 }, (_, i) => outcome(rec(`p${i}`), { band: "high" })));
-    expect(highSignalGate({ split: "heldout", provider: "claude", expertLabeled: 60, items: 60, metrics: perfect })).toEqual({ met: true, reasons: [] });
-    expect(highSignalGate({ split: "heldout", provider: "claude", expertLabeled: 59, items: 60, metrics: perfect }).met).toBe(false);
+    expect(highSignalGate({ split: "frozen", provider: "claude", expertLabeled: 60, items: 60, metrics: perfect })).toEqual({ met: true, reasons: [] });
+    // The inspected former held-out set is development data: it cannot open the gate whatever it scores.
+    expect(highSignalGate({ split: "heldout", provider: "claude", expertLabeled: 60, items: 60, metrics: perfect }).met).toBe(false);
+    expect(highSignalGate({ split: "frozen", provider: "claude", expertLabeled: 59, items: 60, metrics: perfect }).met).toBe(false);
     // A set that has been looked at cannot open the gate, however good the numbers are.
-    const inspected = highSignalGate({ split: "heldout", provider: "claude", expertLabeled: 60, items: 60, metrics: perfect, inspected: true });
+    const inspected = highSignalGate({ split: "frozen", provider: "claude", expertLabeled: 60, items: 60, metrics: perfect, inspected: true });
     expect(inspected.met).toBe(false);
     expect(inspected.reasons[0]).toMatch(/has been inspected/);
     expect(HELDOUT_STATUS.inspected).toBe(true);
@@ -117,5 +123,50 @@ describe("evaluation runner", () => {
     expect(first.metrics).toEqual(second.metrics);
     expect(first.metrics.evidenceFaithfulness.rate).toBe(1);
     expect(first.metrics.providerFailures.hits).toBe(0);
+  });
+});
+
+describe("frozen test set (evals/PROTOCOL.md)", () => {
+  const expert = (id: string): EvalRecord => ({ ...rec(id), split: "frozen", labeling: { source: "expert", labelers: ["Labeler A", "Labeler B"], adjudicated: true, disagreement: null } });
+  function fixture(records: EvalRecord[], manifest: (text: string) => Partial<FrozenManifest> | null) {
+    const dir = mkdtempSync(join(tmpdir(), "ci-frozen-"));
+    const text = records.map((r) => JSON.stringify(r)).join("\n") + "\n";
+    writeFileSync(join(dir, "frozen.jsonl"), text);
+    const m = manifest(text);
+    if (m) writeFileSync(join(dir, "frozen.manifest.json"), JSON.stringify({ sha256: createHash("sha256").update(text).digest("hex"), records: records.length, frozenAt: "2026-11-01T00:00:00.000Z", author: "Set Author", labelers: ["Labeler A", "Labeler B"], adjudicator: "Adjudicator", agreement: { raw: 0.9, kappa: 0.8 }, inspected: null, scoredRuns: 0, ...m }));
+    return dir;
+  }
+  const attempt = (dir: string) => {
+    try {
+      return loadDataset("frozen", dir).records.length;
+    } catch (err) {
+      return (err as Error).message;
+    } finally {
+      rmSync(dir, { recursive: true, force: true });
+    }
+  };
+
+  it("does not exist yet, and asking for it fails loudly instead of falling back to another set", () => {
+    expect(() => loadDataset("frozen")).toThrow(/No frozen test set exists yet/);
+    expect(DEVELOPMENT_SPLITS).toEqual(["development", "heldout"]);
+  });
+  it("loads only when the file matches its manifest and every record is expert-labeled by two people", () => {
+    expect(attempt(fixture([expert("a"), expert("b")], () => ({})))).toBe(2);
+    expect(attempt(fixture([expert("a")], () => null))).toMatch(/has not been frozen/);
+    expect(attempt(fixture([expert("a")], () => ({ sha256: "0".repeat(64) })))).toMatch(/changed after freezing/);
+    expect(attempt(fixture([expert("a"), { ...rec("b"), split: "frozen" }], () => ({})))).toMatch(/1 records are not expert-labeled/);
+    expect(attempt(fixture([{ ...expert("a"), labeling: { source: "expert", labelers: ["Labeler A"], adjudicated: true, disagreement: null } }], () => ({})))).toMatch(/not labeled by two people/);
+    expect(attempt(fixture([{ ...expert("a"), labeling: { source: "expert", labelers: ["Labeler A", "Labeler B"], adjudicated: false, disagreement: null } }], () => ({})))).toMatch(/neither adjudicated nor recorded as a disagreement/);
+    expect(attempt(fixture([{ ...expert("a"), labeling: { source: "expert", labelers: ["Labeler A", "The Developer"], adjudicated: true, disagreement: null } }], () => ({})))).toMatch(/not in the manifest/);
+  });
+  it("is spent once inspected or scored too often", () => {
+    expect(attempt(fixture([expert("a")], () => ({ inspected: { at: "2026-11-02T00:00:00.000Z", reason: "Misses were read." } })))).toMatch(/development data now/);
+    expect(attempt(fixture([expert("a")], () => ({ scoredRuns: MAX_FROZEN_RUNS })))).toMatch(/retires a set after 5/);
+  });
+  it("reports a Wilson interval beside High precision", () => {
+    const w = wilson(48, 50)!;
+    expect(w.low).toBeCloseTo(0.865, 2);
+    expect(w.high).toBeCloseTo(0.989, 2);
+    expect(wilson(0, 0)).toBeNull();
   });
 });

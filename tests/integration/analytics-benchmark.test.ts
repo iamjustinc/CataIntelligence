@@ -4,7 +4,8 @@ import type pg from "pg";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import { closeDb } from "@/db/client";
 import { seedScenario } from "@/db/seed-scenario";
-import { DemoPlanner } from "@/lib/analytics/planner";
+import { ClaudePlanner } from "@/lib/analytics/claude-planner";
+import { DemoPlanner, type Planner } from "@/lib/analytics/planner";
 import type { Actor } from "@/lib/auth/actor";
 import type { AnalysisSpec } from "@/lib/contracts/analysis-spec";
 import { executeAnalysis, interpretQuestion } from "@/lib/domain/analytics";
@@ -23,6 +24,53 @@ async function rowCounts() {
   const out: Record<string, number> = {};
   for (const t of MUTABLE) out[t] = (await admin.query(`select count(*)::int as n from ${t} where workspace_id = any($1)`, [[ws.id, empty.id]])).rows[0].n;
   out.review_state_versions = (await admin.query("select coalesce(sum(lock_version), 0)::int as n from review_states where workspace_id = $1", [ws.id])).rows[0].n;
+  return out;
+}
+
+/** Asks every benchmark question through the real interpret and execute services with the given planner. */
+async function runQuestions(planner: Planner): Promise<BenchResult[]> {
+  const out: BenchResult[] = [];
+  const actors: Record<"scenario" | "empty", Actor> = { scenario: await actorFor(ws, "viewer"), empty: await actorFor(empty, "viewer") };
+  const conversation = new Map<string, string>();
+  for (const q of QUESTIONS) {
+    const actor = actors[q.workspace ?? "scenario"];
+    const wsId = q.workspace === "empty" ? empty.id : ws.id;
+    const result: BenchResult = { id: q.id, category: q.category, question: q.question, expected: q.expect.kind, got: "", specMatches: null, numbersMatch: null, pass: false };
+    try {
+      const { outcome } = await interpretQuestion(actor, { question: q.question, conversationId: q.after ? conversation.get(q.after) : null }, { planner, now: BENCH_NOW });
+      result.got = outcome.kind;
+      let toRun: AnalysisSpec | null = null;
+      if (q.expect.kind === "spec") {
+        const expected = q.expect.spec(context);
+        result.specMatches = outcome.kind === "spec" && JSON.stringify(sorted(outcome.spec)) === JSON.stringify(sorted(expected));
+        if (outcome.kind === "spec") toRun = outcome.spec;
+        if (!result.specMatches) result.detail = outcome.kind === "spec" ? `spec differs: ${JSON.stringify(outcome.spec)}` : JSON.stringify(outcome).slice(0, 300);
+      } else if (q.expect.kind === "clarify") {
+        result.pass = outcome.kind === "clarify" && outcome.options.length >= q.expect.minOptions;
+        if (outcome.kind === "clarify" && q.expect.accept !== undefined) toRun = outcome.options[q.expect.accept]?.spec ?? null;
+      } else if (q.expect.kind === "unsupported") {
+        result.pass = outcome.kind === "unsupported" && outcome.reason === q.expect.reason;
+      } else {
+        result.pass = outcome.kind === "not_understood";
+      }
+      if (!result.pass && q.expect.kind !== "spec") result.detail = JSON.stringify(outcome).slice(0, 300);
+      if (toRun) {
+        const run = await executeAnalysis(actor, { spec: toRun, question: q.question, conversationId: q.after ? conversation.get(q.after) : null, source: planner.id });
+        conversation.set(q.id, run.conversationId!);
+        if (q.expect.kind === "spec") {
+          const reference = sortRows((await admin.query(q.expect.reference, [wsId])).rows as ReferenceRow[]);
+          const got = comparable(run.result);
+          result.numbersMatch = JSON.stringify(normal(got)) === JSON.stringify(normal(reference));
+          if (!result.numbersMatch) result.detail = `numbers differ: got ${JSON.stringify(got)} reference ${JSON.stringify(reference)}`;
+          result.pass = !!result.specMatches && result.numbersMatch;
+        }
+      }
+    } catch (err) {
+      result.got = "error";
+      result.detail = err instanceof Error ? err.message : String(err);
+    }
+    out.push(result);
+  }
   return out;
 }
 
@@ -58,48 +106,7 @@ beforeAll(async () => {
   }
   mutationsBefore = await rowCounts();
 
-  const actors: Record<"scenario" | "empty", Actor> = { scenario: await actorFor(ws, "viewer"), empty: await actorFor(empty, "viewer") };
-  const conversation = new Map<string, string>();
-  const planner = new DemoPlanner();
-  for (const q of QUESTIONS) {
-    const actor = actors[q.workspace ?? "scenario"];
-    const wsId = q.workspace === "empty" ? empty.id : ws.id;
-    const result: BenchResult = { id: q.id, category: q.category, question: q.question, expected: q.expect.kind, got: "", specMatches: null, numbersMatch: null, pass: false };
-    try {
-      const { outcome } = await interpretQuestion(actor, { question: q.question, conversationId: q.after ? conversation.get(q.after) : null }, { planner, now: BENCH_NOW });
-      result.got = outcome.kind;
-      let toRun: AnalysisSpec | null = null;
-      if (q.expect.kind === "spec") {
-        const expected = q.expect.spec(context);
-        result.specMatches = outcome.kind === "spec" && JSON.stringify(sorted(outcome.spec)) === JSON.stringify(sorted(expected));
-        if (outcome.kind === "spec") toRun = outcome.spec;
-        if (!result.specMatches) result.detail = outcome.kind === "spec" ? `spec differs: ${JSON.stringify(outcome.spec)}` : JSON.stringify(outcome).slice(0, 300);
-      } else if (q.expect.kind === "clarify") {
-        result.pass = outcome.kind === "clarify" && outcome.options.length >= q.expect.minOptions;
-        if (outcome.kind === "clarify" && q.expect.accept !== undefined) toRun = outcome.options[q.expect.accept]?.spec ?? null;
-      } else if (q.expect.kind === "unsupported") {
-        result.pass = outcome.kind === "unsupported" && outcome.reason === q.expect.reason;
-      } else {
-        result.pass = outcome.kind === "not_understood";
-      }
-      if (!result.pass && q.expect.kind !== "spec") result.detail = JSON.stringify(outcome).slice(0, 300);
-      if (toRun) {
-        const run = await executeAnalysis(actor, { spec: toRun, question: q.question, conversationId: q.after ? conversation.get(q.after) : null, source: "demo" });
-        conversation.set(q.id, run.conversationId!);
-        if (q.expect.kind === "spec") {
-          const reference = sortRows((await admin.query(q.expect.reference, [wsId])).rows as ReferenceRow[]);
-          const got = comparable(run.result);
-          result.numbersMatch = JSON.stringify(normal(got)) === JSON.stringify(normal(reference));
-          if (!result.numbersMatch) result.detail = `numbers differ: got ${JSON.stringify(got)} reference ${JSON.stringify(reference)}`;
-          result.pass = !!result.specMatches && result.numbersMatch;
-        }
-      }
-    } catch (err) {
-      result.got = "error";
-      result.detail = err instanceof Error ? err.message : String(err);
-    }
-    results.push(result);
-  }
+  results.push(...(await runQuestions(new DemoPlanner())));
 }, 120_000);
 afterAll(async () => {
   await admin.end();
@@ -160,4 +167,33 @@ describe("analytics benchmark with the demo planner (deterministic)", () => {
     expect(score.supported.correct).toBe(score.supported.total);
     expect(score.clarificationOrRefusal.correct).toBe(score.clarificationOrRefusal.total);
   });
+});
+
+/**
+ * The same questions through the live Claude planner. Runs only through `pnpm eval:analytics:live`,
+ * which sets LIVE_ANALYTICS_BENCHMARK and checks for credentials first. It is a measurement: it
+ * records what the model did and asserts only that nothing ran which should not have. Deterministic
+ * runs skip it, and a skipped run is never evidence about the live planner.
+ */
+const live = process.env.LIVE_ANALYTICS_BENCHMARK === "1" && !!process.env.ANTHROPIC_API_KEY && !!process.env.AI_MODEL_ID;
+describe.skipIf(!live)("analytics benchmark with the live planner (real provider calls)", () => {
+  it("measures the live planner and writes its report", async () => {
+    const liveResults = await runQuestions(new ClaudePlanner(process.env.AI_MODEL_ID!, { apiKey: process.env.ANTHROPIC_API_KEY }));
+    const score = scoreBenchmark(liveResults);
+    const usage = (await admin.query("select count(*)::int as calls, coalesce(sum(input_tokens), 0)::int as input, coalesce(sum(output_tokens), 0)::int as output, count(*) filter (where status <> 'ok')::int as not_ok from ai_usage where workspace_id = any($1) and purpose = 'analytics_plan'", [[ws.id, empty.id]])).rows[0];
+    const report = {
+      benchmark: "analytics-40",
+      planner: `live: ${process.env.AI_MODEL_ID}`,
+      note: "Questions that the fixed guards refuse never reach the model. A supported question counts as correct when the executed rows equal the reference rows; an exact match of the reference spec is reported separately because equivalent specs can differ in sort, limit or chart type.",
+      fixedInputs: { now: BENCH_NOW.toISOString(), timezone: BENCH_TIMEZONE },
+      usage,
+      score: { ...score, supported: { ...score.supported, numbersCorrect: liveResults.filter((r) => r.expected === "spec" && r.numbersMatch).length } },
+      results: liveResults,
+    };
+    writeFileSync(resolve(process.cwd(), "evals/reports/analytics-benchmark-live.json"), JSON.stringify(report, null, 2) + "\n");
+    console.log(JSON.stringify({ usage, score: report.score }, null, 2));
+    expect(usage.calls).toBeGreaterThan(0);
+    expect(score.unauthorizedExecutions).toBe(0);
+    expect(await rowCounts()).toEqual(mutationsBefore);
+  }, 900_000);
 });

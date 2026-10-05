@@ -23,7 +23,9 @@
     "eval": "tsx evals/run.ts",
     "eval:check": "tsx evals/leakage.ts",
     "smoke:live": "tsx scripts/live-smoke.ts",
-    "backup:check": "tsx scripts/backup-restore-check.ts"
+    "backup:check": "tsx scripts/backup-restore-check.ts",
+    "eval:freeze": "tsx evals/freeze.ts",
+    "eval:analytics:live": "tsx scripts/analytics-live.ts"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.131.0",

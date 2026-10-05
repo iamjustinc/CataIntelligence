@@ -4,13 +4,14 @@
 - **dataset version:** 791e7aa2793515e3
 - **items evaluated:** 151 of 151
 - **labeling:** PRELIMINARY: 151 of 151 labels are provisional (written by the model that built this application, not by an independent expert)
+- **set status:** development set, used for tuning
 - **provider:** baseline
 - **model:** none (deterministic)
 - **prompt version:** baseline-unique-exact-v1
 - **retrieval policy:** lexical-v1
 - **signal policy:** signal-v1
 - **provider usage:** none
-- **generated:** 2026-10-04T00:28:32.591Z
+- **generated:** 2026-10-05T05:22:10.855Z
 
 | Measure | Result | Count | Note |
 | --- | --- | --- | --- |
@@ -25,7 +26,7 @@
 | Evidence faithfulness | 100.0% | 151/151 | Responses passing server validation, including literal excerpts |
 | Selections citing evidence | 100.0% | 43/43 |  |
 | Provider failures | 0.0% | 0/151 | Refusals, truncation, errors, invalid output |
-| High band precision | 79.1% | 34/43 | KPI03 target 95%. Coverage 28.5% |
+| High band precision | 79.1% | 34/43 | KPI03 target 95%. Coverage 28.5%. 95% interval 64.8% to 88.6% |
 | Medium band precision | n/a | 0/0 | Coverage 0.0% |
 | Low band precision | n/a | 0/0 | Coverage 0.0% |
 
@@ -46,7 +47,7 @@
 
 **Not met.** The High band stays disabled.
 
-- The gate is evaluated on the held-out split only.
+- The gate is evaluated on the frozen test set only (evals/PROTOCOL.md). Development and inspected sets cannot open it.
 - The gate requires results from the live model, not a baseline or fixture provider.
 - 151 of 151 records are not independently expert-labeled.
 - Only 43 High selections; at least 50 are needed for a meaningful precision estimate.
