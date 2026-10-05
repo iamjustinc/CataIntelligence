@@ -40,7 +40,7 @@ afterAll(async () => {
 describe("fresh database from migrations", () => {
   it("applies all migrations and creates every table", async () => {
     const migrations = await admin.query("select count(*)::int as n from drizzle.__drizzle_migrations");
-    expect(migrations.rows[0].n).toBe(4);
+    expect(migrations.rows[0].n).toBe(5);
     const tables = await admin.query("select count(*)::int as n from information_schema.tables where table_schema = 'public' and table_type = 'BASE TABLE'");
     expect(tables.rows[0].n).toBe(31);
   });

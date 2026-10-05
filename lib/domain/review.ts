@@ -23,6 +23,12 @@ export interface ReviewFilters {
   /** Canonical concept ID: matches listings proposed or decided under this concept or its descendants. */
   conceptId?: string | null;
   warning?: boolean;
+  /** Drilldowns from governed metrics: the same predicates the metric service counts. */
+  flag?: "ambiguous" | "failed" | null;
+  /** Whether the listing has a mapping in its merchant's current release for the current catalog revision. */
+  published?: "mapped" | "unmapped" | null;
+  /** "none": listings that have no recommendation yet. */
+  unanalyzed?: boolean;
   q?: string | null;
   sort?: ReviewSort;
   cursor?: string | null;
@@ -85,6 +91,13 @@ export async function listReviewItems(actor: Actor, f: ReviewFilters) {
     if (f.state === "unresolved") where.push(sql`rs.state <> 'approved'`);
     else if (f.state) where.push(sql`rs.state = ${f.state}`);
     if (f.band) where.push(sql`rec.signal_band = ${f.band}`);
+    if (f.unanalyzed) where.push(sql`rec.id is null`);
+    if (f.flag === "ambiguous") where.push(sql`rs.ambiguous`);
+    if (f.flag === "failed") where.push(sql`rs.analysis_failed`);
+    if (f.published) {
+      const mapped = sql`exists (select 1 from current_releases cur join published_mappings pm on pm.release_id = cur.release_id where cur.merchant_id = m.id and cur.catalog_revision_id = m.active_catalog_revision_id and pm.listing_revision_id = lr.id)`;
+      where.push(f.published === "mapped" ? mapped : sql`not ${mapped}`);
+    }
     if (f.warning) where.push(sql`(rs.ambiguous or jsonb_array_length(coalesce(rec.warnings, '[]'::jsonb)) + jsonb_array_length(coalesce(rec.ambiguity_flags, '[]'::jsonb)) + jsonb_array_length(coalesce(rec.missing_information, '[]'::jsonb)) > 0)`);
     if (f.q?.trim()) {
       const pattern = `%${f.q.trim().replace(/[\\%_]/g, (c) => `\\${c}`)}%`;
@@ -95,6 +108,7 @@ export async function listReviewItems(actor: Actor, f: ReviewFilters) {
       if (!concept) where.push(sql`false`);
       else where.push(sql`(coalesce(dc.path, rc.path) = ${concept.path} or starts_with(coalesce(dc.path, rc.path), ${concept.path + " > "}))`);
     }
+    const matchingAt = where.length;
     if (f.cursor) {
       const [k, id] = decodeCursor(f.cursor);
       where.push(sql`(${key}, lr.id) > (${k}, ${id}::uuid)`);
@@ -120,6 +134,8 @@ export async function listReviewItems(actor: Actor, f: ReviewFilters) {
       limit ${limit + 1}`);
     const rows = result.rows;
     const page = rows.slice(0, limit);
+    // Every listing the filters match, across all pages: what a metric drilldown reconciles with.
+    const [matching] = (await tx.execute<{ n: number }>(sql`select count(*)::int as n ${from} where ${sql.join(where.slice(0, matchingAt), sql` and `)}`)).rows;
     const items: ReviewQueueItem[] = page.map((r) => ({
       id: r.id as string,
       sku: r.sku as string,
@@ -152,6 +168,7 @@ export async function listReviewItems(actor: Actor, f: ReviewFilters) {
     const total = Object.values(byState).reduce((a, b) => a + b, 0);
     return {
       items,
+      matching: matching.n,
       nextCursor: rows.length > limit && last ? encodeCursor(last.sort_key as string, last.id as string) : null,
       progress: { total, approved: byState.approved, remaining: total - byState.approved, byState },
       activeTaxonomyVersionId: ws.active,
@@ -171,6 +188,9 @@ export function parseReviewFilters(get: (key: string) => string | null | undefin
     band: (SIGNAL_BANDS as readonly string[]).includes(band ?? "") ? (band as SignalBand) : null,
     conceptId: uuid(get("concept")),
     warning: get("warning") === "1",
+    flag: get("flag") === "ambiguous" || get("flag") === "failed" ? (get("flag") as "ambiguous" | "failed") : null,
+    published: get("published") === "mapped" || get("published") === "unmapped" ? (get("published") as "mapped" | "unmapped") : null,
+    unanalyzed: get("unanalyzed") === "1",
     q: get("q")?.slice(0, 200) ?? null,
     sort: (REVIEW_SORTS as readonly string[]).includes(sort ?? "") ? (sort as ReviewSort) : "age",
     cursor: get("cursor") ?? null,

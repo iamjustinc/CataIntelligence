@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { loadDataset, type EvalRecord } from "@/evals/corpus";
+import { HELDOUT_STATUS, loadDataset, type EvalRecord } from "@/evals/corpus";
 import { checkCorpus, jaccard } from "@/evals/leakage";
 import { computeMetrics, highSignalGate, type ItemOutcome } from "@/evals/metrics";
 import { BaselineProvider, evaluate } from "@/evals/run";
@@ -100,6 +100,11 @@ describe("evaluation metrics", () => {
     const perfect = computeMetrics(Array.from({ length: 60 }, (_, i) => outcome(rec(`p${i}`), { band: "high" })));
     expect(highSignalGate({ split: "heldout", provider: "claude", expertLabeled: 60, items: 60, metrics: perfect })).toEqual({ met: true, reasons: [] });
     expect(highSignalGate({ split: "heldout", provider: "claude", expertLabeled: 59, items: 60, metrics: perfect }).met).toBe(false);
+    // A set that has been looked at cannot open the gate, however good the numbers are.
+    const inspected = highSignalGate({ split: "heldout", provider: "claude", expertLabeled: 60, items: 60, metrics: perfect, inspected: true });
+    expect(inspected.met).toBe(false);
+    expect(inspected.reasons[0]).toMatch(/has been inspected/);
+    expect(HELDOUT_STATUS.inspected).toBe(true);
     expect(highSignalGate({ split: "development", provider: "claude", expertLabeled: 60, items: 60, metrics: perfect }).met).toBe(false);
   });
 });

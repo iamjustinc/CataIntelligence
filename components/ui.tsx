@@ -1,4 +1,4 @@
-import type { ReactNode } from "react";
+import type { HTMLAttributes, ReactNode } from "react";
 
 export function PageHeader({ eyebrow, title, description, actions }: { eyebrow: ReactNode; title: string; description?: string; actions?: ReactNode }) {
   return (
@@ -31,8 +31,12 @@ export function Badge({ tone = "neutral", children, title }: { tone?: Tone; chil
   );
 }
 
-export function Card({ children, className = "" }: { children: ReactNode; className?: string }) {
-  return <section className={`rounded-md border border-rule bg-surface shadow-[0_1px_0_var(--color-rule)] ${className}`}>{children}</section>;
+export function Card({ children, className = "", ...rest }: { children: ReactNode; className?: string } & Omit<HTMLAttributes<HTMLElement>, "className" | "children">) {
+  return (
+    <section {...rest} className={`rounded-md border border-rule bg-surface shadow-[0_1px_0_var(--color-rule)] ${className}`}>
+      {children}
+    </section>
+  );
 }
 
 export function StatePanel({ kind, title, children, action }: { kind: "empty" | "denied" | "error" | "pending" | "stale"; title: string; children?: ReactNode; action?: ReactNode }) {

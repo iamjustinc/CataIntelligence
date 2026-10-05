@@ -914,6 +914,8 @@ export const analyticsRuns = pgTable(
     validatedSpec: jsonb("validated_spec").notNull(),
     dataScope: jsonb("data_scope").notNull(),
     resultSnapshot: jsonb("result_snapshot"),
+    // How the specification was produced: "builder", "demo" or "live". Never a model's SQL.
+    planner: text("planner"),
     status: text("status").notNull(),
     createdAt: createdAt(),
   },
@@ -939,10 +941,19 @@ export const savedReports = pgTable(
     spec: jsonb("spec").notNull(),
     chartConfig: jsonb("chart_config").notNull().default({}),
     visibility: reportVisibilityEnum("visibility").notNull().default("private"),
+    // The result as it was when the report was saved. Never replaced by a refresh.
+    snapshotRunId: uuid("snapshot_run_id"),
+    // The most recent refresh, if any.
     lastRunId: uuid("last_run_id"),
+    lockVersion: integer("lock_version").notNull().default(0),
     createdAt: createdAt(),
   },
   (t) => [
+    foreignKey({
+      name: "saved_reports_snapshot_fk",
+      columns: [t.workspaceId, t.snapshotRunId],
+      foreignColumns: [analyticsRuns.workspaceId, analyticsRuns.id],
+    }),
     foreignKey({
       name: "saved_reports_run_fk",
       columns: [t.workspaceId, t.lastRunId],

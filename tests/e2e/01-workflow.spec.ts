@@ -20,9 +20,10 @@ test("fresh setup shows the seeded demo workspace, labeled as demo data", async 
   await expect(page.getByText("Demo AI")).toBeVisible();
   // Totals come from the seeded records: 300 active listings, 172 approved, 128 pending.
   const stat = (label: string) => page.locator("dl > div", { has: page.getByText(label, { exact: true }) }).locator("dd").first();
-  await expect(stat("Active listings")).toHaveText("300");
-  await expect(stat("Approved (draft)")).toHaveText("172");
-  await expect(stat("Pending review")).toHaveText("128");
+  await expect(stat("Active listing count")).toHaveText("300");
+  await expect(stat("Approved draft coverage")).toHaveText("57.3%172 of 300");
+  await expect(stat("Published mapping coverage")).toHaveText("46.7%140 of 300");
+  await expect(stat("Pending review count")).toHaveText("128");
   await page.goto("/releases");
   await expect(page.getByRole("row", { name: /Release 3/ })).toContainText("Current");
   await expect(page.getByRole("row", { name: /Release 1/ })).toContainText("Historical");

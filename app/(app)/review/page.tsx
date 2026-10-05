@@ -18,13 +18,21 @@ export default async function ReviewQueuePage({ searchParams }: { searchParams: 
 
   // Filters (without the cursor) are carried into item links so the workspace keeps the same queue.
   const carried = new URLSearchParams();
-  for (const k of ["merchant", "revision", "state", "band", "warning", "q", "sort", "concept"]) if (params[k]) carried.set(k, params[k]!);
+  for (const k of ["merchant", "revision", "state", "band", "warning", "q", "sort", "concept", "flag", "published", "unanalyzed"]) if (params[k]) carried.set(k, params[k]!);
   const withCursor = new URLSearchParams(carried);
   if (filters.cursor) withCursor.set("cursor", filters.cursor);
   const next = new URLSearchParams(carried);
   if (data.nextCursor) next.set("cursor", data.nextCursor);
   const filtered = [...carried.keys()].some((k) => k !== "sort");
   const { progress } = data;
+  // Filters that only metric drilldowns set; shown in words because the form has no control for them.
+  const drill = [
+    filters.flag === "ambiguous" ? "flagged as ambiguous" : null,
+    filters.flag === "failed" ? "whose latest analysis failed" : null,
+    filters.published === "mapped" ? "mapped in the merchant's current release" : null,
+    filters.published === "unmapped" ? "not mapped in a current release for the current catalog revision" : null,
+    filters.unanalyzed ? "with no recommendation yet" : null,
+  ].filter((d): d is string => !!d);
 
   return (
     <div className="space-y-6">
@@ -107,12 +115,20 @@ export default async function ReviewQueuePage({ searchParams }: { searchParams: 
             Apply
           </button>
         </div>
-        {params.concept ? <input type="hidden" name="concept" value={params.concept} /> : null}
+        {(["concept", "flag", "published", "unanalyzed"] as const).map((k) => (params[k] ? <input key={k} type="hidden" name={k} value={params[k]} /> : null))}
       </form>
 
       <p className="text-sm text-ink-soft" role="status">
         <span className="font-mono">{progress.approved}</span> approved, <span className="font-mono">{progress.remaining}</span> remaining of <span className="font-mono">{progress.total}</span> active listings
-        {params.merchant ? " for this merchant" : " across current catalogs"}.{params.concept ? " Showing listings proposed or decided under the selected canonical concept." : ""}{" "}
+        {params.merchant ? " for this merchant" : " across current catalogs"}.{params.concept ? " Showing listings proposed or decided under the selected canonical concept." : ""}
+        {drill.length ? (
+          <>
+            {" "}
+            <span data-testid="drilldown-scope">
+              Showing <span className="font-mono">{data.matching}</span> {drill.join(", ")}.
+            </span>
+          </>
+        ) : null}{" "}
         {filtered ? (
           <Link href="/review" className="font-semibold text-stamp underline underline-offset-4">
             Clear filters

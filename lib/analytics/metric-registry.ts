@@ -34,7 +34,18 @@ export interface MetricDefinition {
   dimensions: readonly DimensionId[];
   /** Timestamp column a time range filters on; null for as-of snapshot metrics. */
   timestamp: "decision_created_at" | null;
+  /**
+   * Which population the metric is computed over. "snapshot" metrics count active listings of
+   * merchants' current catalog revisions as of now; "activity" metrics count human review
+   * decisions by when they were recorded. Metrics from different families cannot share a result.
+   */
+  family: "snapshot" | "activity";
+  /** Dimensions the metric can be filtered by. */
+  filters: readonly FilterDimension[];
 }
+
+export const FILTER_DIMENSIONS = ["merchant", "canonical_branch", "decision_status", "signal_band"] as const;
+export type FilterDimension = (typeof FILTER_DIMENSIONS)[number];
 
 const SNAPSHOT_DIMENSIONS = ["merchant", "decision_status", "signal_band"] as const;
 
@@ -48,6 +59,8 @@ export const METRICS: Record<MetricId, MetricDefinition> = {
     mappingState: null,
     dimensions: [...SNAPSHOT_DIMENSIONS, "canonical_branch"],
     timestamp: null,
+    family: "snapshot",
+    filters: ["merchant", "canonical_branch", "decision_status", "signal_band"],
   },
   published_mapping_coverage: {
     id: "published_mapping_coverage",
@@ -62,6 +75,8 @@ export const METRICS: Record<MetricId, MetricDefinition> = {
     mappingState: "published",
     dimensions: ["merchant"],
     timestamp: null,
+    family: "snapshot",
+    filters: ["merchant", "canonical_branch", "decision_status", "signal_band"],
   },
   approved_draft_coverage: {
     id: "approved_draft_coverage",
@@ -74,6 +89,8 @@ export const METRICS: Record<MetricId, MetricDefinition> = {
     mappingState: "draft",
     dimensions: ["merchant"],
     timestamp: null,
+    family: "snapshot",
+    filters: ["merchant", "canonical_branch", "decision_status", "signal_band"],
   },
   pending_review_count: {
     id: "pending_review_count",
@@ -85,6 +102,8 @@ export const METRICS: Record<MetricId, MetricDefinition> = {
     mappingState: "draft",
     dimensions: SNAPSHOT_DIMENSIONS,
     timestamp: null,
+    family: "snapshot",
+    filters: ["merchant", "canonical_branch", "decision_status", "signal_band"],
   },
   ambiguous_count: {
     id: "ambiguous_count",
@@ -95,6 +114,8 @@ export const METRICS: Record<MetricId, MetricDefinition> = {
     mappingState: "draft",
     dimensions: ["merchant", "signal_band"],
     timestamp: null,
+    family: "snapshot",
+    filters: ["merchant", "canonical_branch", "decision_status", "signal_band"],
   },
   failed_analysis_count: {
     id: "failed_analysis_count",
@@ -105,6 +126,8 @@ export const METRICS: Record<MetricId, MetricDefinition> = {
     mappingState: "draft",
     dimensions: ["merchant"],
     timestamp: null,
+    family: "snapshot",
+    filters: ["merchant", "canonical_branch", "decision_status", "signal_band"],
   },
   reviewed_listing_count: {
     id: "reviewed_listing_count",
@@ -115,6 +138,8 @@ export const METRICS: Record<MetricId, MetricDefinition> = {
     mappingState: null,
     dimensions: ["merchant", "utc_day", "utc_week"],
     timestamp: "decision_created_at",
+    family: "activity",
+    filters: ["merchant"],
   },
   median_review_seconds: {
     id: "median_review_seconds",
@@ -125,6 +150,8 @@ export const METRICS: Record<MetricId, MetricDefinition> = {
     mappingState: null,
     dimensions: ["merchant", "utc_day", "utc_week"],
     timestamp: "decision_created_at",
+    family: "activity",
+    filters: ["merchant"],
   },
 };
 

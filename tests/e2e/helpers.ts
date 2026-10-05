@@ -6,6 +6,7 @@ export const ORIGIN = e2eEnv().APP_BASE_URL;
 export const USERS = {
   admin: "avery.admin@catalog-intelligence.test",
   taxonomist: "rin.taxonomist@catalog-intelligence.test",
+  analyst: "jo.analyst@catalog-intelligence.test",
   viewer: "sam.viewer@catalog-intelligence.test",
   outsider: "dana.admin@fennel-sandbox.test",
 };
@@ -22,7 +23,14 @@ export async function signIn(page: Page, email: string) {
     await page.getByRole("button", { name: "Sign in" }).click();
     const limited = page.getByText("Too many attempts. Wait a minute and try again.");
     const outcome = await Promise.race([page.waitForURL(/\/overview$/).then(() => "ok" as const), limited.waitFor().then(() => "limited" as const)]);
-    if (outcome === "ok") return;
+    if (outcome === "ok") {
+      // Let the overview finish rendering. Leaving while its server render is still streaming is
+      // harmless but makes the server log "The destination stream closed early" for the abandoned
+      // navigation (reproduced on unrelated pages in .data/diag/abort-probe2.ts).
+      await expect(page.locator("h1")).toBeVisible();
+      await page.waitForLoadState("networkidle");
+      return;
+    }
     await page.waitForTimeout(11_000);
   }
   throw new Error(`Could not sign in as ${email}`);
