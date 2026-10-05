@@ -22,7 +22,8 @@
     "test:e2e": "tsx tests/e2e/prepare.ts && next build && playwright test",
     "eval": "tsx evals/run.ts",
     "eval:check": "tsx evals/leakage.ts",
-    "smoke:live": "tsx scripts/live-smoke.ts"
+    "smoke:live": "tsx scripts/live-smoke.ts",
+    "backup:check": "tsx scripts/backup-restore-check.ts"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.131.0",
