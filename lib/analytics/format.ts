@@ -79,7 +79,8 @@ export function describeSpec(spec: AnalysisSpec, names: { timezone: string; merc
   if (spec.metricIds.some((id) => METRICS[id].mappingState) || spec.groupBy.includes("canonical_branch") || spec.filters.some((f) => f.dimension === "canonical_branch")) {
     lines.push(spec.scope.mappingState === "published" ? "Mapping scope: published (each merchant's current release for its current catalog revision)" : "Mapping scope: draft (reviewer-approved decisions, published or not)");
   }
-  if (family === "activity") lines.push(spec.timeRange ? `Period: ${formatInstant(spec.timeRange.start, names.timezone)} up to, not including, ${formatInstant(spec.timeRange.end, names.timezone)} (${names.timezone})` : "Period: all recorded review activity");
+  if (family === "publication") lines.push("Population: mapping releases, by the time each was published");
+  if (family !== "snapshot") lines.push(spec.timeRange ? `Period: ${formatInstant(spec.timeRange.start, names.timezone)} up to, not including, ${formatInstant(spec.timeRange.end, names.timezone)} (${names.timezone})` : `Period: all recorded ${family === "publication" ? "publications" : "review activity"}`);
   if (spec.sort && spec.groupBy.length) lines.push(`Sorted by: ${(spec.metricIds as string[]).includes(spec.sort.field) ? METRICS[spec.sort.field as MetricId].label : DIMENSION_LABELS[spec.sort.field as DimensionId]}, ${spec.sort.direction === "asc" ? "lowest" : "highest"} first`);
   return lines;
 }

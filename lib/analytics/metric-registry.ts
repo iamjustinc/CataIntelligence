@@ -17,6 +17,8 @@ export const METRIC_IDS = [
   "failed_analysis_count",
   "reviewed_listing_count",
   "median_review_seconds",
+  "releases_published_count",
+  "mappings_published_count",
 ] as const;
 export type MetricId = (typeof METRIC_IDS)[number];
 
@@ -33,13 +35,14 @@ export interface MetricDefinition {
   mappingState: MappingState | null;
   dimensions: readonly DimensionId[];
   /** Timestamp column a time range filters on; null for as-of snapshot metrics. */
-  timestamp: "decision_created_at" | null;
+  timestamp: "decision_created_at" | "release_published_at" | null;
   /**
    * Which population the metric is computed over. "snapshot" metrics count active listings of
    * merchants' current catalog revisions as of now; "activity" metrics count human review
-   * decisions by when they were recorded. Metrics from different families cannot share a result.
+   * decisions by when they were recorded; "publication" metrics count immutable mapping releases
+   * by when they were published. Metrics from different families cannot share a result.
    */
-  family: "snapshot" | "activity";
+  family: "snapshot" | "activity" | "publication";
   /** Dimensions the metric can be filtered by. */
   filters: readonly FilterDimension[];
 }
@@ -151,6 +154,31 @@ export const METRICS: Record<MetricId, MetricDefinition> = {
     dimensions: ["merchant", "utc_day", "utc_week"],
     timestamp: "decision_created_at",
     family: "activity",
+    filters: ["merchant"],
+  },
+  // Recorded history: every release is immutable and timestamped, so these need no reconstruction.
+  releases_published_count: {
+    id: "releases_published_count",
+    label: "Releases published",
+    kind: "count",
+    definition: "Number of mapping releases published in the interval.",
+    scopeNote: "Counts publication events from the immutable release records. Making an earlier release current again (rollback) is not a publication and is not counted.",
+    mappingState: null,
+    dimensions: ["merchant", "utc_day", "utc_week"],
+    timestamp: "release_published_at",
+    family: "publication",
+    filters: ["merchant"],
+  },
+  mappings_published_count: {
+    id: "mappings_published_count",
+    label: "Mappings published",
+    kind: "count",
+    definition: "Number of listing mappings contained in the mapping releases published in the interval.",
+    scopeNote: "A listing included in two releases is counted in each, because each release republishes its whole mapping set. This is publication volume, not coverage and not daily catalog history.",
+    mappingState: null,
+    dimensions: ["merchant", "utc_day", "utc_week"],
+    timestamp: "release_published_at",
+    family: "publication",
     filters: ["merchant"],
   },
 };

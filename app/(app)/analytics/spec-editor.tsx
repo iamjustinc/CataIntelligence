@@ -99,7 +99,7 @@ export function SpecEditor({ spec, onChange, vocabulary, now }: { spec: Analysis
             def.mappingState ? "Fixed by the metric." : scopeMatters ? "Decides which mapping a branch comes from." : "Not used by this analysis.",
           )
         : null}
-      {def.family === "activity" ? (
+      {def.family !== "snapshot" ? (
         <>
           {field(
             "Period",

@@ -93,7 +93,7 @@ export function guard(question: string): Extract<PlanOutcome, { kind: "unsupport
     return {
       kind: "unsupported",
       reason: "history",
-      message: "This comparison is unavailable. Coverage, pending and listing counts are as-of counts of the current catalogs; past values were not recorded, and they are not reconstructed from current data. Review activity is recorded by date and can be shown by day or week.",
+      message: "This comparison is unavailable. Coverage, pending and listing counts are as-of counts of the current catalogs; past values were not recorded, and they are not reconstructed from current data. Review activity and publications are recorded by date and can be shown by day or week.",
       links: [],
     };
   }
@@ -110,6 +110,7 @@ export const DEMO_EXAMPLES = [
   "Which merchant has the lowest published coverage?",
   "How many listings are pending review by merchant?",
   "How many listings were reviewed last week by day?",
+  "How many releases were published by week?",
   "How many active listings by decision status?",
   "What is the median review time?",
   "How many ambiguous listings by signal band?",
@@ -221,6 +222,8 @@ function parse(question: string, vocab: Vocabulary, now: Date): Parsed {
     [/\b(ambiguous|ambiguity|ambiguities)( count)?\b/, "ambiguous_count"],
     [/\bpending( review)?( count)?\b|\b(backlog|unresolved|unreviewed|outstanding)\b|\b(left|remaining|waiting)( to (be )?review(ed)?)?\b|\bnot (yet )?approved\b|\bstill needs? review\b/, "pending_review_count"],
     [/\b(mapping )?coverage\b|\bcovered\b|\b(percent|percentage|share|proportion|rate) (of (listings |products |items )?)?mapped\b|\bmapped\b/, "coverage"],
+    [/\b(how many |number of )?mappings( were| was| got)? published\b|\bpublished mappings( count)?\b/, "mappings_published_count"],
+    [/\b(how many |number of )?(mapping )?releases?( were| was| got)?( published| made)?\b|\bpublications?( trend| activity| history)?\b/, "releases_published_count"],
     [/\b(how many|number of|count of|total)( active)?( listings| products| items| skus)\b|\b(active )?listings? counts?\b|\bhow (big|large)\b|\bcatalog size\b/, "listing_count"],
   ];
   for (const [re, metric] of metrics) {
@@ -279,6 +282,7 @@ export function planWithRules({ question, previousSpec, vocabulary, now }: PlanI
       question: "Compared with what? Coverage and backlog are as-of counts: their past values were not recorded, so a change over time cannot be shown. Review activity is recorded by date. Which of these would help?",
       options: [
         { label: "Reviewed listings by week", spec: spec("reviewed_listing_count", { groupBy: ["utc_week"], chartType: "line" }) },
+        { label: "Mappings published by week", spec: spec("mappings_published_count", { groupBy: ["utc_week"], chartType: "line" }) },
         { label: "Published coverage by merchant, as of now", spec: spec("published_mapping_coverage", { groupBy: ["merchant"], chartType: "bar" }) },
         { label: "Approved draft coverage by merchant, as of now", spec: spec("approved_draft_coverage", { groupBy: ["merchant"], chartType: "bar" }) },
       ],
@@ -343,7 +347,7 @@ export function planWithRules({ question, previousSpec, vocabulary, now }: PlanI
     return {
       kind: "unsupported",
       reason: "history",
-      message: `${def.label} is an as-of count of the current catalogs, so it has no time range; past values were not recorded. Review activity (reviewed listings, median review time) can be filtered by date.`,
+      message: `${def.label} is an as-of count of the current catalogs, so it has no time range; past values were not recorded. Review activity (reviewed listings, median review time) and publication activity (releases and mappings published) are recorded by date.`,
       links: [],
     };
   }
@@ -404,8 +408,8 @@ export function planWithRules({ question, previousSpec, vocabulary, now }: PlanI
     next.timeRange = p.time === "all" ? null : p.time.interval;
     if (base) changes.push(p.time === "all" ? "Period removed: all recorded activity" : `Period changed to ${p.time.label}`);
     if (p.time !== "all") notes.push(`"${p.time.label}" was read in the workspace timezone (${vocabulary.timezone}): ${formatInstant(p.time.interval.start, vocabulary.timezone)} up to, not including, ${formatInstant(p.time.interval.end, vocabulary.timezone)}.`);
-  } else if (!base && def.family === "activity") {
-    notes.push("No period was named, so all recorded review activity is included.");
+  } else if (!base && def.family !== "snapshot") {
+    notes.push(`No period was named, so all recorded ${def.family === "publication" ? "publications are" : "review activity is"} included.`);
   }
   if (p.sort) {
     next.sort = { field: metricId, direction: p.sort };

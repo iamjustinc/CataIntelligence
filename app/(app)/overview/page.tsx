@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { ChartFrame, Distribution, LineChart } from "@/components/charts";
+import { BarList, ChartFrame, Distribution, LineChart } from "@/components/charts";
 import { Badge, buttonClass, Card, PageHeader } from "@/components/ui";
 import { drilldownHref, formatFraction, formatValue } from "@/lib/analytics/format";
 import { baseSpec } from "@/lib/analytics/metric-service";
@@ -212,19 +212,28 @@ export default async function OverviewPage() {
             </ChartFrame>
           </div>
 
-          <Card className="px-5 py-4">
-            <h2 className="eyebrow">Most recent publication</h2>
+          <ChartFrame
+            title="Publications"
+            scope={`Mapping releases by the UTC day they were published, from the release records: ${dashboard.publications.releases} release${dashboard.publications.releases === 1 ? "" : "s"} containing ${dashboard.publications.mappings} mappings in total. A listing republished in a later release is counted in each. This is publication activity, not coverage over time; past coverage is not recorded and is not estimated.`}
+            action={
+              <Link href="/releases" className="text-sm font-semibold underline underline-offset-4">
+                View releases
+              </Link>
+            }
+          >
             {dashboard.latestRelease ? (
-              <p className="mt-1 text-sm" data-testid="latest-release">
-                <span className="font-display text-xl">Release {dashboard.latestRelease.releaseNumber}</span> · {dashboard.latestRelease.merchantName} · {dashboard.latestRelease.mapped} mappings{dashboard.latestRelease.partial ? " (partial)" : ""} · published {dashboard.latestRelease.publishedAt.slice(0, 16).replace("T", " ")} UTC ·{" "}
-                <Link href="/releases" className="font-semibold text-stamp underline underline-offset-4">
-                  View release
-                </Link>
+              <p className="mb-4 text-sm" data-testid="latest-release">
+                Most recent: <span className="font-display text-lg">Release {dashboard.latestRelease.releaseNumber}</span> · {dashboard.latestRelease.merchantName} · {dashboard.latestRelease.mapped} mappings{dashboard.latestRelease.partial ? " (partial)" : ""} · {dashboard.latestRelease.publishedAt.slice(0, 16).replace("T", " ")} UTC
               </p>
             ) : (
-              <p className="mt-1 text-sm text-ink-soft">Nothing has been published yet, so published coverage is zero for every merchant.</p>
+              <p className="text-sm text-ink-soft">Nothing has been published yet, so published coverage is zero for every merchant.</p>
             )}
-          </Card>
+            {dashboard.publications.days.length > 0 ? (
+              <div data-testid="publication-trend">
+                <BarList label="Mappings published per UTC day" data={dashboard.publications.days.map((d) => ({ key: d.day, label: d.day, value: d.mappings, text: `${d.mappings} mappings`, detail: `${d.releases} release${d.releases === 1 ? "" : "s"}` }))} />
+              </div>
+            ) : null}
+          </ChartFrame>
         </>
       ) : null}
 

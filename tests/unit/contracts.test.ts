@@ -53,8 +53,9 @@ describe("AnalysisSpec contract", () => {
     expect(analysisSpecSchema.safeParse({ ...prdSpec, needsClarification: true }).success).toBe(false);
     expect(analysisSpecSchema.safeParse({ ...prdSpec, needsClarification: true, clarificationQuestion: "Published or draft coverage?" }).success).toBe(true);
   });
-  it("registers exactly the eight PRD metrics with definitions", () => {
-    expect(METRIC_IDS).toHaveLength(8);
+  it("registers the eight PRD metrics plus the two publication-trend metrics of ANA03, with definitions", () => {
+    expect(METRIC_IDS.slice(0, 8)).toEqual(["listing_count", "published_mapping_coverage", "approved_draft_coverage", "pending_review_count", "ambiguous_count", "failed_analysis_count", "reviewed_listing_count", "median_review_seconds"]);
+    expect(METRIC_IDS.slice(8)).toEqual(["releases_published_count", "mappings_published_count"]);
     for (const id of METRIC_IDS) expect(METRICS[id].definition.length).toBeGreaterThan(20);
     expect(METRICS.published_mapping_coverage.denominator).toMatch(/all valid active listings/i);
   });

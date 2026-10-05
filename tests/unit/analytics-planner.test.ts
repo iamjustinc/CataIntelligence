@@ -82,6 +82,15 @@ describe("demo planner (rule-based)", () => {
     for (const outcome of [specOf("pending review by signal band"), specOf("median review time by week"), specOf("reviewed listings today")]) expect(analysisSpecSchema.safeParse(outcome.spec).success).toBe(true);
   });
 
+  it("reads publication questions as counts of release records, not as coverage history", () => {
+    expect(specOf("How many releases were published by week?").spec).toEqual(spec("releases_published_count", { groupBy: ["utc_week"], chartType: "line" }));
+    expect(specOf("How many mappings were published last month by day?").spec).toEqual(spec("mappings_published_count", { groupBy: ["utc_day"], chartType: "line", timeRange: { start: "2026-09-01T07:00:00.000Z", end: "2026-10-01T07:00:00.000Z" } }));
+    expect(specOf("releases published by merchant").spec).toMatchObject({ metricIds: ["releases_published_count"], groupBy: ["merchant"] });
+    // Coverage keeps its meaning even when a release is mentioned.
+    expect(specOf("published coverage by merchant").spec.metricIds).toEqual(["published_mapping_coverage"]);
+    expect(plan("Show coverage over time")).toMatchObject({ kind: "unsupported", reason: "history" });
+  });
+
   it("asks which coverage is meant and offers both as ready interpretations (ANA03)", () => {
     const outcome = plan("Which merchant has the lowest coverage?");
     expect(outcome.kind).toBe("clarify");

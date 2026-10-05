@@ -163,12 +163,24 @@ const ACTIVITY_FACTS = sql`
   join merchants m on m.id = cr.merchant_id
   where d.origin in ('manual', 'suggestion', 'bulk')`;
 
+/**
+ * One row per mapping release, with the number of mappings it contains. Releases are immutable, so
+ * this is recorded history: nothing here is inferred from the current state of the catalogs.
+ */
+const PUBLICATION_FACTS = sql`
+  select r.id as release_id, r.published_at as created_at, m.id as merchant_id, m.name as merchant_name,
+         (select count(*) from published_mappings pm where pm.release_id = r.id)::int as mapped
+  from mapping_releases r
+  join merchants m on m.id = r.merchant_id`;
+
+type Family = "snapshot" | "activity" | "publication";
+
 interface Compiled {
   groupExprs: { dim: DimensionId; value: SQL; label: SQL }[];
   where: SQL[];
 }
 
-function compile(spec: AnalysisSpec, family: "snapshot" | "activity", branchNames: Map<string, string>): Compiled {
+function compile(spec: AnalysisSpec, family: Family, branchNames: Map<string, string>): Compiled {
   const branch = spec.scope.mappingState === "published" ? sql`f.published_branch` : sql`f.draft_branch`;
   // Fixed fragments keyed by registry dimension. No spec text is ever placed into SQL.
   const exprs: Record<DimensionId, { value: SQL; label: SQL }> = {
@@ -184,8 +196,8 @@ function compile(spec: AnalysisSpec, family: "snapshot" | "activity", branchName
     if (filter.dimension === "merchant") {
       for (const v of filter.values) if (!/^[0-9a-f-]{36}$/i.test(v)) throw new ApiError("invalid", "A merchant filter must name merchants of this workspace.", { fieldErrors: [{ path: "filters", message: "Unknown merchant." }] });
       where.push(sql`f.merchant_id in (${sql.join(filter.values.map((v) => sql`${v}::uuid`), sql`, `)})`);
-    } else if (family === "activity") {
-      throw new ApiError("invalid", "Review activity can only be filtered by merchant.", { fieldErrors: [{ path: "filters", message: `${filter.dimension} is not available for this metric.` }] });
+    } else if (family !== "snapshot") {
+      throw new ApiError("invalid", "Review and publication activity can only be filtered by merchant.", { fieldErrors: [{ path: "filters", message: `${filter.dimension} is not available for this metric.` }] });
     } else if (filter.dimension === "decision_status") {
       for (const v of filter.values) if (!(REVIEW_STATES as readonly string[]).includes(v)) throw new ApiError("invalid", `"${v}" is not a decision status.`);
       where.push(sql`f.state in (${sql.join(filter.values.map((v) => sql`${v}`), sql`, `)})`);
@@ -203,7 +215,7 @@ function compile(spec: AnalysisSpec, family: "snapshot" | "activity", branchName
       where.push(sql`(${sql.join(parts, sql` or `)})`);
     }
   }
-  if (family === "activity" && spec.timeRange) where.push(sql`f.created_at >= ${spec.timeRange.start}::timestamptz and f.created_at < ${spec.timeRange.end}::timestamptz`);
+  if (family !== "snapshot" && spec.timeRange) where.push(sql`f.created_at >= ${spec.timeRange.start}::timestamptz and f.created_at < ${spec.timeRange.end}::timestamptz`);
   return { groupExprs: spec.groupBy.map((dim) => ({ dim, ...exprs[dim] })), where };
 }
 
@@ -226,6 +238,8 @@ function valuesFrom(raw: Raw, metricIds: readonly MetricId[]): Partial<Record<Me
       case "ambiguous_count": out[id] = count(n(raw.ambiguous)); break;
       case "failed_analysis_count": out[id] = count(n(raw.failed)); break;
       case "reviewed_listing_count": out[id] = count(n(raw.reviewed)); break;
+      case "releases_published_count": out[id] = count(n(raw.releases)); break;
+      case "mappings_published_count": out[id] = count(n(raw.mappings)); break;
       case "median_review_seconds": out[id] = { value: raw.median === null || raw.median === undefined ? null : Number(raw.median), denominator: n(raw.sessions) }; break;
     }
   }
@@ -244,12 +258,14 @@ export async function runSpecInTx(tx: Tx, workspaceId: string, input: AnalysisSp
   const { scope, branchNames } = await loadScope(tx, spec, workspaceId);
   const { groupExprs, where } = compile(spec, family, branchNames);
 
-  const facts = family === "snapshot" ? SNAPSHOT_FACTS : ACTIVITY_FACTS;
+  const facts = family === "snapshot" ? SNAPSHOT_FACTS : family === "activity" ? ACTIVITY_FACTS : PUBLICATION_FACTS;
   const aggregates =
     family === "snapshot"
       ? sql`count(*)::int as total, count(*) filter (where f.published)::int as published, count(*) filter (where f.draft_approved)::int as draft,
             count(*) filter (where f.state <> 'approved')::int as pending, count(*) filter (where f.ambiguous)::int as ambiguous, count(*) filter (where f.analysis_failed)::int as failed`
-      : sql`count(distinct f.listing_revision_id)::int as reviewed,
+      : family === "publication"
+        ? sql`count(*)::int as releases, coalesce(sum(f.mapped), 0)::int as mappings`
+        : sql`count(distinct f.listing_revision_id)::int as reviewed,
             percentile_cont(0.5) within group (order by f.duration_seconds) filter (where f.origin <> 'bulk' and f.duration_seconds is not null) as median,
             count(*) filter (where f.origin <> 'bulk' and f.duration_seconds is not null)::int as sessions,
             count(*) filter (where f.origin = 'bulk')::int as bulk, count(*) filter (where f.origin <> 'bulk' and f.duration_seconds is null)::int as no_duration`;
@@ -298,6 +314,11 @@ export async function runSpecInTx(tx: Tx, workspaceId: string, input: AnalysisSp
     warnings.push(`Unmapped listings have no canonical category, so they cannot be assigned to a branch. With a branch filter the denominator is only the listings already classified there in the ${spec.scope.mappingState} mappings, which is not the branch's overall coverage. True branch coverage would need a verified source-domain classification.`);
   }
   if (spec.groupBy.includes("canonical_branch")) warnings.push(`Listings without a ${spec.scope.mappingState} mapping have no canonical category and are shown as "${UNMAPPED}".`);
+  if (family === "publication") {
+    warnings.push(spec.timeRange ? `Counts mapping releases published from ${spec.timeRange.start} up to, but not including, ${spec.timeRange.end} (UTC).` : "Counts every mapping release published so far; no time range was applied.");
+    warnings.push("This is publication activity taken from the release records. It is not coverage over time: past coverage was never recorded and is not reconstructed.");
+    if (spec.metricIds.includes("mappings_published_count")) warnings.push("A listing included in more than one release is counted once per release.");
+  }
   if (family === "activity") {
     warnings.push(spec.timeRange ? `Counts human review decisions recorded from ${spec.timeRange.start} up to, but not including, ${spec.timeRange.end} (UTC).` : "Counts every human review decision recorded so far; no time range was applied.");
     if (spec.groupBy.some((g) => g.startsWith("utc_")) && spec.metricIds.includes("reviewed_listing_count")) warnings.push("A listing reviewed in more than one period is counted once in each; the total counts it once.");

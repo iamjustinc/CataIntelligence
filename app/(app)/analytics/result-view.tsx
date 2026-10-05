@@ -34,7 +34,7 @@ export function ResultView({ run, heading, children }: { run: RunView; heading?:
   const visible = result.rows.slice(page * PAGE, page * PAGE + PAGE);
   // The whole filtered population, whatever the grouping.
   const overall = drilldownHref({ ...result.spec, groupBy: [] }, primary);
-  const usesMapping = metrics.some((m) => METRICS[m].mappingState === "published") || ((dimensions.includes("canonical_branch") || result.spec.filters.some((f) => f.dimension === "canonical_branch")) && result.spec.scope.mappingState === "published");
+  const usesMapping = metrics.some((m) => METRICS[m].mappingState === "published" || METRICS[m].family === "publication") || ((dimensions.includes("canonical_branch") || result.spec.filters.some((f) => f.dimension === "canonical_branch")) && result.spec.scope.mappingState === "published");
   const source = SOURCE[run.planner ?? "builder"] ?? SOURCE.builder;
 
   let chart: React.ReactNode = null;

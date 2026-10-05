@@ -176,6 +176,44 @@ describe("review activity metrics", () => {
   });
 });
 
+describe("publication trend from immutable release records (ANA03)", () => {
+  it("counts releases and the mappings they contain by merchant, without inferring catalog history", async () => {
+    const rows = await ref<{ name: string; releases: number; mappings: number }>(
+      `select m.name, count(*)::int as releases, sum((select count(*) from published_mappings pm where pm.release_id = r.id))::int as mappings from mapping_releases r join merchants m on m.id = r.merchant_id where r.workspace_id = $1 group by m.name order by m.name`,
+    );
+    expect(rows).toEqual([{ name: "Daily Basket", releases: 1, mappings: 58 }, { name: "Harbor Market", releases: 3, mappings: 220 }]);
+    const result = await runSpec(viewer, { ...baseSpec("releases_published_count", { groupBy: ["merchant"] }), metricIds: ["releases_published_count", "mappings_published_count"] });
+    expect(result.rows.map((r) => ({ name: r.dims.merchant!.label, releases: r.values.releases_published_count!.value, mappings: r.values.mappings_published_count!.value }))).toEqual(rows);
+    expect(result.totals).toEqual({ releases_published_count: { value: 4 }, mappings_published_count: { value: 278 } });
+    // Superseded releases still count: they were published. Corner Goods never published and has no row.
+    expect(result.warnings.join(" ")).toMatch(/not coverage over time: past coverage was never recorded/);
+    expect(result.warnings.join(" ")).toMatch(/counted once per release/);
+  });
+
+  it("groups by the UTC day of publication and honours a half-open range", async () => {
+    const days = await ref<{ k: string; n: number }>(`select to_char(published_at at time zone 'UTC', 'YYYY-MM-DD') as k, count(*)::int as n from mapping_releases where workspace_id = $1 group by 1 order by 1`);
+    const byDay = await runSpec(viewer, baseSpec("releases_published_count", { groupBy: ["utc_day"] }));
+    expect(byDay.rows.map((r) => ({ k: r.dims.utc_day!.value, n: r.values.releases_published_count!.value }))).toEqual(days);
+    const stamps = (await ref<{ at: Date }>(`select published_at as at from mapping_releases where workspace_id = $1 order by published_at`)).map((r) => r.at.toISOString());
+    const upToSecond = await runSpec(viewer, baseSpec("releases_published_count", { timeRange: { start: "2000-01-01T00:00:00.000Z", end: stamps[1] } }));
+    expect(upToSecond.totals.releases_published_count).toEqual({ value: stamps.filter((s) => s < stamps[1]).length });
+    const fromSecond = await runSpec(viewer, baseSpec("releases_published_count", { timeRange: { start: stamps[1], end: "2100-01-01T00:00:00.000Z" } }));
+    expect(fromSecond.totals.releases_published_count).toEqual({ value: stamps.filter((s) => s >= stamps[1]).length });
+    expect(upToSecond.totals.releases_published_count!.value! + fromSecond.totals.releases_published_count!.value!).toBe(4);
+  });
+
+  it("cannot be mixed with as-of counts or filtered by anything but merchant, and offers no listing drilldown", async () => {
+    await expect(runSpec(viewer, { ...baseSpec("releases_published_count"), metricIds: ["releases_published_count", "published_mapping_coverage"] })).rejects.toMatchObject({ status: 422 });
+    await expect(runSpec(viewer, baseSpec("mappings_published_count", { filters: [{ dimension: "decision_status", operator: "eq", values: ["approved"] }] }))).rejects.toMatchObject({ status: 422 });
+    await expect(runSpec(viewer, baseSpec("mappings_published_count", { groupBy: ["canonical_branch"] }))).rejects.toMatchObject({ status: 422 });
+    const result = await runSpec(viewer, baseSpec("mappings_published_count"));
+    expect(drilldownHref(result.spec, "mappings_published_count")).toBeNull();
+    const dashboard = await getDashboard(viewer);
+    expect(dashboard.publications).toMatchObject({ releases: 4, mappings: 278 });
+    expect(dashboard.publications.days.reduce((sum, d) => sum + d.mappings, 0)).toBe(278);
+  });
+});
+
 describe("empty populations (AT23)", () => {
   it("a workspace with no listings reports Not applicable, not zero percent", async () => {
     const actor = await actorFor(empty, "analyst");

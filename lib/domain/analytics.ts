@@ -392,6 +392,8 @@ export async function getDashboard(actor: Actor, now = new Date()) {
     const byState = await run(baseSpec("listing_count", { groupBy: ["decision_status"], limit: 1000 }));
     const window = { start: periodInterval("last_30_days", now, "UTC").start, end: periodInterval("today", now, "UTC").end };
     const activity = await run(baseSpec("reviewed_listing_count", { groupBy: ["utc_day"], timeRange: window, limit: 1000, chartType: "line" }));
+    // Publication history comes from the immutable release records, so it is complete from the first release.
+    const publications = await run(baseSpec("releases_published_count", { metricIds: ["releases_published_count", "mappings_published_count"], groupBy: ["utc_day"], limit: 1000, chartType: "line" }));
     const [latest] = await tx
       .select({ id: mappingReleases.id, releaseNumber: mappingReleases.releaseNumber, publishedAt: mappingReleases.publishedAt, merchantName: merchants.name, partial: mappingReleases.partial, counts: mappingReleases.counts })
       .from(mappingReleases)
@@ -421,6 +423,11 @@ export async function getDashboard(actor: Actor, now = new Date()) {
       }),
       states: byState.rows.map((r) => ({ state: r.dims.decision_status!.value, label: r.dims.decision_status!.label, count: r.values.listing_count!.value ?? 0 })),
       activity: { window, days: activity.rows.map((r) => ({ day: r.dims.utc_day!.value, count: r.values.reviewed_listing_count!.value ?? 0 })), total: activity.totals.reviewed_listing_count?.value ?? 0, spec: activity.spec },
+      publications: {
+        days: publications.rows.map((r) => ({ day: r.dims.utc_day!.value, releases: r.values.releases_published_count!.value ?? 0, mappings: r.values.mappings_published_count!.value ?? 0 })),
+        releases: publications.totals.releases_published_count?.value ?? 0,
+        mappings: publications.totals.mappings_published_count?.value ?? 0,
+      },
       latestRelease: latest ? { id: latest.id, releaseNumber: latest.releaseNumber, merchantName: latest.merchantName, publishedAt: latest.publishedAt.toISOString(), partial: latest.partial, mapped: Number((latest.counts as { mapped?: number }).mapped ?? 0) } : null,
     };
   });
