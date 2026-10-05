@@ -1,6 +1,6 @@
 # Build status
 
-Last updated: 2026-10-04 (session 4)
+Last updated: 2026-10-05 (session 5)
 
 Status values: **Not started** · **In progress** · **Implemented but unverified** · **Verified**.
 "Verified" means an automated test or a recorded manual check exercised the behavior on the server, not that a screen renders.
@@ -13,7 +13,7 @@ Status values: **Not started** · **In progress** · **Implemented but unverifie
 | 1 Deterministic taxonomy workflow | **Verified** | Met |
 | 2 Live recommendation processing | **Implemented with deterministic verification. Live provider verification and independent quality evaluation are pending** | Partly met. See "Phase 2 exit gate" below for what is met and what is blocked |
 | 3 Shared dashboard and analytics | **Implemented; verified deterministically. Live question planner NOT verified** | Met for the deterministic path: the 40 benchmark questions reconcile with reference queries and unsupported or malicious questions cause no execution. The live planner has not been run against the benchmark. See "Phase 3 exit gate" |
-| 4 Integrated release and demonstration | Not started | |
+| 4 Integrated release and demonstration | **Implemented; demo-mode half of the exit gate verified deterministically. Live half NOT verified** | Partly met. The workflow runs from a freshly built database in demo mode in the browser suite. "Live mode is verified with configured credentials" is blocked: no credentials. See "Phase 4" below |
 
 **No live provider call has been made, in any phase.** This machine has no `ANTHROPIC_API_KEY`, no `ANTHROPIC_AUTH_TOKEN` and no `ant` profile. The Claude recommendation adapter and the Claude analytics planner are tested against a deterministic stand-in for the SDK client only. Nothing in this document claims live verification.
 
@@ -28,20 +28,85 @@ Two kinds of verification are kept apart throughout this document:
 | --- | --- | --- |
 | `pnpm typecheck` | Deterministic | Clean |
 | `pnpm lint` | Deterministic | Clean |
-| Connection tests (`connection-retry.test.ts`) | Deterministic | 4 passed |
-| Isolation tests (`isolation.test.ts`) | Deterministic | 19 passed |
-| `pnpm test` (unit and integration, isolated `_test` database) | Deterministic | 297 passed in 22 files, run twice on the final code (212 in 18 files before Phase 3, also run in seven shuffled orders) |
-| `pnpm build` (as part of `pnpm test:e2e`) | Deterministic | Production build succeeded |
-| `pnpm test:e2e` (isolated `_e2e` database, production build, real worker) | Deterministic | 13 Chromium tests passed: 5 Phase 1, 3 Phase 2, 5 Phase 3. Server log clean. Two earlier runs this session failed on one new analytics test each time (a dropped test attribute, then a wrong expectation about which merchants were unpublished); both were test defects and are fixed |
-| Analytics benchmark (inside `pnpm test`) | Deterministic, demo planner | 40 of 40; report in `evals/reports/analytics-benchmark-demo.json` |
+| `pnpm test` (unit and integration, isolated `_test` database) | Deterministic | 305 passed, 1 skipped, in 22 files. The skipped test is the live analytics benchmark, which runs only with credentials |
+| `pnpm build` (inside `pnpm test:e2e`) | Deterministic | Production build succeeded |
+| `pnpm test:e2e` (isolated `_e2e` database rebuilt from migrations and seed, production build, real worker) | Deterministic | 24 Chromium tests passed in five files, in two consecutive full runs, the second on the final code: 5 Phase 1, 3 Phase 2, 5 Phase 3, 11 Phase 4. The only server errors logged are the ones the recovery test causes on purpose (the application role's read access to one table is revoked, then restored) |
+| Analytics benchmark (inside `pnpm test`) | Deterministic, demo planner | 40 of 40 |
+| `pnpm backup:check` | Deterministic, local | Passed against the development database as a read-only source: 31 tables and 3,056 rows dumped, restored into a scratch database, compared, scratch database dropped |
 | `pnpm eval:check` | Deterministic | Corpus passes leakage and composition checks |
-| `pnpm eval --split heldout --provider baseline` | Deterministic | Re-run; report now labeled INSPECTED and the High gate lists that as a reason |
-| Manual browser check on the development server | Manual | Dashboard and one question-to-result flow viewed as the seeded analyst against development data; no console errors |
-| `pnpm smoke:live` | Live model | **Not run**: no credentials |
-| `pnpm eval --split heldout --provider claude` | Live model | **Not run**: no credentials |
-| Live analytics planner | Live model | **Not run**: no credentials. Tested only with a stand-in client |
+| `pnpm eval --split development` and `--split heldout`, `--provider baseline` | Deterministic | Re-run. The former held-out set is labeled INSPECTED, development data |
+| `pnpm eval --split frozen` | Deterministic | Refuses: "No frozen test set exists yet", exit 2 |
+| `pnpm smoke:live` | Live model | **Not run.** Exits 2: "No provider call was made" |
+| `pnpm eval:analytics:live` | Live model | **Not run.** Exits 2: "No provider call was made" |
+| `pnpm eval --provider claude` | Live model | **Not run.** "Nothing was run" |
 
-The development database was **not** reset. Migration `0004_phase3` is additive (three columns, one foreign key, one append-only trigger) and was applied with `pnpm db:migrate`. Destructive setup happened only in the `_test` and `_e2e` databases.
+The development database was not reset and no row in it was changed this session. `pnpm backup:check` read it with `pg_dump` and wrote only to a scratch database that it then dropped. No migration was added. Test runs remain serialized by the advisory lock (D49); the browser suite uses its own `_e2e` database.
+
+## Phase 4
+
+PRD section 18: "Deliver polished responsive UI, keyboard/accessibility checks, complete seed scenario, end-to-end tests, worker deployment instructions, backup/restore pilot checklist, release notes, and known limitations. Exit when the five-minute workflow works from fresh setup in demo mode and live mode is verified with configured credentials."
+
+### Deliverables
+
+| Deliverable | Status | Evidence | What is left |
+| --- | --- | --- | --- |
+| Polished responsive UI | Implemented; verified by automated checks and a visual pass at phone width | `04-accessibility.spec.ts`: eight screens at 390 px have no sideways scroll, navigation and headings are present, a question can be answered and a listing decided | Bulk approval and the taxonomy tree are usable but cramped on a phone; the queue says so. No tablet-specific layout |
+| Interface states (PRD 10.4) | Verified for the states listed | Loading skeleton on every route (the browser suite waits through it); empty states in an empty workspace; permission-denied states for a viewer; failed state with retry (`05`: a server render fails and recovers); stale state after a taxonomy publication (`01`); all job states (`02`); "AI unavailable" (`02`) | The root-level error page (`app/global-error.tsx`) is written to the framework's contract but has not been triggered in a test |
+| Keyboard and accessibility checks | Verified by automation; **no manual screen-reader pass** | `04`: axe rules for WCAG 2.0, 2.1 and 2.2 A and AA report no violations on 16 administrator screens, analytics with an interpretation, result, clarification and line chart, a saved report, a dialog, ten viewer screens and ten empty-workspace screens. Keyboard only: sign in, skip link, Tab reaches every control with a visible focus ring on five screens, ask and run a question, move through and operate a review item | Automated rules cover part of WCAG. No conformance claim. Catalog import by keyboard is not automated (file choosing cannot be driven by keys in the test browser) |
+| Clear demo and live labels | Verified | Shell badges "Demo data", "Demo AI" or "AI unavailable", and the environment; "Demo planner (rule-based, not AI)" on interpretations and "Demo planner · not AI" on results; demo suggestions labeled per item (`01`, `02`, `03`) | Live labels have only been seen with a stand-in provider |
+| Complete seed scenario | Verified | `scenario.test.ts` pins every seeded total; the e2e database is built from migrations and seed on every run | |
+| End-to-end tests | Verified | 24 browser tests in five files. New this phase: role matrix on all 52 API routes for four roles and no session; cross-workspace access by real ID; rollback; failed server render; failed and lost saves; analytics request failures; accessibility; keyboard; phone | Chromium only |
+| Worker deployment instructions | Written, **not exercised** | `docs/DEPLOYMENT.md` | Never deployed to a host. No container or process-manager configuration |
+| Backup and restore pilot checklist | Written; restore verified locally | `docs/PILOT_CHECKLIST.md`, `pnpm backup:check` | Scheduled backups, point-in-time recovery and a timed restore drill on a host are not done |
+| Release notes and known limitations | Written | `RELEASE_NOTES.md`, "Known gaps and limitations" below | |
+
+### Exit gate
+
+| Condition | Status | Evidence |
+| --- | --- | --- |
+| The five-minute workflow works from fresh setup in demo mode | Met, deterministic | `pnpm test:e2e` drops and recreates its database, applies migrations, seeds, builds, starts web and worker, then `01-workflow` imports a catalog, runs demo analysis, approves, corrects, defers, proposes a leaf, publishes the taxonomy, revalidates, publishes a partial release and exports it; `03-analytics` asks questions and drills down. The walkthrough's closing question, "Which merchant still needs the most review?", is covered by a planner test |
+| Live mode is verified with configured credentials | **Not met: blocked** | No `ANTHROPIC_API_KEY` exists on this machine. Nothing was substituted for it |
+| Both taxonomy and analytics complete | Implemented | See Requirements. Open P0 items are listed under "Implementation gaps" |
+
+`pnpm setup` itself (which writes `.env` and starts a local cluster) was not re-run on a clean clone. Its database steps, migrations and seed, are what the browser suite runs from nothing.
+
+### What remains, by cause
+
+**Blocked by credentials** (ready to run, never run):
+
+1. `pnpm smoke:live`: three recommendation calls and two analytics planner calls through the real adapters.
+2. A live analysis job from the UI with the worker, and a live analytics question.
+3. `pnpm eval --split development --provider claude --max-items <n>`.
+4. `pnpm eval:analytics:live`: the 40 questions through the live planner.
+
+**Blocked by people** (protocol written, nothing started):
+
+5. A frozen, expert-labeled, adjudicated test set (`evals/PROTOCOL.md`). Until it exists KPI01 to KPI03 are unmeasured and High signal stays disabled.
+6. Independently written analytics questions (KPI05 is 100% only on questions written by the planner's author).
+7. Review-time study (KPI04) and usability sessions (KPI08).
+8. A manual accessibility pass with a screen reader.
+9. A security review, and provider retention terms checked by the data owner.
+
+**Implementation gaps** (could be built without either):
+
+10. Member management screen (PRD 10.2 lists members under Settings; members are database rows today).
+11. Merchant deactivation and workspace deletion (PRD 14.5).
+12. Bounded export job for results over 1,000 rows (PRD 13.4).
+13. Alerts on failed jobs and model error rate (PRD section 16). The data is recorded; nothing watches it.
+14. Performance measurement at 5,000 listings with three reviewers (PRD section 16).
+15. An object-store adapter; storage is a local directory behind an interface.
+16. Deployment to a real host, with its backup schedule and restore drill.
+
+### Readiness assessment
+
+| For | Ready? | Basis |
+| --- | --- | --- |
+| A guided demonstration in demo mode, on a laptop | **Yes** | The whole workflow passes in a browser from a freshly built database, with every figure reconciled against independent queries |
+| Evaluation by the product owner in demo mode, unassisted | Probably, with the README walkthrough | Not tested with a person who has not seen it (KPI08) |
+| A pilot with real users and real catalogs | **No** | Live AI has never run; nothing is deployed; no backup schedule; no member management; the pilot checklist is unticked |
+| Production | **No** | All of the above, plus unmeasured accuracy, unmeasured performance, no monitoring and no security review |
+
+This build is a demonstration candidate. Nothing in the evidence supports calling it production-ready, and this document does not.
 
 ## Connection fix (start of this session)
 
@@ -169,7 +234,7 @@ What this does and does not show: retrieval alone misses the correct leaf for ro
 | AT12 Taxonomy changes after recommendation | Verified | `releases.test.ts`, e2e |
 | AT13 Partial release with deferred items | Verified | `releases.test.ts`, e2e |
 | AT14 Publication fails mid-write | Verified | `releases.test.ts` (failure injected before the pointer moves) |
-| AT15 Rollback to incompatible revision | Verified | `releases.test.ts` |
+| AT15 Rollback to incompatible revision | Verified | `releases.test.ts`; in the browser, `05-recovery-and-permissions.spec.ts` |
 | AT16 Export historical release after new revisions | Verified | `releases.test.ts` (byte-identical) |
 | AT17 Provider timeout, 429, worker restart, cancellation | Verified with scripted providers | `jobs.test.ts`; restart and retry also in the browser with the real worker (`02-jobs.spec.ts`) |
 | AT18 Missing key in live mode | Verified | `review.test.ts`, `jobs.test.ts` (provider unavailable at processing time), e2e: "AI unavailable", 503, no fixture output, manual mapping works |
@@ -181,8 +246,8 @@ What this does and does not show: retrieval alone misses the correct leaf for ro
 | AT24 Foreign workspace ID | Verified for all existing endpoints | Each integration file asserts 404 or empty for another workspace, now including conversations, runs, reports and exports; e2e |
 | AT25 Formula-leading CSV cell | Verified | `releases.test.ts`, e2e |
 | AT26 Viewer requests approval or publication via analytics | Verified | `analytics-api.test.ts`, e2e: explanation and navigation links, no rows changed |
-| AT27 Keyboard-only operation | In progress | Tree navigation checked manually; A-to-approve in e2e. No automated accessibility audit |
-| AT28 Fresh install and refresh | Verified for Phase 1 scope | e2e rebuilds the database from migrations and seed; decisions and releases persist across reloads |
+| AT27 Keyboard-only import, review, and analytics | Verified for review and analytics; import partly | `04-accessibility.spec.ts`: keyboard-only sign-in, review and analytics; charts have list and table equivalents; focus moves to new content. Import: every control is reachable by Tab, but choosing a file by keyboard is not automated |
+| AT28 Fresh install and refresh | Verified | e2e rebuilds the database from migrations and seed; decisions, releases, jobs and saved reports persist across reloads (`01`, `02`, `03`) |
 
 ## Known gaps and limitations
 
@@ -197,16 +262,20 @@ What this does and does not show: retrieval alone misses the correct leaf for ro
 - **The analytics benchmark is not independent of the planner it tests** (same author). A fair measure of question understanding needs questions written by someone else, and a live run.
 - **The held-out evaluation set is inspected**; an untouched reserved set does not exist.
 - **The demo planner is strict.** Phrasings outside its rules are refused with the unmatched words listed; the controls are the fallback. That is deliberate, and it will feel rigid.
-- **No history for as-of metrics.** Coverage and backlog over time cannot be shown because snapshots are not recorded. The dashboard's only time series is review completions.
+- **No history for as-of metrics.** Coverage and backlog over time cannot be shown because snapshots are not recorded, and none are backfilled (D60). Two things are recorded by date and shown: review completions and publications.
 - **Conversation privacy is enforced in the service layer**, not by row-level security (which isolates workspaces). Every read goes through one owner check.
 - **Charts are hand-built HTML and SVG** with text equivalents; a single-day series renders as one point.
 - **Result export is CSV of up to 1,000 rows.** The PRD's separate bounded job for larger exports is not built.
+- **Keyboard focus after an in-app navigation stays where it was**; only a fresh page load starts at "Skip to content".
+- **Typing into a form in the first moments after a page loads can be lost**, before the page's scripts attach. Found by the keyboard test; not fixed.
 - **Browser coverage is Chromium only**; retry and restart recovery in the browser start from failure states arranged in the test database, because a healthy demo run cannot produce them.
 - **`pnpm setup` on a clean clone** was still not re-run end to end; its steps and the e2e preparation were.
 - Configuration is validated on first use by each process, not by a dedicated startup hook.
 
 ## Next steps
 
-1. With credentials: `pnpm smoke:live`, a live analysis job from the UI, a live analytics question, then a budgeted live evaluation on the development set and a live run of the analytics benchmark.
-2. Expert labeling and adjudication of the corpus, and a new reserved set from an independent labeler; then the High gate decision.
-3. Phase 4: integrated release and demonstration (PRD section 18), including benchmark questions written by someone other than the planner's author.
+In order of what unblocks the most:
+
+1. Provide `ANTHROPIC_API_KEY` and a model ID, then run the four credential-blocked checks listed under Phase 4. Expect to adjust the prompts: neither has met the real API.
+2. Engage two labelers and an adjudicator and build the frozen test set (`evals/PROTOCOL.md`).
+3. Decide whether a pilot is wanted. If so, work through `docs/PILOT_CHECKLIST.md`, starting with hosting, backups and member management.

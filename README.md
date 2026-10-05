@@ -6,7 +6,7 @@ Reconcile merchant catalogs with a canonical taxonomy, publish reproducible mapp
 - What is built and how it was verified: [BUILD_STATUS.md](BUILD_STATUS.md)
 - Architecture decisions: [DECISIONS.md](DECISIONS.md)
 
-> **Status:** Phases 0 and 1 are verified. Phase 2 is implemented with deterministic verification; live provider verification and independent quality evaluation remain pending. Phase 3 (dashboard and governed analytics) is implemented and verified deterministically; its live question planner has not been run against a real model. **No live provider call has been made**, because no credentials were available. See BUILD_STATUS.md for exactly what is and is not verified.
+> **Status:** a demonstration candidate. All four build phases are implemented and verified deterministically: the complete workflow runs in a browser from a freshly built database in demo mode. **No live AI call has ever been made**, because no provider credentials were available, so live mode, suggestion accuracy and the live analytics planner are unverified. It has not been deployed and is not production-ready. See BUILD_STATUS.md for the evidence and the readiness assessment, and RELEASE_NOTES.md for what this build contains.
 
 All merchants, brands, people and products in this repository are fictional.
 
@@ -115,7 +115,13 @@ pnpm test:e2e
 
 `pnpm test` needs the database server running (`pnpm db:up`). It drops and recreates a separate `<database>_test` database from migrations on every run and never touches development data. Tests never call a live AI provider. Only one run can use the test database at a time: a second `pnpm test` started while another is running stops immediately and names the process holding the lock.
 
-`pnpm test:e2e` rebuilds a third database (`<database>_e2e`) from migrations and the demo seed, makes a production build, starts it on port 3100 together with the real worker process, and runs the Chromium browser tests. The first run needs the browser once:
+```bash
+pnpm backup:check
+```
+
+`pnpm backup:check` dumps a database (read-only), restores it into a scratch database, compares the two and drops the scratch database. See `docs/PILOT_CHECKLIST.md`.
+
+`pnpm test:e2e` rebuilds a third database (`<database>_e2e`) from migrations and the demo seed, makes a production build, starts it on port 3100 together with the real worker process, and runs the Chromium browser tests: the workflow, jobs, analytics, accessibility rules and keyboard operation on every screen, the role matrix on every API route, rollback and failure recovery. The first run needs the browser once:
 
 ```bash
 pnpm exec playwright install chromium
@@ -127,7 +133,7 @@ pnpm exec playwright install chromium
 2. As an administrator open **Settings**: choose Live, enter the model ID and provider prices, tick the opt-in that lists the fields sent, and save.
 3. Open a merchant and choose **Run live analysis**. The dialog shows the estimated tokens and cost and the caps before anything is sent.
 
-A separately budgeted smoke test makes three real calls and prints actual usage. It exits with code 2 and makes no call when credentials are missing:
+A separately budgeted smoke test makes five real calls (three recommendations, two analytics interpretations) and prints actual usage. It exits with code 2 and makes no call when credentials are missing:
 
 ```bash
 pnpm smoke:live
@@ -155,7 +161,17 @@ Results can be saved as reports. A report keeps the result as it was when saved;
 
 The 40-question benchmark runs as part of `pnpm test` (`tests/integration/analytics-benchmark.test.ts`) and writes `evals/reports/analytics-benchmark-demo.json`. It checks the demo planner and the metric SQL against hand-written reference queries. It was written by the same author as the planner rules, so it is a regression check, not an independent accuracy measurement.
 
+The 40 analytics questions can be put to the live planner, about 30 real calls, with:
+
+```bash
+pnpm eval:analytics:live
+```
+
+Both commands refuse to run without credentials. Neither has ever been run with them.
+
 ## Evaluation
+
+The full protocol is in `evals/PROTOCOL.md`. In short: the two existing sets are development data, and a launch gate needs a frozen, expert-labeled test set that does not exist yet.
 
 `evals/corpus/` holds a development set and a held-out set (304 records, three fictional merchants, eight domains) that share no product family, and no title, with each other or with the demo fixtures.
 
@@ -167,7 +183,7 @@ pnpm eval:check
 pnpm eval --split development --provider baseline
 ```
 
-**The held-out set has been inspected.** Its baseline misses were printed and read while the harness was built, so it is no longer an untouched evaluation: reports on it say INSPECTED and it cannot open the High signal gate. Tune against the development set only. An independent assessment needs a new set from an independent labeler in `evals/corpus/reserved.jsonl`, which does not exist yet.
+**The held-out set has been inspected.** Its baseline misses were printed and read while the harness was built, so it is no longer an untouched evaluation: reports on it say INSPECTED and it cannot open the High signal gate. Tune against the development set only. It is development data now. An independent assessment needs the frozen set described in `evals/PROTOCOL.md`; `pnpm eval --split frozen` refuses to run until that set exists, matches its manifest and is fully expert-labeled.
 
 `baseline` is a deterministic lexical yardstick, not a model. `--provider claude --max-items <n>` runs the live adapter and spends money. Reports are written to `evals/reports/`.
 
@@ -198,9 +214,13 @@ After `pnpm db:seed` the demo workspace already holds a published taxonomy, thre
 9. **Audit** lists every step with actor, reason and before/after references. In **Releases**, try **Make current (rollback)** on Harbor Market release 2.
 10. Sign in as **Sam Whitlock** to see read-only states, and as **Dana Mbeki** to confirm the second workspace sees none of this.
 
-11. Sign in as **Jo Lindqvist** (analyst) and open **Analytics**. Ask "Which merchant has the lowest published coverage?", read the interpretation, run it, then follow up with "Only grocery products". Corner Goods shows 0% with a note that it has never published. Save the result as a report, publish another release as the administrator, and use **Refresh** to see the new figure beside the saved snapshot.
+11. Sign in as **Jo Lindqvist** (analyst) and open **Analytics**. Ask "Which merchant still needs the most review?" and follow a row's link into the review queue. Then ask "Which merchant has the lowest published coverage?", read the interpretation, run it, then follow up with "Only grocery products". Corner Goods shows 0% with a note that it has never published. Save the result as a report, publish another release as the administrator, and use **Refresh** to see the new figure beside the saved snapshot.
 
-The browser tests `tests/e2e/01-workflow.spec.ts` (steps 2 to 9), `02-jobs.spec.ts` and `03-analytics.spec.ts` (dashboard reconciliation, question to drilldown, report refresh, permissions) perform these automatically.
+The browser tests `tests/e2e/01-workflow.spec.ts` (steps 2 to 9), `02-jobs.spec.ts`, `03-analytics.spec.ts` (dashboard reconciliation, question to drilldown, report refresh, permissions), `04-accessibility.spec.ts` and `05-recovery-and-permissions.spec.ts` perform these automatically.
+
+## Deployment and pilot
+
+`docs/DEPLOYMENT.md` describes the web and worker processes, configuration and release order. `docs/PILOT_CHECKLIST.md` covers backup, restore and what must be true before real users and real data. Neither has been exercised on a host.
 
 ## Project layout
 
@@ -217,7 +237,8 @@ lib/export/     spreadsheet-safe CSV and ZIP writers
 lib/analytics/  metric registry, metric service (query compiler), planners (guards, demo rules, Claude), time and formatting
 lib/ai/         provider interface, Claude adapter, fixture provider, response validation and signal policy
 lib/jobs/       job engine the worker runs (leases, retries, cancellation) and storage cleanup
-evals/          evaluation corpus, leakage checks, metrics, runner, reports and the analytics benchmark (evals/analytics)
+evals/          evaluation protocol, corpus, leakage checks, metrics, runner, reports and the analytics benchmark (evals/analytics)
+docs/           deployment guide and pilot checklist
 lib/storage/    private object storage adapter
 worker/         durable job worker process
 fixtures/       synthetic sources, generator and generated files
