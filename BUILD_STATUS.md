@@ -40,6 +40,8 @@ Two kinds of verification are kept apart throughout this document:
 | `pnpm eval:analytics:live` | Live model | **Not run.** Exits 2: "No provider call was made" |
 | `pnpm eval --provider claude` | Live model | **Not run.** "Nothing was run" |
 
+Each of the five Phase 4 commits was also checked out on its own in a clean worktree and passed typecheck, lint and the full unit and integration suite (301 tests for the first three, 305 plus the skipped live benchmark from the fourth). The browser suite was run on the final code, not on each commit.
+
 The development database was not reset and no row in it was changed this session. `pnpm backup:check` read it with `pg_dump` and wrote only to a scratch database that it then dropped. No migration was added. Test runs remain serialized by the advisory lock (D49); the browser suite uses its own `_e2e` database.
 
 ## Phase 4
