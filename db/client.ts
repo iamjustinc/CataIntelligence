@@ -14,7 +14,7 @@ export function pool(): pg.Pool {
     // connectionTimeoutMillis: if every connection is busy, waiting for one fails with a clear
     // error after 15 seconds instead of waiting forever. It bounds the wait for a pool slot only;
     // it is not a statement timeout.
-    globalForDb.__ciPool = new pg.Pool({ connectionString: env().DATABASE_URL, max: 10, connectionTimeoutMillis: 15_000, keepAlive: true });
+    globalForDb.__ciPool = new pg.Pool({ connectionString: env().DATABASE_URL, max: env().DB_POOL_MAX, connectionTimeoutMillis: 15_000, keepAlive: true });
     // An idle connection can be closed by the server (restart, failover, dropped database).
     // Without a listener that surfaces as an unhandled error; the pool discards the client itself.
     const warn = (event: string) => (err: Error) => console.error(JSON.stringify({ level: "warn", event, message: err.message }));

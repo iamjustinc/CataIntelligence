@@ -205,3 +205,11 @@ The browser suite runs axe's WCAG 2.0, 2.1 and 2.2 A and AA rules on every scree
 
 ## D64 Error pages re-fetch
 The route error page calls the framework's `retry`, which re-runs the failed server render, rather than only clearing the error state, which would show the same failure again. A browser test revokes the application role's read access to one table, checks the error page shows a reference and no internals, restores access and recovers with "Try again".
+
+## D65 Serverless hosting: database-backed objects and inline job processing, both opt-in
+A host such as Vercel has no disk shared between requests and no long-running process. Two settings cover that, and both default to the original behavior everywhere else:
+
+- `STORAGE_DRIVER=database` keeps staged uploads and generated exports in a `stored_objects` table under the same row-level security as other tenant data, instead of a private directory. Objects are small (uploads are capped at 10 MB, exports are text).
+- `JOB_RUNNER=inline` lets the web process run the ordinary job engine after it has responded to the request that queued a job, and again whenever an unfinished job's status is polled. Leases, retries, caps and idempotent commits are unchanged, so a function cut off by its time limit loses nothing and the next poll resumes. This narrows D33 ("the worker is the only processor") to "exactly one engine, hosted by the worker or, where there is none, by the web process".
+
+On Vercel both are the defaults, the pool is limited to five connections per instance, and the public origin falls back to the project's production domain. Inline processing suits demo mode and small live jobs; a large live job still needs the worker process on a host that can run one.

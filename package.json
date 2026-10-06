@@ -2,6 +2,10 @@
   "name": "catalog-intelligence",
   "version": "0.1.0",
   "private": true,
+  "packageManager": "pnpm@10.33.0",
+  "engines": {
+    "node": ">=22"
+  },
   "scripts": {
     "dev": "next dev",
     "build": "next build",
@@ -20,6 +24,7 @@
     "setup": "pnpm setup:env && pnpm db:up && pnpm db:migrate && pnpm db:seed",
     "db:reset": "node scripts/db-reset.mjs",
     "test:e2e": "tsx tests/e2e/prepare.ts && next build && playwright test",
+    "test:e2e:serverless": "E2E_SERVERLESS=1 tsx tests/e2e/prepare.ts && next build && E2E_SERVERLESS=1 playwright test tests/e2e/01-workflow.spec.ts tests/e2e/03-analytics.spec.ts",
     "eval": "tsx evals/run.ts",
     "eval:check": "tsx evals/leakage.ts",
     "smoke:live": "tsx scripts/live-smoke.ts",

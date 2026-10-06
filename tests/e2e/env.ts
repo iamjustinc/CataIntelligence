@@ -1,6 +1,7 @@
 import "dotenv/config";
 
 export const E2E_PORT = 3100;
+export const SERVERLESS = process.env.E2E_SERVERLESS === "1";
 export const E2E_WORKER_HEALTH_PORT = 3101;
 export const E2E_BASE_URL = `http://localhost:${E2E_PORT}`;
 
@@ -24,5 +25,7 @@ export function e2eEnv(): Record<string, string> {
     ANTHROPIC_API_KEY: "",
     AI_MODEL_ID: "",
     UPLOAD_RATE_LIMIT_PER_MINUTE: "30",
+    // E2E_SERVERLESS=1 runs the suite the way a serverless host does: no worker process, objects in the database.
+    ...(SERVERLESS ? { STORAGE_DRIVER: "database", JOB_RUNNER: "inline", DB_POOL_MAX: "5" } : {}),
   };
 }

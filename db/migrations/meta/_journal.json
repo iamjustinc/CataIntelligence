@@ -36,6 +36,13 @@
       "when": 1791161594581,
       "tag": "0004_phase3",
       "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1791255831072,
+      "tag": "0005_serverless_storage",
+      "breakpoints": true
     }
   ]
 }

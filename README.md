@@ -86,6 +86,9 @@ Restart `pnpm dev` after installing or removing dependencies. Changing packages 
 | `ANTHROPIC_API_KEY` | For live AI | Read by the web server and worker only. Never stored in the database, returned by an API or logged. When missing, live mode shows "AI unavailable" and manual workflows keep working; fixtures are never substituted. |
 | `AI_MODEL_ID` | For live AI | Default model for workspaces that set none in Settings, for example `claude-opus-5-5`. The application assumes no model. |
 | `STORAGE_DIR` | No | Private directory for staged imports and exports. Not served over HTTP. |
+| `STORAGE_DRIVER` | No | `local` (default) or `database`, for hosts without a shared disk. Defaults to `database` on Vercel. |
+| `JOB_RUNNER` | No | `worker` (default) or `inline`, where the web process runs jobs after responding. Defaults to `inline` on Vercel. |
+| `DB_POOL_MAX` | No | Database connections per process (default 10; 5 on Vercel). |
 | `UPLOAD_RATE_LIMIT_PER_MINUTE` | No | Catalog and taxonomy uploads allowed per user per minute. Default 30. |
 | `JOB_CONCURRENCY` | No | Provider calls in flight per job (default 2). |
 | `WORKER_POLL_MS`, `WORKER_LEASE_SECONDS`, `WORKER_ITEM_DELAY_MS`, `WORKER_HEALTH_PORT` | No | Worker poll interval, lease length, pause between provider calls, and health port. |
@@ -219,6 +222,8 @@ After `pnpm db:seed` the demo workspace already holds a published taxonomy, thre
 The browser tests `tests/e2e/01-workflow.spec.ts` (steps 2 to 9), `02-jobs.spec.ts`, `03-analytics.spec.ts` (dashboard reconciliation, question to drilldown, report refresh, permissions), `04-accessibility.spec.ts` and `05-recovery-and-permissions.spec.ts` perform these automatically.
 
 ## Deployment and pilot
+
+**To host it on Vercel, follow `docs/VERCEL.md`.** It needs a hosted PostgreSQL database; uploads, exports and analysis jobs then work without a separate worker or disk.
 
 `docs/DEPLOYMENT.md` describes the web and worker processes, configuration and release order. `docs/PILOT_CHECKLIST.md` covers backup, restore and what must be true before real users and real data. Neither has been exercised on a host.
 

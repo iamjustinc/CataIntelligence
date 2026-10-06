@@ -1,6 +1,9 @@
 import { randomUUID } from "node:crypto";
 import { mkdir, readFile, rm, writeFile } from "node:fs/promises";
 import { dirname, resolve, sep } from "node:path";
+import { and, eq } from "drizzle-orm";
+import { withContext } from "@/db/client";
+import { storedObjects } from "@/db/schema";
 import { env } from "@/lib/env";
 
 /**
@@ -42,8 +45,35 @@ class LocalObjectStore implements ObjectStore {
   }
 }
 
+/**
+ * Keeps objects in PostgreSQL, under the same row-level security as every other tenant table. For
+ * hosts where web requests do not share a writable disk (serverless). Objects are small: uploads
+ * are capped at 10 MB and exports are text.
+ */
+export class DatabaseObjectStore implements ObjectStore {
+  private check(workspaceId: string, key: string) {
+    if (!key.startsWith(`${workspaceId}/`)) throw new Error("Storage key does not belong to this workspace.");
+  }
+  async put(workspaceId: string, kind: "imports" | "exports", extension: string, content: string | Uint8Array): Promise<string> {
+    const ext = extension.replace(/[^a-z0-9]/gi, "").slice(0, 8) || "bin";
+    const key = `${workspaceId}/${kind}/${randomUUID()}.${ext}`;
+    await withContext({ workspaceId }, (tx) => tx.insert(storedObjects).values({ workspaceId, key, content: Buffer.from(content) }));
+    return key;
+  }
+  async get(workspaceId: string, key: string): Promise<Buffer> {
+    this.check(workspaceId, key);
+    const [row] = await withContext({ workspaceId }, (tx) => tx.select({ content: storedObjects.content }).from(storedObjects).where(and(eq(storedObjects.workspaceId, workspaceId), eq(storedObjects.key, key))));
+    if (!row) throw Object.assign(new Error("Stored object not found."), { code: "ENOENT" });
+    return Buffer.from(row.content);
+  }
+  async remove(workspaceId: string, key: string): Promise<void> {
+    this.check(workspaceId, key);
+    await withContext({ workspaceId }, (tx) => tx.delete(storedObjects).where(and(eq(storedObjects.workspaceId, workspaceId), eq(storedObjects.key, key))));
+  }
+}
+
 let store: ObjectStore | undefined;
 export function objectStore(): ObjectStore {
-  store ??= new LocalObjectStore();
+  store ??= env().STORAGE_DRIVER === "database" ? new DatabaseObjectStore() : new LocalObjectStore();
   return store;
 }

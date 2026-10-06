@@ -110,6 +110,20 @@ PRD section 18: "Deliver polished responsive UI, keyboard/accessibility checks, 
 
 This build is a demonstration candidate. Nothing in the evidence supports calling it production-ready, and this document does not.
 
+## Hosting on Vercel (2026-10-05)
+
+A Vercel deployment showed "Ready" with a 404 and a 21-millisecond build. Cause: the GitHub repository held a single `.gitattributes` commit; the application was in a separate local repository with no remote and had never been pushed.
+
+| Item | Status | Evidence |
+| --- | --- | --- |
+| Repository is complete and builds from tracked files alone | Verified locally | CLEAN_BUILD |
+| Vercel configuration | Written, **not deployed** | `vercel.json` sets the Next.js framework, install and build commands and the output directory, overriding any static-site setting |
+| Uploads and exports without a shared disk | Verified locally | `STORAGE_DRIVER=database`: `settings-cleanup.test.ts` (round trip, workspace isolation); serverless browser run |
+| Analysis jobs without a worker process | Verified locally | `JOB_RUNNER=inline`: `pnpm test:e2e:serverless` runs the workflow and analytics specs against a production build with **no worker process**: import, demo analysis, review, publish and export pass (10 tests) |
+| A real Vercel deployment with a hosted database | **Not done** | Needs your GitHub push, a hosted PostgreSQL database and environment variables. Steps in `docs/VERCEL.md` |
+
+"Verified locally" means `next start` on this machine in a mode that imitates Vercel. It is not Vercel: the function time limit, request size limit and connection behavior there have not been exercised.
+
 ## Connection fix (start of this session)
 
 The Phase 2 commit retried a whole transaction after a lost connection, which could have replayed a mutation whose commit had already succeeded.

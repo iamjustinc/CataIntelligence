@@ -2,6 +2,8 @@
 
 Status: **these instructions have not been exercised on a hosting platform.** They describe what the application needs, verified locally with a production build (`next build`, `next start`) and the real worker process in the browser test suite. Nothing here has been deployed.
 
+For Vercel specifically, where there is no worker process and no shared disk, see `docs/VERCEL.md`.
+
 ## What runs
 
 | Process | Command | Notes |

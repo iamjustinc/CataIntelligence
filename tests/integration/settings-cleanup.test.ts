@@ -132,3 +132,37 @@ describe("cleanup of expired storage objects (PRD 14.5)", () => {
     expect(await cleanupExpiredObjects()).toEqual({ imports: 0, exports: 0, errors: 0 });
   });
 });
+
+describe("database object store (STORAGE_DRIVER=database, for hosts without a shared disk)", () => {
+  it("stores, returns and removes bytes, and keeps workspaces apart", async () => {
+    const { withContext } = await import("@/db/client");
+    const { storedObjects } = await import("@/db/schema");
+    const { DatabaseObjectStore } = await import("@/lib/storage");
+    const { adminClient, createTestWorkspace } = await import("../setup/helpers");
+    const owner = await adminClient();
+    try {
+      const a = await createTestWorkspace(owner, "store-a");
+      const b = await createTestWorkspace(owner, "store-b");
+      const store = new DatabaseObjectStore();
+      const bytes = new Uint8Array([0, 255, 10, 13, 0, 80, 75, 3, 4]);
+      const key = await store.put(a.id, "exports", "zip", bytes);
+      expect(key).toMatch(new RegExp(`^${a.id}/exports/[0-9a-f-]{36}\\.zip$`));
+      expect(new Uint8Array(await store.get(a.id, key))).toEqual(bytes);
+      const csv = "merchant_sku,title\nA-1,Café “crème”\n";
+      expect((await store.get(a.id, await store.put(a.id, "imports", "csv", csv))).toString("utf8")).toBe(csv);
+
+      // Another workspace cannot address the object by key, and row-level security hides the rows.
+      await expect(store.get(b.id, key)).rejects.toThrow(/does not belong to this workspace/);
+      await expect(store.remove(b.id, key)).rejects.toThrow(/does not belong to this workspace/);
+      expect(await withContext({ workspaceId: b.id }, (tx) => tx.select({ key: storedObjects.key }).from(storedObjects))).toEqual([]);
+      expect(await withContext({}, (tx) => tx.select({ key: storedObjects.key }).from(storedObjects))).toEqual([]);
+      expect((await owner.query("select count(*)::int as n from stored_objects where workspace_id = $1", [a.id])).rows[0].n).toBe(2);
+
+      await store.remove(a.id, key);
+      await expect(store.get(a.id, key)).rejects.toThrow(/not found/);
+      await store.remove(a.id, key); // removing twice is not an error
+    } finally {
+      await owner.end();
+    }
+  });
+});

@@ -9,6 +9,7 @@
  */
 import { sql } from "drizzle-orm";
 import {
+  customType,
   type AnyPgColumn,
   boolean,
   check,
@@ -983,6 +984,24 @@ export const auditEvents = pgTable(
     createdAt: createdAt(),
   },
   (t) => [index("audit_events_ws_time_idx").on(t.workspaceId, t.createdAt, t.id)],
+);
+
+/** Raw bytes. Used only by the database-backed object store. */
+const bytea = customType<{ data: Buffer; driverData: Buffer }>({ dataType: () => "bytea" });
+
+/**
+ * Private objects (staged uploads, generated exports) for deployments without a shared disk, such
+ * as serverless hosts. Selected with STORAGE_DRIVER=database; the local driver does not use it.
+ */
+export const storedObjects = pgTable(
+  "stored_objects",
+  {
+    workspaceId: workspaceId().references(() => workspaces.id),
+    key: text("key").notNull(),
+    content: bytea("content").notNull(),
+    createdAt: createdAt(),
+  },
+  (t) => [primaryKey({ name: "stored_objects_pk", columns: [t.workspaceId, t.key] })],
 );
 
 export const idempotencyKeys = pgTable(
