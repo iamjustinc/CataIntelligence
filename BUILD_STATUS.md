@@ -116,7 +116,7 @@ A Vercel deployment showed "Ready" with a 404 and a 21-millisecond build. Cause:
 
 | Item | Status | Evidence |
 | --- | --- | --- |
-| Repository is complete and builds from tracked files alone | Verified locally | CLEAN_BUILD |
+| Repository is complete and builds from tracked files alone | Verified locally | A fresh `git clone` of the repository, `pnpm install --frozen-lockfile` and `pnpm build` with no `.env` file and no database variables succeeded (`VERCEL=1` set). 251+ tracked files include the app, `package.json`, `pnpm-lock.yaml`, `next.config.ts`, six migrations and `public/`. Typecheck and lint clean; 306 unit and integration tests pass; the standard browser suite passes 24 of 24 |
 | Vercel configuration | Written, **not deployed** | `vercel.json` sets the Next.js framework, install and build commands and the output directory, overriding any static-site setting |
 | Uploads and exports without a shared disk | Verified locally | `STORAGE_DRIVER=database`: `settings-cleanup.test.ts` (round trip, workspace isolation); serverless browser run |
 | Analysis jobs without a worker process | Verified locally | `JOB_RUNNER=inline`: `pnpm test:e2e:serverless` runs the workflow and analytics specs against a production build with **no worker process**: import, demo analysis, review, publish and export pass (10 tests) |

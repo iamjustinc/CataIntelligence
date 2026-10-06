@@ -18,23 +18,15 @@ The GitHub repository `iamjustinc/CataIntelligence` contained one commit with a 
 
 ## Step 1: put the real project on GitHub
 
-Run these in the project folder (`CataTelligence`). The GitHub repository already has one commit, so its history is merged in rather than overwritten.
-
-```bash
-git remote add origin https://github.com/iamjustinc/CataIntelligence.git
-```
-
-```bash
-git fetch origin
-```
-
-```bash
-git merge origin/main --allow-unrelated-histories -m "Merge the initial GitHub commit"
-```
+The local repository is already connected: the remote `origin` points at `https://github.com/iamjustinc/CataIntelligence.git`, and the one commit that was on GitHub (a `.gitattributes` file) has been merged in, so nothing on GitHub is overwritten. One command remains, run in the project folder (`CataTelligence`):
 
 ```bash
 git push -u origin main
 ```
+
+If Git asks you to sign in, use your GitHub username and a personal access token, or sign in through the browser prompt.
+
+For reference, the connection was made with `git remote add origin <url>`, `git fetch origin` and `git merge origin/main --allow-unrelated-histories`.
 
 Then delete the stray clone inside the project folder. It is an empty copy of the GitHub repository and is not part of the application:
 
@@ -42,7 +34,7 @@ Then delete the stray clone inside the project folder. It is an empty copy of th
 rm -rf CataIntelligence
 ```
 
-Check on GitHub that you now see `app/`, `package.json`, `pnpm-lock.yaml` and the rest. If the repository is public, everything in it is public, including the PRD and the documentation. `.env` is not tracked and is never pushed.
+Check on GitHub that you now see `app/`, `package.json`, `pnpm-lock.yaml` and the rest. **The repository is public**, so everything in it becomes public when you push, including the PRD and the documentation. Make the repository private on GitHub first (Settings → General → Change visibility) if you do not want that; Vercel works with private repositories. `.env` is not tracked and is never pushed.
 
 ## Step 2: create the database
 
