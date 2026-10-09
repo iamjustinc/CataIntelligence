@@ -10,9 +10,11 @@
  */
 import "dotenv/config";
 import { spawnSync } from "node:child_process";
+import { liveProvider } from "@/lib/ai/live";
 
-if (!process.env.ANTHROPIC_API_KEY || !process.env.AI_MODEL_ID) {
-  console.error("Live analytics benchmark NOT RUN: ANTHROPIC_API_KEY and AI_MODEL_ID are required. No provider call was made.");
+const live = liveProvider();
+if (!live.apiKey || !process.env.AI_MODEL_ID) {
+  console.error(`Live analytics benchmark NOT RUN: ${live.keyVariable} and AI_MODEL_ID are required. No provider call was made.`);
   process.exit(2);
 }
 const run = spawnSync("pnpm", ["exec", "vitest", "run", "tests/integration/analytics-benchmark.test.ts"], { stdio: "inherit", env: { ...process.env, LIVE_ANALYTICS_BENCHMARK: "1" } });

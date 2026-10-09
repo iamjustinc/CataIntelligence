@@ -28,7 +28,7 @@ export interface WorkerOptions {
   sleep: (ms: number) => Promise<void>;
   /** Delay before retry number `attempt` (1-based) of a transient failure. */
   backoffMs: (attempt: number) => number;
-  resolveProvider: (job: { providerMode: "off" | "demo" | "live"; modelId: string | null }) => ProviderResolution;
+  resolveProvider: (job: { providerMode: "off" | "demo" | "live"; modelId: string | null; provider?: string | null }) => ProviderResolution;
   /** Lets a graceful shutdown stop between items. */
   shouldStop: () => boolean;
   log: (event: string, extra?: Record<string, unknown>) => void;
@@ -235,7 +235,7 @@ export async function processJob(claim: Claim, opts: WorkerOptions): Promise<Job
   if (!setup) return "lost_lease";
   const { job } = setup;
 
-  const resolved = opts.resolveProvider({ providerMode: job.providerMode, modelId: job.modelId });
+  const resolved = opts.resolveProvider({ providerMode: job.providerMode, modelId: job.modelId, provider: job.provider });
   if (!resolved.ok) {
     opts.log("job_provider_unavailable", { jobId: job.id });
     // Pending items are kept so the job can be retried once the provider is configured.

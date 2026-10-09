@@ -48,7 +48,7 @@ export interface ProviderStatus {
  */
 export function resolveProviderStatus(
   mode: ProviderMode,
-  config: { ANTHROPIC_API_KEY?: string; AI_MODEL_ID?: string },
+  config: { apiKey?: string; modelId?: string; providerLabel?: string },
   liveAiOptIn: boolean,
 ): ProviderStatus {
   if (mode === "off") {
@@ -62,12 +62,12 @@ export function resolveProviderStatus(
       detail: "Deterministic fixture suggestions for seeded fixture data only. Not live model output.",
     };
   }
-  if (!config.ANTHROPIC_API_KEY || !config.AI_MODEL_ID) {
+  if (!config.apiKey || !config.modelId) {
     return {
       mode,
       state: "unavailable",
       label: "AI unavailable",
-      detail: "Live mode is selected but the server has no provider key or model ID. Manual mapping is available.",
+      detail: `Live mode is selected but the server has no ${config.providerLabel ? `${config.providerLabel} ` : "provider "}key or model ID. Manual mapping is available.`,
     };
   }
   if (!liveAiOptIn) {
@@ -78,5 +78,5 @@ export function resolveProviderStatus(
       detail: "An administrator has not opted this workspace into sending catalog fields to the live provider.",
     };
   }
-  return { mode, state: "live", label: "Live AI", detail: `Model ${config.AI_MODEL_ID}` };
+  return { mode, state: "live", label: "Live AI", detail: `${config.providerLabel ? `${config.providerLabel}, model` : "Model"} ${config.modelId}` };
 }

@@ -162,7 +162,7 @@ test("live mode without a server key shows AI unavailable, never demo output, an
 
   await page.goto(`/catalogs/${merchantId}`);
   await expect(panel(page).getByText("AI unavailable")).toBeVisible();
-  await expect(panel(page)).toContainText("no provider key");
+  await expect(panel(page)).toContainText("no OpenAI key or model ID");
   await expect(panel(page).getByRole("button", { name: /Run (demo|live) analysis/ })).toHaveCount(0);
   // The API refuses too, and creates neither a job nor any suggestion.
   const revision = await (await page.request.get(`/api/review-items?merchant=${merchantId}&limit=1`)).json();

@@ -86,8 +86,9 @@ describe("provider status", () => {
     expect(status.label).toBe("AI unavailable");
   });
   it("requires administrator opt-in before live mode is usable", () => {
-    expect(resolveProviderStatus("live", { ANTHROPIC_API_KEY: "k", AI_MODEL_ID: "m" }, false).state).toBe("unavailable");
-    expect(resolveProviderStatus("live", { ANTHROPIC_API_KEY: "k", AI_MODEL_ID: "m" }, true).state).toBe("live");
+    expect(resolveProviderStatus("live", { apiKey: "k", modelId: "m" }, false).state).toBe("unavailable");
+    expect(resolveProviderStatus("live", { apiKey: "k", modelId: "m", providerLabel: "OpenAI" }, true)).toMatchObject({ state: "live", detail: "OpenAI, model m" });
+    expect(resolveProviderStatus("live", { modelId: "m", providerLabel: "OpenAI" }, true).detail).toMatch(/no OpenAI key or model ID/);
   });
   it("labels demo mode as demo", () => expect(resolveProviderStatus("demo", {}, false).label).toBe("Demo AI"));
 });

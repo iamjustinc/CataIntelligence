@@ -25,8 +25,11 @@ export default defineConfig({
       SEED_USER_PASSWORD: "test-only-password-not-a-secret",
       AI_PROVIDER_MODE: "demo",
       STORAGE_DIR: ".data/storage-test",
-      ANTHROPIC_API_KEY: "",
-      AI_MODEL_ID: "",
+      // Ordinary runs never see a real provider key, whatever is in .env. Only the explicitly
+      // requested live benchmark (pnpm eval:analytics:live) passes the configured key through.
+      ...(process.env.LIVE_ANALYTICS_BENCHMARK === "1"
+        ? {}
+        : { OPENAI_API_KEY: "", ANTHROPIC_API_KEY: "", AI_MODEL_ID: "", AI_PROVIDER: "" }),
     },
   },
 });

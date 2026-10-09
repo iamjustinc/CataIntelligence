@@ -47,6 +47,8 @@ export interface PlannerUsage {
 }
 export interface Planner {
   id: "demo" | "live";
+  /** Stored with usage records: "openai", "claude" or "demo-rules". */
+  provider: string;
   modelId: string | null;
   promptVersion: string;
   plan(input: PlanInput): Promise<{ outcome: PlanOutcome; usage: PlannerUsage | null }>;
@@ -440,6 +442,7 @@ export function planWithRules({ question, previousSpec, vocabulary, now }: PlanI
 
 export class DemoPlanner implements Planner {
   readonly id = "demo" as const;
+  readonly provider = "demo-rules";
   readonly modelId = null;
   readonly promptVersion = DEMO_PLANNER_VERSION;
   async plan(input: PlanInput) {

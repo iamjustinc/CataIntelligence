@@ -4,6 +4,7 @@ import { catalogRevisions, mappingReleases, memberships, merchants, taxonomyVers
 import type { Actor } from "@/lib/auth/actor";
 import { can } from "@/lib/auth/permissions";
 import { forbidden, notFound } from "@/lib/api/errors";
+import { liveProvider } from "@/lib/ai/live";
 import { resolveProviderStatus, type ProviderStatus } from "@/lib/ai/provider";
 import { env } from "@/lib/env";
 
@@ -16,7 +17,7 @@ export async function getWorkspace(actor: Actor) {
 export async function getProviderStatus(actor: Actor): Promise<ProviderStatus> {
   const ws = await getWorkspace(actor);
   const config = env();
-  return resolveProviderStatus(ws.providerMode, { ANTHROPIC_API_KEY: config.ANTHROPIC_API_KEY, AI_MODEL_ID: ws.aiModelId ?? config.AI_MODEL_ID }, ws.liveAiOptIn);
+  return resolveProviderStatus(ws.providerMode, { apiKey: liveProvider().apiKey, modelId: ws.aiModelId ?? config.AI_MODEL_ID, providerLabel: liveProvider().label }, ws.liveAiOptIn);
 }
 
 export interface SetupProgress {

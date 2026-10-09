@@ -138,7 +138,7 @@ export function highSignalGate(input: { split: string; provider: string; expertL
   const { precision } = input.metrics.bands.high;
   if (input.split !== "frozen") reasons.push("The gate is evaluated on the frozen test set only (evals/PROTOCOL.md). Development and inspected sets cannot open it.");
   if (input.inspected) reasons.push("This set has been inspected, so it is development data, not an untouched evaluation.");
-  if (input.provider !== "claude") reasons.push("The gate requires results from the live model, not a baseline or fixture provider.");
+  if (input.provider !== "claude" && input.provider !== "openai") reasons.push("The gate requires results from the live model, not a baseline or fixture provider.");
   if (input.expertLabeled < input.items) reasons.push(`${input.items - input.expertLabeled} of ${input.items} records are not independently expert-labeled.`);
   if (precision.n < HIGH_GATE.minSelections) reasons.push(`Only ${precision.n} High selections; at least ${HIGH_GATE.minSelections} are needed for a meaningful precision estimate.`);
   if (precision.rate === null || precision.rate < HIGH_GATE.minPrecision) reasons.push(`High precision is ${precision.rate === null ? "not applicable" : `${(precision.rate * 100).toFixed(1)}%`}; the target is at least ${HIGH_GATE.minPrecision * 100}%.`);

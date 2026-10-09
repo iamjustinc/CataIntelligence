@@ -41,7 +41,7 @@ const specShape = z.object({
   limit: z.number(),
   chartType: z.enum(["bar", "line", "table"]),
 });
-const responseShape = z.object({ outcome: z.enum(["spec", "clarify", "unsupported"]), message: z.string(), clarificationOptions: z.array(z.string()), spec: specShape.nullable() });
+export const responseShape = z.object({ outcome: z.enum(["spec", "clarify", "unsupported"]), message: z.string(), clarificationOptions: z.array(z.string()), spec: specShape.nullable() });
 
 export function buildPlannerPayload(input: PlanInput) {
   return {
@@ -104,6 +104,7 @@ function errorCode(err: unknown): string {
  */
 export class ClaudePlanner implements Planner {
   readonly id = "live" as const;
+  readonly provider = "claude";
   readonly promptVersion = CLAUDE_PLANNER_VERSION;
   private readonly client: MessagesClient;
   constructor(

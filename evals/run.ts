@@ -15,7 +15,8 @@ import "dotenv/config";
 import { appendFileSync, mkdirSync, writeFileSync } from "node:fs";
 import { resolve } from "node:path";
 import { fileURLToPath } from "node:url";
-import { ClaudeProvider, CLAUDE_PROMPT_VERSION } from "@/lib/ai/claude-adapter";
+import { ClaudeProvider } from "@/lib/ai/claude-adapter";
+import { OpenAIProvider } from "@/lib/ai/openai-adapter";
 import type { ProviderResult, RecommendationProvider } from "@/lib/ai/provider";
 import { SIGNAL_POLICY_VERSION, signalBand, validateRecommendation } from "@/lib/ai/validate-recommendation";
 import type { RecommendationRequest } from "@/lib/contracts/recommendation";
@@ -154,20 +155,20 @@ async function main() {
   }
 
   let provider: RecommendationProvider;
-  if (providerName === "claude") {
-    const key = process.env.ANTHROPIC_API_KEY;
+  if (providerName === "claude" || providerName === "openai") {
+    const key = providerName === "openai" ? process.env.OPENAI_API_KEY : process.env.ANTHROPIC_API_KEY;
     const model = process.env.AI_MODEL_ID;
     if (!key || !model) {
-      console.error("The live evaluation needs ANTHROPIC_API_KEY and AI_MODEL_ID. Nothing was run.");
+      console.error(`The live evaluation needs ${providerName === "openai" ? "OPENAI_API_KEY" : "ANTHROPIC_API_KEY"} and AI_MODEL_ID. Nothing was run.`);
       process.exit(2);
     }
     if (!maxItems) {
       console.error("Pass --max-items to bound the cost of a live evaluation. Nothing was run.");
       process.exit(2);
     }
-    provider = new ClaudeProvider(model, { apiKey: key });
+    provider = providerName === "openai" ? new OpenAIProvider(model, { apiKey: key }) : new ClaudeProvider(model, { apiKey: key });
   } else if (providerName === "baseline") provider = new BaselineProvider();
-  else throw new Error(`Unknown provider "${providerName}". Use baseline or claude.`);
+  else throw new Error(`Unknown provider "${providerName}". Use baseline, openai or claude.`);
 
   const { metrics, usage, evaluated } = await evaluate(dataset, provider, { maxItems, onItem: (done, total) => done % 25 === 0 && console.error(`${done}/${total}`) });
   const inspected = split === "heldout" && HELDOUT_STATUS.inspected;
@@ -181,10 +182,10 @@ async function main() {
     "set status": frozen ? "FROZEN test set: hash verified against its manifest, aggregate results only" : inspected ? `INSPECTED since ${HELDOUT_STATUS.since}: development data, not an untouched evaluation. ${HELDOUT_STATUS.reason}` : "development set, used for tuning",
     provider: provider.id,
     model: provider.modelId ?? "none (deterministic)",
-    "prompt version": provider.id === "claude" ? CLAUDE_PROMPT_VERSION : provider.promptVersion,
+    "prompt version": provider.promptVersion,
     "retrieval policy": RETRIEVAL_POLICY_VERSION,
     "signal policy": SIGNAL_POLICY_VERSION,
-    "provider usage": provider.id === "claude" ? `${usage.calls} calls, ${usage.inputTokens} input and ${usage.outputTokens} output tokens` : "none",
+    "provider usage": provider.id === "claude" || provider.id === "openai" ? `${usage.calls} calls, ${usage.inputTokens} input and ${usage.outputTokens} output tokens` : "none",
     generated: new Date().toISOString(),
   };
   const dir = resolve(process.cwd(), "evals/reports");

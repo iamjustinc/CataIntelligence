@@ -10,6 +10,7 @@ import "dotenv/config";
 import { createServer } from "node:http";
 import { sql } from "drizzle-orm";
 import { closeDb, db } from "@/db/client";
+import { liveProvider } from "@/lib/ai/live";
 import { env } from "@/lib/env";
 import { claimNextJob, defaultWorkerOptions, processJob } from "@/lib/jobs/analysis-worker";
 import { cleanupExpiredObjects } from "@/lib/jobs/cleanup";
@@ -34,7 +35,7 @@ async function main() {
   const state = { startedAt: new Date().toISOString(), lastPollAt: null as string | null, currentJobId: null as string | null, jobsProcessed: 0 };
   const opts = defaultWorkerOptions({ leaseSeconds: LEASE_SECONDS, concurrency: config.JOB_CONCURRENCY, itemDelayMs: ITEM_DELAY_MS, shouldStop: () => stopping, log: (event, extra) => log("info", event, extra) });
   // A live provider key is reported as present or absent only; its value is never logged.
-  log("info", "started", { workerId: opts.workerId, role, concurrency: opts.concurrency, leaseSeconds: LEASE_SECONDS, providerKeyConfigured: Boolean(config.ANTHROPIC_API_KEY) });
+  log("info", "started", { workerId: opts.workerId, role, concurrency: opts.concurrency, leaseSeconds: LEASE_SECONDS, liveProvider: liveProvider().label, providerKeyConfigured: Boolean(liveProvider().apiKey) });
 
   const healthPort = Number(process.env.WORKER_HEALTH_PORT ?? 0);
   const health = healthPort

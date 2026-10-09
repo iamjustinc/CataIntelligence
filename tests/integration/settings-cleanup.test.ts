@@ -60,7 +60,7 @@ describe("workspace settings (provider mode, model and budgets)", () => {
     // Live mode is selected but an administrator has not opted in to sending catalog fields.
     expect(data).toMatchObject({ lockVersion: 1, providerMode: "live", effectiveModelId: "claude-opus-5-5", inputPricePerMtok: 4, jobSpendCapUsd: 2.5, status: { state: "unavailable", label: "AI unavailable" } });
     const optedIn = (await (await put({ ...base, providerMode: "live", liveAiOptIn: true, aiModelId: "claude-opus-5-5", expectedVersion: 1 })).json()).data;
-    expect(optedIn.status).toMatchObject({ state: "live", label: "Live AI", detail: "Model claude-opus-5-5" });
+    expect(optedIn.status).toMatchObject({ state: "live", label: "Live AI", detail: "Anthropic Claude, model claude-opus-5-5" });
     // The stale page that still holds version 0 cannot overwrite the newer settings.
     expect((await put({ ...base, expectedVersion: 0 })).status).toBe(409);
 

@@ -213,3 +213,15 @@ A host such as Vercel has no disk shared between requests and no long-running pr
 - `JOB_RUNNER=inline` lets the web process run the ordinary job engine after it has responded to the request that queued a job, and again whenever an unfinished job's status is polled. Leases, retries, caps and idempotent commits are unchanged, so a function cut off by its time limit loses nothing and the next poll resumes. This narrows D33 ("the worker is the only processor") to "exactly one engine, hosted by the worker or, where there is none, by the web process".
 
 On Vercel both are the defaults, the pool is limited to five connections per instance, and the public origin falls back to the project's production domain. Inline processing suits demo mode and small live jobs; a large live job still needs the worker process on a host that can run one.
+
+## D66 OpenAI is the default live provider; the provider is server configuration
+The product owner asked for OpenAI. Both live paths now have an OpenAI implementation beside the Claude one: `OpenAIProvider` for recommendations and `OpenAIPlanner` for analytics, each on the Responses API with strict structured output, no tools, no stored responses and the SDK's retries disabled. They share the prompts, response schemas and server validation of the Claude versions, so candidate restriction, evidence checks, the validated AnalysisSpec, budgets and usage accounting are identical; only the transport differs.
+
+The provider is chosen by server environment (`AI_PROVIDER`, else whichever key is present, else OpenAI), not per workspace, because the key lives there. Records keep the provider that produced them (`openai`, `claude`, `fixture`), a queued job stays with the provider it was created for, and a missing key is "AI unavailable", never a substitution by the other provider or by demo fixtures. The High gate accepts either live provider.
+
+Ordinary test runs blank every provider key regardless of `.env`, so a developer's real key cannot be spent by `pnpm test`. The smoke test enforces its own budget from prices passed on the command line, charging a call with unknown usage at its worst case.
+
+## D67 A rehearsal workspace, and a scheduled safety net for unattended jobs
+`pnpm rehearsal:create` adds a second synthetic workspace with the same members and scenario, so practising the demo does not move the presentation dashboard. It uses the same services as the seed and deletes nothing.
+
+Inline jobs run after the response that queued them and on each status poll. `GET /api/cron/jobs`, callable only with the host's `CRON_SECRET`, resumes a job whose page was closed. On Vercel's free plan a scheduled request runs once a day, so this is a backstop, not the mechanism.

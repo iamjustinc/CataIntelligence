@@ -132,6 +132,8 @@ test("every API route enforces the role matrix, and requires a session (KPI06)",
       await context.close();
     });
   }
+  // The scheduled job route is not part of the role matrix: without the host's secret it refuses everyone.
+  expect((await (await browser.newContext({ baseURL: e2eEnv().APP_BASE_URL })).request.get("/api/cron/jobs", { headers: { authorization: "Bearer guess" } })).status()).toBe(401);
   // The probes used empty bodies and an unknown ID: nothing may have been created by any role.
   expect(await rowCounts()).toEqual(before);
 });

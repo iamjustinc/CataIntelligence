@@ -15,7 +15,7 @@ export default defineConfig({
   expect: { timeout: 10_000 },
   reporter: [["list"]],
   outputDir: ".data/playwright",
-  use: { baseURL: E2E_BASE_URL, trace: "retain-on-failure", screenshot: "only-on-failure", viewport: { width: 1440, height: 900 } },
+  use: { baseURL: E2E_BASE_URL, trace: "retain-on-failure", screenshot: "only-on-failure", ...(process.env.E2E_VIDEO === "1" ? { video: { mode: "on" as const, size: { width: 1440, height: 900 } } } : {}), viewport: { width: 1440, height: 900 } },
   webServer: [
     {
       command: `pnpm exec next start -p ${E2E_PORT}`,

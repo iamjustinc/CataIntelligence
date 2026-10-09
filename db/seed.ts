@@ -41,7 +41,7 @@ async function ensureUser(email: string, name: string, password: string): Promis
   return id;
 }
 
-async function ensureWorkspace(ownerUserId: string, def: { slug: string; name: string }, isDemo: boolean): Promise<string> {
+export async function ensureWorkspace(ownerUserId: string, def: { slug: string; name: string }, isDemo: boolean): Promise<string> {
   const found = await withContext({ userId: ownerUserId }, (tx) => tx.select({ id: workspaces.id }).from(workspaces).where(eq(workspaces.slug, def.slug)));
   if (found[0]) return found[0].id;
   const id = randomUUID();
@@ -51,7 +51,7 @@ async function ensureWorkspace(ownerUserId: string, def: { slug: string; name: s
   return id;
 }
 
-async function ensureMembership(workspaceId: string, userId: string, role: Role): Promise<void> {
+export async function ensureMembership(workspaceId: string, userId: string, role: Role): Promise<void> {
   await withContext({ workspaceId }, (tx) => tx.insert(memberships).values({ workspaceId, userId, role }).onConflictDoNothing());
 }
 

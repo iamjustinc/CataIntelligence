@@ -29,6 +29,7 @@
     "eval:check": "tsx evals/leakage.ts",
     "smoke:live": "tsx scripts/live-smoke.ts",
     "backup:check": "tsx scripts/backup-restore-check.ts",
+    "rehearsal:create": "tsx scripts/create-rehearsal.ts",
     "eval:freeze": "tsx evals/freeze.ts",
     "eval:analytics:live": "tsx scripts/analytics-live.ts"
   },
@@ -37,6 +38,7 @@
     "better-auth": "^1.7.7",
     "drizzle-orm": "^0.45.3",
     "next": "16.3.8",
+    "openai": "^7.30.1",
     "pg": "^8.23.1",
     "react": "19.2.8",
     "react-dom": "19.2.8",
@@ -59,6 +61,5 @@
     "tsx": "^4.23.15",
     "typescript": "^5",
     "vitest": "^5.0.3"
-  },
-  "packageManager": "pnpm@10.33.0"
+  }
 }

@@ -5,6 +5,9 @@ const schema = z.object({
   BETTER_AUTH_SECRET: z.string().min(16, "BETTER_AUTH_SECRET must be at least 16 characters"),
   APP_BASE_URL: z.string().url().default("http://localhost:3000"),
   AI_PROVIDER_MODE: z.enum(["off", "demo", "live"]).default("demo"),
+  /** Live provider. When unset: whichever provider has a key, otherwise OpenAI. */
+  AI_PROVIDER: z.enum(["openai", "anthropic"]).optional(),
+  OPENAI_API_KEY: z.string().optional(),
   ANTHROPIC_API_KEY: z.string().optional(),
   AI_MODEL_ID: z.string().optional(),
   STORAGE_DIR: z.string().default(".data/storage"),

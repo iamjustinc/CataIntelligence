@@ -9,8 +9,10 @@ import { randomUUID } from "node:crypto";
 import { and, asc, desc, eq, or, sql } from "drizzle-orm";
 import { withContext, type Tx } from "@/db/client";
 import { aiUsage, analyticsConversations, analyticsRuns, mappingReleases, merchants, savedReports, user, workspaces } from "@/db/schema";
+import { liveProvider } from "@/lib/ai/live";
 import { resolveProviderStatus } from "@/lib/ai/provider";
 import { ClaudePlanner } from "@/lib/analytics/claude-planner";
+import { OpenAIPlanner } from "@/lib/analytics/openai-planner";
 import { describeSpec, DIMENSION_LABELS, formatFraction, formatValue, summarize } from "@/lib/analytics/format";
 import { METRICS, type MetricId } from "@/lib/analytics/metric-registry";
 import { analyticsVocabulary, baseSpec, runSpecInTx, validateSpec, type MetricResult } from "@/lib/analytics/metric-service";
@@ -36,9 +38,9 @@ type WorkspaceRow = typeof workspaces.$inferSelect;
 
 function plannerStatusOf(ws: WorkspaceRow): PlannerStatus & { modelId: string | null } {
   const modelId = ws.aiModelId ?? env().AI_MODEL_ID ?? null;
-  const status = resolveProviderStatus(ws.providerMode, { ANTHROPIC_API_KEY: env().ANTHROPIC_API_KEY, AI_MODEL_ID: modelId ?? undefined }, ws.liveAiOptIn);
+  const status = resolveProviderStatus(ws.providerMode, { apiKey: liveProvider().apiKey, modelId: modelId ?? undefined, providerLabel: liveProvider().label }, ws.liveAiOptIn);
   if (status.state === "demo") return { mode: "demo", modelId: null, label: "Demo planner", detail: "Rule-based phrase matching for a fixed set of question forms. Not AI: questions it cannot fully match are refused, not guessed." };
-  if (status.state === "live") return { mode: "live", modelId, label: "Live AI", detail: `Questions are interpreted by ${modelId}. The model proposes an analysis; the server validates it and computes every number.` };
+  if (status.state === "live") return { mode: "live", modelId, label: "Live AI", detail: `Questions are interpreted by ${liveProvider().label} (${modelId}). The model proposes an analysis; the server validates it and computes every number.` };
   return { mode: "none", modelId: null, label: status.state === "off" ? "Question interpretation off" : "AI unavailable", detail: `${status.detail} The analysis builder works without a provider.` };
 }
 
@@ -99,7 +101,8 @@ export async function interpretQuestion(actor: Actor, input: { question: string;
   let planner = deps.planner ?? null;
   if (!planner) {
     if (status.mode === "none") return { planner: "none", plannerLabel: status.label, outcome: { kind: "unavailable", message: `${status.detail}` }, description: [] };
-    planner = status.mode === "demo" ? new DemoPlanner() : new ClaudePlanner(status.modelId!, { apiKey: env().ANTHROPIC_API_KEY });
+    const live = liveProvider();
+    planner = status.mode === "demo" ? new DemoPlanner() : live.name === "openai" ? new OpenAIPlanner(status.modelId!, { apiKey: live.apiKey }) : new ClaudePlanner(status.modelId!, { apiKey: live.apiKey });
   }
   if (planner.id === "live" && committed >= Number(ws.dailySpendCapUsd)) {
     throw new ApiError("rate_limited", "Today's provider spending cap for this workspace is reached. The analysis builder still works.");
@@ -112,7 +115,7 @@ export async function interpretQuestion(actor: Actor, input: { question: string;
         workspaceId: actor.workspaceId,
         runId: randomUUID(),
         purpose: "analytics_plan",
-        provider: "claude",
+        provider: planner.provider,
         modelId: planner.modelId,
         promptVersion: planner.promptVersion,
         inputTokens: usage.inputTokens,
@@ -125,7 +128,7 @@ export async function interpretQuestion(actor: Actor, input: { question: string;
       }),
     );
   }
-  return { planner: planner.id, plannerLabel: planner.id === "demo" ? "Demo planner (rule-based, not AI)" : `Live AI (${planner.modelId})`, outcome, description: describe(outcome) };
+  return { planner: planner.id, plannerLabel: planner.id === "demo" ? "Demo planner (rule-based, not AI)" : `Live AI (${planner.provider === "openai" ? "OpenAI" : planner.provider === "claude" ? "Claude" : planner.provider}, ${planner.modelId})`, outcome, description: describe(outcome) };
 }
 
 export interface RunView {

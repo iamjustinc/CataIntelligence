@@ -44,3 +44,6 @@ next-env.d.ts
 .data/
 .env
 !.env.example
+
+# local rehearsal recordings
+/rehearsal-recording/

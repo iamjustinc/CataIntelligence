@@ -163,7 +163,7 @@ describe("planner availability", () => {
     const client: MessagesClient = { messages: { create: async () => ({ id: "m", type: "message", role: "assistant", model: "some-model", content: [{ type: "text", text: JSON.stringify(reply), citations: null }], stop_reason: "end_turn", stop_sequence: null, usage: { input_tokens: 1000, output_tokens: 100, cache_creation_input_tokens: 0, cache_read_input_tokens: 0 } }) as unknown as Anthropic.Message } };
     const planner = new ClaudePlanner("some-model", { client });
     const first = await interpretQuestion(actor, { question: "How big is the catalog?" }, { planner });
-    expect(first).toMatchObject({ planner: "live", plannerLabel: "Live AI (some-model)", outcome: { kind: "spec" } });
+    expect(first).toMatchObject({ planner: "live", plannerLabel: "Live AI (Claude, some-model)", outcome: { kind: "spec" } });
     let usage = (await admin.query("select purpose, provider, model_id, input_tokens, output_tokens, cost_estimate_usd, status from ai_usage where workspace_id = $1 order by created_at", [other.id])).rows;
     expect(usage).toEqual([{ purpose: "analytics_plan", provider: "claude", model_id: "some-model", input_tokens: 1000, output_tokens: 100, cost_estimate_usd: null, status: "ok" }]);
 

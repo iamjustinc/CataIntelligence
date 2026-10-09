@@ -96,7 +96,9 @@ Environment variables (Production, and Preview if you use it):
 | `BETTER_AUTH_SECRET` | 32 or more random characters. Generate with `openssl rand -base64 32` | Yes |
 | `APP_BASE_URL` | The exact public origin people will use, for example `https://cataintelligence.vercel.app`. No trailing slash | Recommended. If unset on Vercel, the project's production domain is used |
 | `AI_PROVIDER_MODE` | `demo` | No (default) |
-| `ANTHROPIC_API_KEY`, `AI_MODEL_ID` | Only for live AI | No |
+| `OPENAI_API_KEY`, `AI_MODEL_ID` | Only for live AI. `AI_MODEL_ID` is a current OpenAI model ID such as `gpt-5.4-mini` | No |
+| `AI_PROVIDER` | `openai` (the default when an OpenAI key is set) or `anthropic` with `ANTHROPIC_API_KEY` | No |
+| `CRON_SECRET` | 16 or more random characters. Enables the daily scheduled request that resumes unattended jobs | No |
 
 Do **not** add `DATABASE_ADMIN_URL` to Vercel. The running site never needs the owner role.
 
@@ -127,6 +129,18 @@ Then check, in order:
 
 Only the first row is checked by Vercel. The rest you check by using the site.
 
+## Turning on live AI (OpenAI)
+
+1. Add `OPENAI_API_KEY` and `AI_MODEL_ID` in Vercel and redeploy. Keys go in Vercel's settings or your private `.env`, never in `.env.example`, which is committed.
+2. Sign in as the administrator, open **Settings**, choose **Live**, tick the opt-in, enter the model's current prices per million tokens and check the per-job and daily caps. Without prices, cost is shown as unknown and spending caps cannot stop a job.
+3. The header badge changes from "Demo AI" to "Live AI". Suggestions made from then on are stored with provider `openai`; earlier demo suggestions keep their demo label.
+
+Live mode has no fallback: if the key is missing or the provider fails, the site says "AI unavailable" or shows failed items, and manual mapping still works.
+
+## Rehearsing without touching the presentation data
+
+`pnpm rehearsal:create` (run with the hosted database variables, like the seed) adds a second workspace, "Rehearsal (synthetic data)", with the same people and the same synthetic scenario. Choose it in the workspace selector at the top of the page. Nothing done there appears in the demo workspace.
+
 ## Limits of this arrangement
 
 - **Analysis jobs run inside a web function**, after the response, with a 60-second limit per invocation. Demo mode needs no network and finishes at once. A live AI job of more than a few dozen listings will be cut off; it resumes each time the open page polls its status, so it finishes only while someone keeps the catalog page open. For real live-AI use, run `pnpm worker` on a host with a long-running process (Railway, Render, Fly.io, a small VM) with the same `DATABASE_URL`, and set `JOB_RUNNER=worker` on Vercel.
@@ -135,4 +149,4 @@ Only the first row is checked by Vercel. The rest you check by using the site.
 - **Sign-in rate limiting is per function instance**, so it is weaker than on a single server.
 - **Each function instance holds up to 5 database connections.** Use the pooled URL so the database is not exhausted.
 - **Anyone with a seeded account can change the shared demo data.** For a read-only share, give out only the viewer account.
-- **Live AI has still never been run**, here or anywhere.
+- **Live AI on the hosted site is verified only once you have set the key there and run a job**; see BUILD_STATUS.md for what has actually been run.

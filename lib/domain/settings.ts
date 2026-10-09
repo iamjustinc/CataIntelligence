@@ -2,6 +2,7 @@ import { eq } from "drizzle-orm";
 import { withContext } from "@/db/client";
 import { workspaces } from "@/db/schema";
 import { FIELDS_SENT_TO_PROVIDER } from "@/lib/ai/claude-adapter";
+import { liveProvider } from "@/lib/ai/live";
 import { resolveProviderStatus } from "@/lib/ai/provider";
 import { conflict, forbidden } from "@/lib/api/errors";
 import { recordAudit } from "@/lib/audit";
@@ -27,7 +28,9 @@ function view(ws: Workspace, committedToday: number) {
     serverDefaultModelId: config.AI_MODEL_ID ?? null,
     effectiveModelId: modelId,
     // Presence only. The key is read from the server environment and is never stored, returned or logged.
-    providerKeyConfigured: Boolean(config.ANTHROPIC_API_KEY),
+    providerKeyConfigured: Boolean(liveProvider().apiKey),
+    /** Which live provider this server is configured for. Chosen by server environment, not stored per workspace. */
+    liveProvider: { label: liveProvider().label, keyVariable: liveProvider().keyVariable },
     inputPricePerMtok: ws.inputPricePerMtok === null ? null : Number(ws.inputPricePerMtok),
     outputPricePerMtok: ws.outputPricePerMtok === null ? null : Number(ws.outputPricePerMtok),
     jobTokenCap: ws.jobTokenCap,
@@ -37,7 +40,7 @@ function view(ws: Workspace, committedToday: number) {
     committedTodayUsd: committedToday,
     highSignalEnabled: ws.highSignalEnabled,
     fieldsSentToProvider: FIELDS_SENT_TO_PROVIDER,
-    status: resolveProviderStatus(ws.providerMode, { ANTHROPIC_API_KEY: config.ANTHROPIC_API_KEY, AI_MODEL_ID: modelId ?? undefined }, ws.liveAiOptIn),
+    status: resolveProviderStatus(ws.providerMode, { apiKey: liveProvider().apiKey, modelId: modelId ?? undefined, providerLabel: liveProvider().label }, ws.liveAiOptIn),
   };
 }
 

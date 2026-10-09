@@ -83,8 +83,10 @@ Restart `pnpm dev` after installing or removing dependencies. Changing packages 
 | `APP_BASE_URL` | Yes | Public origin; also the allowed origin for state-changing requests. |
 | `SEED_USER_PASSWORD` | For seeding | Password given to seeded demo identities. |
 | `AI_PROVIDER_MODE` | No | Default provider mode: `demo`, `live` or `off`. |
-| `ANTHROPIC_API_KEY` | For live AI | Read by the web server and worker only. Never stored in the database, returned by an API or logged. When missing, live mode shows "AI unavailable" and manual workflows keep working; fixtures are never substituted. |
-| `AI_MODEL_ID` | For live AI | Default model for workspaces that set none in Settings, for example `claude-opus-5-5`. The application assumes no model. |
+| `OPENAI_API_KEY` | For live AI (default provider) | Read by the web server and worker only. Never stored in the database, returned by an API or logged. When missing, live mode shows "AI unavailable" and manual workflows keep working; fixtures are never substituted. Never put a real key in `.env.example`: that file is committed. |
+| `AI_PROVIDER` | No | `openai` or `anthropic`. When unset, whichever provider has a key; OpenAI if both or neither. |
+| `ANTHROPIC_API_KEY` | For live AI with `AI_PROVIDER=anthropic` | Same handling as the OpenAI key. |
+| `AI_MODEL_ID` | For live AI | Default model for workspaces that set none in Settings, for example `gpt-5.4-mini`. The application assumes no model. |
 | `STORAGE_DIR` | No | Private directory for staged imports and exports. Not served over HTTP. |
 | `STORAGE_DRIVER` | No | `local` (default) or `database`, for hosts without a shared disk. Defaults to `database` on Vercel. |
 | `JOB_RUNNER` | No | `worker` (default) or `inline`, where the web process runs jobs after responding. Defaults to `inline` on Vercel. |
@@ -132,15 +134,17 @@ pnpm exec playwright install chromium
 
 ## Live AI
 
-1. Put `ANTHROPIC_API_KEY` (and optionally `AI_MODEL_ID`) in the server environment and restart the web server and worker.
+1. Put `OPENAI_API_KEY` and `AI_MODEL_ID` in the server environment (your private `.env`, or the host's settings) and restart the web server and worker. For Claude instead, set `AI_PROVIDER=anthropic` and `ANTHROPIC_API_KEY`.
 2. As an administrator open **Settings**: choose Live, enter the model ID and provider prices, tick the opt-in that lists the fields sent, and save.
 3. Open a merchant and choose **Run live analysis**. The dialog shows the estimated tokens and cost and the caps before anything is sent.
 
 A separately budgeted smoke test makes five real calls (three recommendations, two analytics interpretations) and prints actual usage. It exits with code 2 and makes no call when credentials are missing:
 
 ```bash
-pnpm smoke:live
+AI_MODEL_ID=gpt-5.4-mini pnpm smoke:live --input-price 0.75 --output-price 4.50 --budget 2
 ```
+
+The prices are the provider's current prices per million tokens for that model; the script uses them to stop before the budget is exceeded.
 
 ## Analytics
 

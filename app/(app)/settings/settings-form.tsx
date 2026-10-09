@@ -12,6 +12,7 @@ export interface SettingsView {
   aiModelId: string | null;
   serverDefaultModelId: string | null;
   providerKeyConfigured: boolean;
+  liveProvider: { label: string; keyVariable: string };
   inputPricePerMtok: number | null;
   outputPricePerMtok: number | null;
   jobTokenCap: number;
@@ -113,7 +114,9 @@ export function SettingsForm({ settings }: { settings: SettingsView }) {
         <p className="flex flex-wrap items-center gap-2 text-ink-soft">
           Server API key:
           {settings.providerKeyConfigured ? <Badge tone="ok">Configured</Badge> : <Badge tone="danger">Not configured</Badge>}
-          <span>The key is read from the server environment (ANTHROPIC_API_KEY). It is never stored in the database, shown here or written to logs.</span>
+          <span>
+            Provider: <strong className="text-ink">{settings.liveProvider.label}</strong>. The key is read from the server environment ({settings.liveProvider.keyVariable}). It is never stored in the database, shown here or written to logs.
+          </span>
         </p>
         <div className="grid gap-4 sm:grid-cols-3">
           {field("aiModelId", "Model ID", settings.aiModelId, settings.serverDefaultModelId ? `Leave empty to use the server default (${settings.serverDefaultModelId}).` : "The provider's model ID, for example claude-opus-5-5. No model is assumed when this is empty.", { maxLength: 100, autoComplete: "off", spellCheck: false })}

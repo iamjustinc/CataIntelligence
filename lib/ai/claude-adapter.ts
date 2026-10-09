@@ -34,7 +34,7 @@ Output rules:
 - Copy listingRevisionId and taxonomyVersionId from the request unchanged.`;
 
 /** JSON schema for one request: concept IDs are restricted to the enumerated candidates. */
-function responseSchema(request: RecommendationRequest) {
+export function responseSchema(request: RecommendationRequest) {
   const ids = request.candidates.map((c) => c.conceptId) as [string, ...string[]];
   const candidate = z.enum(ids);
   const parents = request.branches.map((b) => b.conceptId) as [string, ...string[]];

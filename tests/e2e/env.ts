@@ -23,6 +23,7 @@ export function e2eEnv(): Record<string, string> {
     STORAGE_DIR: ".data/storage-e2e",
     AI_PROVIDER_MODE: "demo",
     ANTHROPIC_API_KEY: "",
+    OPENAI_API_KEY: "",
     AI_MODEL_ID: "",
     UPLOAD_RATE_LIMIT_PER_MINUTE: "30",
     // E2E_SERVERLESS=1 runs the suite the way a serverless host does: no worker process, objects in the database.

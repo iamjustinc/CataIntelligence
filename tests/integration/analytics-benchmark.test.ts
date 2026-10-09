@@ -5,6 +5,7 @@ import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import { closeDb } from "@/db/client";
 import { seedScenario } from "@/db/seed-scenario";
 import { ClaudePlanner } from "@/lib/analytics/claude-planner";
+import { OpenAIPlanner } from "@/lib/analytics/openai-planner";
 import { DemoPlanner, type Planner } from "@/lib/analytics/planner";
 import type { Actor } from "@/lib/auth/actor";
 import type { AnalysisSpec } from "@/lib/contracts/analysis-spec";
@@ -175,15 +176,17 @@ describe("analytics benchmark with the demo planner (deterministic)", () => {
  * records what the model did and asserts only that nothing ran which should not have. Deterministic
  * runs skip it, and a skipped run is never evidence about the live planner.
  */
-const live = process.env.LIVE_ANALYTICS_BENCHMARK === "1" && !!process.env.ANTHROPIC_API_KEY && !!process.env.AI_MODEL_ID;
+const liveKey = process.env.AI_PROVIDER === "anthropic" || (!process.env.OPENAI_API_KEY && process.env.ANTHROPIC_API_KEY) ? process.env.ANTHROPIC_API_KEY : process.env.OPENAI_API_KEY;
+const useOpenAI = liveKey === process.env.OPENAI_API_KEY;
+const live = process.env.LIVE_ANALYTICS_BENCHMARK === "1" && !!liveKey && !!process.env.AI_MODEL_ID;
 describe.skipIf(!live)("analytics benchmark with the live planner (real provider calls)", () => {
   it("measures the live planner and writes its report", async () => {
-    const liveResults = await runQuestions(new ClaudePlanner(process.env.AI_MODEL_ID!, { apiKey: process.env.ANTHROPIC_API_KEY }));
+    const liveResults = await runQuestions(useOpenAI ? new OpenAIPlanner(process.env.AI_MODEL_ID!, { apiKey: liveKey }) : new ClaudePlanner(process.env.AI_MODEL_ID!, { apiKey: liveKey }));
     const score = scoreBenchmark(liveResults);
     const usage = (await admin.query("select count(*)::int as calls, coalesce(sum(input_tokens), 0)::int as input, coalesce(sum(output_tokens), 0)::int as output, count(*) filter (where status <> 'ok')::int as not_ok from ai_usage where workspace_id = any($1) and purpose = 'analytics_plan'", [[ws.id, empty.id]])).rows[0];
     const report = {
       benchmark: "analytics-40",
-      planner: `live: ${process.env.AI_MODEL_ID}`,
+      planner: `live: ${useOpenAI ? "OpenAI" : "Claude"} ${process.env.AI_MODEL_ID}`,
       note: "Questions that the fixed guards refuse never reach the model. A supported question counts as correct when the executed rows equal the reference rows; an exact match of the reference spec is reported separately because equivalent specs can differ in sort, limit or chart type.",
       fixedInputs: { now: BENCH_NOW.toISOString(), timezone: BENCH_TIMEZONE },
       usage,

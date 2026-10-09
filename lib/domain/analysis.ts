@@ -2,7 +2,9 @@ import { and, desc, eq, gte, inArray, sql } from "drizzle-orm";
 import { withContext, type Tx } from "@/db/client";
 import { aiUsage, analysisJobItems, analysisJobs, catalogRevisions, conceptRevisions, concepts, listingRevisions, merchants, recommendations, reviewStates, workspaces } from "@/db/schema";
 import { buildUserPayload, CLAUDE_PROMPT_VERSION, SYSTEM_PROMPT } from "@/lib/ai/claude-adapter";
+import { OPENAI_PROMPT_VERSION } from "@/lib/ai/openai-adapter";
 import { FIXTURE_PROMPT_VERSION } from "@/lib/ai/fixture-adapter";
+import { liveProvider } from "@/lib/ai/live";
 import { resolveProviderStatus, type RecommendationProvider } from "@/lib/ai/provider";
 import { SIGNAL_POLICY_VERSION, signalBand } from "@/lib/ai/validate-recommendation";
 import { ApiError, conflict, forbidden, notFound } from "@/lib/api/errors";
@@ -210,7 +212,7 @@ export async function dailyCommittedUsd(tx: Tx): Promise<number> {
 async function plan(tx: Tx, actor: Actor, catalogRevisionId: string): Promise<Plan> {
   const [ws] = await tx.select().from(workspaces).where(eq(workspaces.id, actor.workspaceId));
   const modelId = ws.aiModelId ?? env().AI_MODEL_ID ?? null;
-  const status = resolveProviderStatus(ws.providerMode, { ANTHROPIC_API_KEY: env().ANTHROPIC_API_KEY, AI_MODEL_ID: modelId ?? undefined }, ws.liveAiOptIn);
+  const status = resolveProviderStatus(ws.providerMode, { apiKey: liveProvider().apiKey, modelId: modelId ?? undefined, providerLabel: liveProvider().label }, ws.liveAiOptIn);
   if (status.state !== "demo" && status.state !== "live") throw new ApiError("provider_unavailable", `${status.label}. ${status.detail}`);
   if (!ws.activeTaxonomyVersionId) throw conflict("Publish a taxonomy version before running analysis.");
   const [revision] = await tx
@@ -222,7 +224,8 @@ async function plan(tx: Tx, actor: Actor, catalogRevisionId: string): Promise<Pl
   if (revision.current !== revision.id) throw conflict("This catalog revision has been superseded. Analyze the current revision.");
 
   const mode = status.state;
-  const provider = mode === "demo" ? "fixture" : "claude";
+  const live = liveProvider();
+  const provider = mode === "demo" ? "fixture" : live.id;
   const listings = await tx
     .select({
       id: listingRevisions.id,
@@ -278,7 +281,7 @@ async function plan(tx: Tx, actor: Actor, catalogRevisionId: string): Promise<Pl
     if (estimate.costUsd !== null && estimate.costUsd > caps.jobSpendCapUsd) blockers.push(`Estimated cost USD ${estimate.costUsd.toFixed(2)} exceeds the per-job spending cap of USD ${caps.jobSpendCapUsd.toFixed(2)}.`);
     if (estimate.costUsd !== null && caps.dailyCommittedUsd + estimate.costUsd > caps.dailySpendCapUsd) blockers.push(`Today's committed spend (USD ${caps.dailyCommittedUsd.toFixed(2)}) plus this estimate exceeds the daily workspace cap of USD ${caps.dailySpendCapUsd.toFixed(2)}.`);
   }
-  return { ws, mode, provider, modelId: mode === "live" ? modelId : null, promptVersion: mode === "demo" ? FIXTURE_PROMPT_VERSION : CLAUDE_PROMPT_VERSION, revisionId: revision.id, taxonomyVersionId: ws.activeTaxonomyVersionId, items, estimate, caps, blockers };
+  return { ws, mode, provider, modelId: mode === "live" ? modelId : null, promptVersion: mode === "demo" ? FIXTURE_PROMPT_VERSION : live.name === "openai" ? OPENAI_PROMPT_VERSION : CLAUDE_PROMPT_VERSION, revisionId: revision.id, taxonomyVersionId: ws.activeTaxonomyVersionId, items, estimate, caps, blockers };
 }
 
 const skipCounts = (items: Plan["items"]) => ({ skippedReviewed: items.filter((i) => i.skip === "already_reviewed").length, skippedUpToDate: items.filter((i) => i.skip === "up_to_date").length });
