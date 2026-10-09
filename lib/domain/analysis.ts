@@ -436,7 +436,7 @@ export async function retryAnalysis(actor: Actor, jobId: string, requestId: stri
     const [job] = await tx.select().from(analysisJobs).where(eq(analysisJobs.id, jobId)).for("update");
     if (!job) throw notFound("Analysis job");
     if (!["partially_completed", "failed"].includes(job.status)) throw conflict(`Only a failed or partially completed job can be retried; this one is ${job.status.replaceAll("_", " ")}.`, { status: job.status });
-    const [ws] = await tx.select({ active: workspaces.activeTaxonomyVersionId }).from(workspaces).where(eq(workspaces.id, actor.workspaceId));
+    const [ws] = await tx.select({ active: workspaces.activeTaxonomyVersionId, aiModelId: workspaces.aiModelId }).from(workspaces).where(eq(workspaces.id, actor.workspaceId));
     const [revision] = await tx.select({ current: merchants.activeCatalogRevisionId }).from(catalogRevisions).innerJoin(merchants, eq(merchants.id, catalogRevisions.merchantId)).where(eq(catalogRevisions.id, job.catalogRevisionId));
     if (ws.active !== job.taxonomyVersionId || revision?.current !== job.catalogRevisionId) throw conflict("The taxonomy version or catalog revision changed since this job ran. Start a new analysis instead.");
     const retried = await tx
@@ -446,7 +446,15 @@ export async function retryAnalysis(actor: Actor, jobId: string, requestId: stri
       .returning({ id: analysisJobItems.id });
     const progress = await computeProgress(tx, jobId);
     if (progress.pending === 0) throw conflict("This job has no failed or unprocessed items to retry.");
-    await tx.update(analysisJobs).set({ status: "queued", cancelRequested: false, errorCode: null, errorMessage: null, leaseOwner: null, leaseExpiresAt: null, finishedAt: null, progress }).where(eq(analysisJobs.id, jobId));
+    // A job stopped by a rejected configuration or missing credentials is retried with the model the
+    // workspace is configured for now. Retrying with the setting that was just rejected would only
+    // fail again. Other failures keep the job's original model, so one job is answered by one model.
+    const currentModel = ws.aiModelId ?? env().AI_MODEL_ID ?? null;
+    const reconfigure = job.providerMode === "live" && ["configuration", "auth", "provider_unavailable"].includes(job.errorCode ?? "") && !!currentModel && currentModel !== job.modelId;
+    await tx
+      .update(analysisJobs)
+      .set({ status: "queued", cancelRequested: false, errorCode: null, errorMessage: null, leaseOwner: null, leaseExpiresAt: null, finishedAt: null, progress, ...(reconfigure ? { modelId: currentModel } : {}) })
+      .where(eq(analysisJobs.id, jobId));
     await recordAudit(tx, actor, requestId, { action: "analysis.retry", entityType: "analysis_job", entityId: jobId, before: { status: job.status }, after: { status: "queued", retriedItems: retried.length, pending: progress.pending } });
     return { id: jobId, status: "queued" as const, retriedItems: retried.length, progress };
   });

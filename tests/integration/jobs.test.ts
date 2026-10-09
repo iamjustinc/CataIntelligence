@@ -217,6 +217,26 @@ describe("retries, invalid output and failures", () => {
     await drainJobs(scripted((req) => good(req)).options());
     expect(await job(id)).toMatchObject({ status: "completed", errorCode: null, progress: { succeeded: 5, pending: 0 } });
   });
+  it("retries a job the provider rejected for its configuration with the model the workspace has now", async () => {
+    // Found on the hosted site: after an invalid model ID was corrected in Settings, Retry reused the rejected one.
+    const { revisionId } = await freshCatalog(2, 40);
+    const id = await startId(revisionId);
+    const seen: (string | null)[] = [];
+    const rejecting = scripted(() => ({ ok: false, failure: { kind: "fatal", code: "configuration" }, usage: null }));
+    const [done] = await drainJobs(rejecting.options({ resolveProvider: (j) => (seen.push(j.modelId), { ok: true, provider: rejecting.provider }) }));
+    expect(done.outcome).toBe("failed");
+    expect(await job(id)).toMatchObject({ status: "failed", errorCode: "configuration", modelId: "test-model" });
+    await admin.query("update workspaces set ai_model_id = 'corrected-model' where id = $1", [ws.id]);
+    try {
+      expect((await retry(id)).status).toBe(200);
+      const fixed = scripted((req) => good(req));
+      await drainJobs(fixed.options({ resolveProvider: (j) => (seen.push(j.modelId), { ok: true, provider: fixed.provider }) }));
+      expect(seen).toEqual(["test-model", "corrected-model"]);
+      expect(await job(id)).toMatchObject({ status: "completed", modelId: "corrected-model", progress: { succeeded: 2, pending: 0 } });
+    } finally {
+      await admin.query("update workspaces set ai_model_id = 'test-model' where id = $1", [ws.id]);
+    }
+  });
   it("fails the job, without demo fallback, when the provider is unavailable at processing time", async () => {
     const { revisionId } = await freshCatalog(3, 19);
     const id = await startId(revisionId);
