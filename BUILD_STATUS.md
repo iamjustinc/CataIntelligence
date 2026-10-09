@@ -129,7 +129,8 @@ Verified **on the hosted site** (https://catatelligence-rho.vercel.app, commit `
 | Phone-width layout of the demo screens | Verified on Vercel | No sideways scrolling on dashboard, review queue, analytics, releases |
 | Console errors on the demo screens | Verified on Vercel | None from the application; the only errors logged were the deliberate 409 and 404 probes |
 | Budget | Verified | About USD 0.05 of live spend on the hosted site and about USD 0.02 locally, against a USD 2 limit; workspace caps USD 0.25 per job, USD 1.50 per day |
-| **Viewer permissions on the hosted site** | **Not verified on Vercel** | Needs a sign-in as the viewer. Verified locally on all 52 routes |
+| **Viewer permissions on the hosted site** | **Not verified on Vercel** | No viewer session has existed on the hosted database (checked 2026-10-09 03:15 UTC), so there was nothing to test with. The viewer account holds the Viewer role in both the demo and rehearsal workspaces, and the role matrix passes locally on all 52 routes for the deployed code |
+| Feature freeze | In effect from commit after `843578f` | Presentation features are frozen; only blockers listed in `docs/DEMO.md` and here should change before the presentation |
 | A full rehearsal by the presenter | **Not done** | The steps were run by the author through the browser and the site's API, not by the person presenting |
 | Local checks on the final code | Verified | Typecheck and lint clean; 324 tests pass, 1 skipped (live benchmark); production build. The full browser suite last ran at 24 of 24 two commits earlier; the two later commits changed server logic covered by integration tests |
 
