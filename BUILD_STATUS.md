@@ -1,6 +1,6 @@
 # Build status
 
-Last updated: 2026-10-08 (session 6)
+Last updated: 2026-10-09 (session 7)
 
 Status values: **Not started** · **In progress** · **Implemented but unverified** · **Verified**.
 "Verified" means an automated test or a recorded manual check exercised the behavior on the server, not that a screen renders.
@@ -15,7 +15,7 @@ Status values: **Not started** · **In progress** · **Implemented but unverifie
 | 3 Shared dashboard and analytics | **Implemented; verified deterministically. Live question planner NOT verified** | Met for the deterministic path: the 40 benchmark questions reconcile with reference queries and unsupported or malicious questions cause no execution. The live planner has not been run against the benchmark. See "Phase 3 exit gate" |
 | 4 Integrated release and demonstration | **Implemented; demo-mode half of the exit gate verified deterministically. Live half NOT verified** | Partly met. The workflow runs from a freshly built database in demo mode in the browser suite. "Live mode is verified with configured credentials" is blocked: no credentials. See "Phase 4" below |
 
-**Live provider calls so far: one smoke test with OpenAI on 2026-10-08 (five calls, run locally).** No live job has been run through the application, nothing live has run on the hosted site, and the Claude adapters have still only met a stand-in client. See "Presentation readiness" below.
+**Live provider calls so far:** an OpenAI smoke test locally on 2026-10-08, and live recommendation jobs and analytics questions through the hosted application on 2026-10-09, all on `gpt-5.4-mini`. The Claude adapters have still only met a stand-in client. See "Presentation readiness" below.
 
 Two kinds of verification are kept apart throughout this document:
 
@@ -110,24 +110,30 @@ PRD section 18: "Deliver polished responsive UI, keyboard/accessibility checks, 
 
 This build is a demonstration candidate. Nothing in the evidence supports calling it production-ready, and this document does not.
 
-## Presentation readiness (2026-10-08)
+## Presentation readiness (2026-10-09)
+
+Verified **on the hosted site** (https://catatelligence-rho.vercel.app, commit `cadd8ce`), signed in as the administrator in the Rehearsal workspace. Details and observed numbers are in `docs/DEMO.md`.
 
 | Item | Status | Evidence |
 | --- | --- | --- |
-| Hosted site serves the intended commit | Verified on Vercel | `/api/health` reports the commit; it matched `origin/main` after each push this session |
-| Hosted health, database, HTTPS, refusal of unauthenticated requests | Verified on Vercel | `/api/health` ok; `/overview` redirects to sign-in; API returns 401; the scheduled route returns 401 without its secret |
-| OpenAI recommendation adapter and analytics planner | **Verified with real calls, locally** | `pnpm smoke:live` on `gpt-5.4-mini`: 3 of 3 recommendations and 2 of 2 interpretations passed server validation; 5 calls, 9,097 input and 958 output tokens, about USD 0.01 of an enforced USD 2.00 budget. 16 unit tests with a stand-in client |
-| OpenAI through the application (a live job, a live question in the UI) | **Not verified** | Needs the key and model set where the app runs, live mode switched on in Settings, and a run |
-| OpenAI on the hosted site | **Not verified** | Whether `OPENAI_API_KEY` and `AI_MODEL_ID` are set in Vercel has not been checked |
-| Rehearsal workspace | Created on the hosted database | "Rehearsal (synthetic data)", same four members, same synthetic scenario; the demo workspace was not touched |
-| Signed-in journey on the hosted site: import, analysis, review, release, export, analytics | **Not verified** | No signed-in browser session was available to the author of this document, who does not enter passwords on live sites. The same journey passes locally on a production build, including with no worker process and database storage |
-| Hosted inline job: completion, failure, recovery | **Not verified on Vercel** | Verified locally only (`pnpm test:e2e:serverless`, `02-jobs.spec.ts`) |
-| Administrator and viewer permissions, sign-out, session persistence on the hosted site | **Not verified on Vercel** | Verified locally by the role-matrix browser test on all 52 routes |
-| Local checks on the final code | Verified | Typecheck and lint clean; 322 unit and integration tests pass, 1 skipped (live benchmark); production build; 24 of 24 browser tests |
+| Deployed commit | Verified on Vercel | `/api/health` matched `origin/main` after every push |
+| Import, validation, commit | Verified on Vercel | 14 rows = 8 + 5 + 1; 9 committed after resolving the conflicting SKU |
+| Demo analysis job without a worker | Verified on Vercel | 9 of 9 processed in seconds |
+| Review decisions, conflict detection | Verified on Vercel | Keyboard approve, change, defer; stale version refused with 409 |
+| Release and exports | Verified on Vercel | Partial release 2 mapped, 7 unresolved; four export formats reconcile; files survive separate requests and a redeploy |
+| Dashboard and analytics | Verified on Vercel | Totals matched the numbers predicted from the release; demo planner interpretation, clarification, refusal and follow-up |
+| Live OpenAI recommendations through the application | Verified on Vercel | A 6-listing job on `gpt-5.4-mini` completed in 11 seconds with no status polling; provider and cost recorded; abstention, prompt injection and thin evidence handled as designed |
+| Live OpenAI analytics through the application | Verified on Vercel | Free-form question to a validated analysis and result; clarification; follow-up; guard refusal before any model call |
+| Job failure and recovery | Verified on Vercel | Invalid model ID: clear failure, no demo substitute, listings untouched; Retry after correction completed (a defect found here and fixed, see D69); an abandoned running job resumed and completed |
+| Sign-out and session persistence | Verified on Vercel | Sign-out leads to sign-in and 401s; the session survived two redeploys |
+| Phone-width layout of the demo screens | Verified on Vercel | No sideways scrolling on dashboard, review queue, analytics, releases |
+| Console errors on the demo screens | Verified on Vercel | None from the application; the only errors logged were the deliberate 409 and 404 probes |
+| Budget | Verified | About USD 0.05 of live spend on the hosted site and about USD 0.02 locally, against a USD 2 limit; workspace caps USD 0.25 per job, USD 1.50 per day |
+| **Viewer permissions on the hosted site** | **Not verified on Vercel** | Needs a sign-in as the viewer. Verified locally on all 52 routes |
+| A full rehearsal by the presenter | **Not done** | The steps were run by the author through the browser and the site's API, not by the person presenting |
+| Local checks on the final code | Verified | Typecheck and lint clean; 324 tests pass, 1 skipped (live benchmark); production build. The full browser suite last ran at 24 of 24 two commits earlier; the two later commits changed server logic covered by integration tests |
 
-One finding to act on: a real OpenAI key had been pasted into `.env.example`, which is tracked in a public repository. It was never committed or pushed, and the file was restored to placeholders. Because the key briefly sat in a tracked file, rotating it is the cautious choice.
-
-The presentation script, checklist and fallback are in `docs/DEMO.md`.
+High signal remains disabled in every workspace. A real OpenAI key was found in `.env.example` on 2026-10-08 and removed before it was committed; rotating that key is still recommended.
 
 ## Hosting on Vercel (2026-10-05)
 
