@@ -170,3 +170,30 @@ describe("frozen test set (evals/PROTOCOL.md)", () => {
     expect(wilson(0, 0)).toBeNull();
   });
 });
+
+describe("thin evidence (signal-v2)", () => {
+  it("treats a model's default pick for a bare one-word listing as low signal needing investigation, without touching its label", async () => {
+    const { evaluationTaxonomy } = await import("@/evals/corpus");
+    const { requestFor } = await import("@/evals/run");
+    const { signalBand, thinEvidence, SIGNAL_POLICY_VERSION } = await import("@/lib/ai/validate-recommendation");
+    const taxonomy = evaluationTaxonomy();
+    const pick = (id: string, key: string) => {
+      const record = development.records.find((r) => r.id === id)!;
+      const request = requestFor(record, 0, taxonomy);
+      const conceptId = request.candidates.find((c) => taxonomy.keyOfId.get(c.conceptId) === key)!.conceptId;
+      const response = { listingRevisionId: request.listingRevisionId, taxonomyVersionId: request.taxonomyVersionId, selectedConceptId: conceptId, alternatives: [], evidence: [], explanation: "", ambiguityFlags: [], missingInformation: [], proposedConcept: null };
+      return { record, request, response };
+    };
+    // What the live model answered on 2026-10-08: "Water", no description, picked still water with no flags.
+    const water = pick("dev-water-sparse", "BEV-WATER-STILL");
+    expect(water.record.label.conceptKey).toBeNull(); // the expected outcome stays abstention
+    expect(thinEvidence(water.request, water.response)).toBe(true);
+    expect(signalBand(water.request, water.response, false)).toMatchObject({ band: "low" });
+    expect(signalBand(water.request, water.response, true).band).toBe("low");
+    // A listing with a description is judged on its text as before.
+    const cheese = pick("dev-cottage-cheese", "GRO-DAI-CHEESE");
+    expect(thinEvidence(cheese.request, cheese.response)).toBe(false);
+    expect(thinEvidence(water.request, { ...water.response, selectedConceptId: null })).toBe(false);
+    expect(SIGNAL_POLICY_VERSION).toBe("signal-v2");
+  });
+});

@@ -9,9 +9,9 @@
     "model": "none (deterministic)",
     "prompt version": "baseline-unique-exact-v1",
     "retrieval policy": "lexical-v1",
-    "signal policy": "signal-v1",
+    "signal policy": "signal-v2",
     "provider usage": "none",
-    "generated": "2026-10-05T05:22:10.855Z"
+    "generated": "2026-10-09T02:37:08.911Z"
   },
   "metrics": {
     "items": 151,

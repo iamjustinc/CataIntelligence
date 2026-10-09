@@ -225,3 +225,10 @@ Ordinary test runs blank every provider key regardless of `.env`, so a developer
 `pnpm rehearsal:create` adds a second synthetic workspace with the same members and scenario, so practising the demo does not move the presentation dashboard. It uses the same services as the seed and deletes nothing.
 
 Inline jobs run after the response that queued them and on each status poll. `GET /api/cron/jobs`, callable only with the host's `CRON_SECRET`, resumes a job whose page was closed. On Vercel's free plan a scheduled request runs once a day, so this is a backstop, not the mechanism.
+
+## D68 Thin evidence is the server's call (signal-v2)
+In the first live run, the model mapped a listing whose whole text was "Water" (category "Drinks", no description) to Still Water, with no ambiguity flag, reasoning that nothing said it was sparkling. The provisional label for that record expects abstention, with still and sparkling water as acceptable alternatives. The answer is defensible but it is a default, not evidence, and the prompt already asks the model to abstain in that case. Two repeated calls gave the same answer.
+
+The label was not changed. Instead the signal policy gained a rule the model cannot influence: when a listing is a one- or two-word title with no description, and the selected concept is not the single concept whose name or synonym is exactly that title, the suggestion is Low signal and the listing goes to Needs investigation, the same route as an ambiguous source label. The suggestion and its explanation are still shown to the reviewer. Listings such as "Bananas" that exactly name one concept are unaffected, and no seeded demo outcome changed. The policy version is recorded on each recommendation, so earlier ones remain identifiable as signal-v1.
+
+This does not make the model abstain, and it is one development example, not a measurement. Whether the model over-selects on sparse listings in general needs the frozen evaluation.

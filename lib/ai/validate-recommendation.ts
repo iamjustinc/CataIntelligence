@@ -1,7 +1,22 @@
 import { recommendationResponseSchema, type RecommendationRequest, type RecommendationResponse } from "@/lib/contracts/recommendation";
 import { fold } from "@/lib/domain/catalog-validation";
 
-export const SIGNAL_POLICY_VERSION = "signal-v1";
+export const SIGNAL_POLICY_VERSION = "signal-v2";
+
+/**
+ * Thin evidence (signal-v2): the listing is a one- or two-word title with no description, and the
+ * selection is not the single concept whose name or synonym is exactly that title. A model tends
+ * to fill such a gap with a default ("Water" becomes still water because nothing says sparkling).
+ * That is a guess, so the server treats it like an ambiguous source label (PRD TAX07): Low band,
+ * routed to investigation. The check is the server's, so it holds for any provider.
+ */
+export function thinEvidence(request: RecommendationRequest, r: RecommendationResponse): boolean {
+  if (!r.selectedConceptId) return false;
+  const words = request.product.title.toLowerCase().match(/[a-z0-9]+/g) ?? [];
+  if (words.length > 2 || (request.product.description ?? "").trim() !== "") return false;
+  const exact = request.candidates.filter((c) => c.exactAlias);
+  return !(exact.length === 1 && exact[0].conceptId === r.selectedConceptId);
+}
 
 export type ValidationOutcome = { ok: true; response: RecommendationResponse } | { ok: false; code: string; message: string };
 
@@ -61,6 +76,7 @@ export function signalBand(request: RecommendationRequest, r: RecommendationResp
   const exact = request.candidates.filter((c) => c.exactAlias);
   const conflicting = exact.filter((c) => c.conceptId !== r.selectedConceptId);
   if (conflicting.length) reasons.push(`title also names ${conflicting.map((c) => c.name).join(", ")}`);
+  if (thinEvidence(request, r)) reasons.push("a one- or two-word title with no description does not identify one concept");
   if (reasons.length) return { band: "low", basis: `Low: ${reasons.join("; ")}.` };
   const uniqueExact = exact.length === 1 && exact[0].conceptId === r.selectedConceptId;
   if (!uniqueExact) return { band: "medium", basis: "Medium: supported selection without a unique exact name or synonym match." };

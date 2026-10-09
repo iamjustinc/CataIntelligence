@@ -6,7 +6,7 @@ import { OPENAI_PROMPT_VERSION } from "@/lib/ai/openai-adapter";
 import { FIXTURE_PROMPT_VERSION } from "@/lib/ai/fixture-adapter";
 import { liveProvider } from "@/lib/ai/live";
 import { resolveProviderStatus, type RecommendationProvider } from "@/lib/ai/provider";
-import { SIGNAL_POLICY_VERSION, signalBand } from "@/lib/ai/validate-recommendation";
+import { thinEvidence, SIGNAL_POLICY_VERSION, signalBand } from "@/lib/ai/validate-recommendation";
 import { ApiError, conflict, forbidden, notFound } from "@/lib/api/errors";
 import { recordAudit } from "@/lib/audit";
 import type { Actor } from "@/lib/auth/actor";
@@ -132,7 +132,8 @@ export async function storeRecommendation(
     await tx.update(reviewStates).set({ latestRecommendationId: rec.id, analysisFailed: false }).where(eq(reviewStates.id, state.id));
     return { recommendationId: rec.id, appliedToState: false, stale: false };
   }
-  const ambiguous = response.ambiguityFlags.length > 0;
+  // The model's own flags, or the server's finding that the listing text is too thin to identify one concept.
+  const ambiguous = response.ambiguityFlags.length > 0 || thinEvidence(request, response);
   await tx
     .update(reviewStates)
     .set({
