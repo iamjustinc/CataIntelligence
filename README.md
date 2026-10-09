@@ -6,7 +6,7 @@ Reconcile merchant catalogs with a canonical taxonomy, publish reproducible mapp
 - What is built and how it was verified: [BUILD_STATUS.md](BUILD_STATUS.md)
 - Architecture decisions: [DECISIONS.md](DECISIONS.md)
 
-> **Status:** a demonstration candidate. All four build phases are implemented and verified deterministically: the complete workflow runs in a browser from a freshly built database in demo mode. **No live AI call has ever been made**, because no provider credentials were available, so live mode, suggestion accuracy and the live analytics planner are unverified. It has not been deployed and is not production-ready. See BUILD_STATUS.md for the evidence and the readiness assessment, and RELEASE_NOTES.md for what this build contains.
+> **Status:** a demonstration candidate, hosted at https://catatelligence-rho.vercel.app. The complete workflow passes in a browser on a production build, and the live OpenAI adapters have passed a small real smoke test locally. Not yet verified: the signed-in journey on the hosted site, and live AI running through the application. It is not production-ready. See BUILD_STATUS.md for the evidence and `docs/DEMO.md` for the presentation script.
 
 All merchants, brands, people and products in this repository are fictional.
 
